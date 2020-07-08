@@ -1,0 +1,165 @@
+% !TEX root =../main-optimal.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multi-Party Computation Protocol}\label{s:2PC}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For our protocol we use the following components: 
+\BI
+\item
+The ``dual''-GSW-based scheme for simulatable threshold multi-key FHE from \secref{dualGSW}, $\MFHE =(\Setup,\Keygen,\Encrypt,\Evall,\\\PartDec,\FinDec)$, with its one-round initialization protocol $\sf \Pi_{GenSetup}=(\setupOne,\setupTwo)$ for computing the matrix~$A$.
+
+\item
+  Two instances of a two-round adaptively secure commitment scheme, supporting tags/identities of length $\kappa$. We denote the first instance by $\nmcom=(\nm_1,\nm_2)$ and the second by $\Com=(\onm_1,\onm_2)$.%
+\footnote{Strictly speaking we do not need the second instance to be adaptively secure, but it is convenient to use the same scheme for both instances.
+}
+
+\item A one-way function~$OWF$.
+
+\item A three-round public coin witness-indistinguishable proof of knowledge $\Pi_\WIPOK=(\WIPOKmsg_1, \WIPOKmsg_2, \WIPOKmsg_3)$ for the $\NP$-Language $\sstPOK$ where party $P$ acts as the Prover, with dealyed input (where the statement is decided in the last round);
+
+\item A four-round zero-knowledge argument of knowledge $\Pi_\FLS=(\FLSmsg_1, \FLSmsg_2, \FLSmsg_3,\FLSmsg_4)$ for  the $\NP$-Language $\sstFLS$ where party $P$ acts as the Prover, with delayed input.
+%\item Let $f$ be a one-way function with domain $\bit^\kappa$ chosen by a family of functions $\func_\kappa$.  
+\EI
+
+%------------------------------------------------------------------------
+\paragraph{The protocol.}
+Let $F: \bit^{\kappa \times N} \rightarrow \bit^\kappa$ be a deterministic function to be computed. Each party $P_i$ holds input $x_i \in \{0,1\}^\kappa$ and identity $\id_i$. (We note that known transformations yield a protocol for randomized functionalities, without increasing the rounds, see \cite[Section 7.3]{Goldreich04}.)
+The protocol consists of four broadcast rounds, where messages $(m_t^1,\ldots, m^N_t)$ are exchanged simultaneously in the $t$-th round for $t\in[4]$. The message flow is detailed in \figref{MPC}, and Figure \ref{messages} depicts the exchanged messages between two parties $P_i$ and $P_j$.
+
+
+%------------------------------------------------------------------------
+\begin{boxfig}{Protocol $\Pi_\PC$ with respect to party $P_i$.\label{fig:MPC}}{protocol}
+
+\centerline{Protocol $\Pi_\PC$}
+{\bf Private Inputs:} For $i \in [N]$, party $P_i$ has input $x_i$.
+
+{\bf Round 1:} For $i\in[N]$ each party $P_i$ proceeds as follows: 
+\BE
+\item
+  Choose randomness $r_i=(r^{gen}_i,r^{enc}_i)$ for the $\MFHE$ protocol.
+
+\item Choose an unrelated $\kappa$-bit randomness value ~$R_i$, and set $\hat{R}_i=OWF(R_i)$.
+
+\item For every $j$, engage in a two-round commitment protocol with $P_j$ for the values $(x_i,r_i,R_i)$, using an instance of $\nmcom$ with tag $\id_i$. Note that the first message in this protocol is sent by~$P_j$ (so $P_i$ sends the first message to all the $P_j$'s for their respective commitments). Denote the message send from $P_i$ to $P_j$ by~$\nm_1^{i,j}$.
+
+\item For every $j$, prepare the first message $\WIPOKmsg^{i,j}_1$ of $\Pi_\WIPOK$ (acting as the Prover) for the $\NP$-Language $\stPOK=\onest\lor\twost$ for ${j\in[N]\setminus{\{i\}}}$ and the first message $\FLSmsg^{i,j}_1$ of $\Pi_\FLS$ (acting as the Verifier) for $\stFLS=(\fourst\land \threest)$ where the $\NP$-Languages $\onest$,$\twost$,$\threest$ are defined in Figure \ref{NPL}.
+
+
+\item Generate the message $\alpha_i$ of the $1$-round $\sf \Pi_{GenSetup}$ protocol.
+
+\item For all $j$ broadcast the message $m^{i,j}_1:=\left(\hat{R}_i, \nm_1^{i,j}, \WIPOKmsg_1^{i,j},\FLSmsg_1^{i,j},\alpha_i\right)$ to party $P_j$.% $\sen$ sends $m_1$.
+\EE
+
+{\bf Round 2:} For $i\in[N]$ each party $P_i$ proceeds as follows: 
+\BE 
+\item Generate the second commitment messages $\nm_2^{j,i}$ for $\nmCom_{\id_i}(x_i, r_i,R_i)$, the second message $\WIPOKmsg_2^{j,i}$ of the $\Pi_\WIPOK$ proof system, and the second message $\FLSmsg_2^{j,i}$ of the $\Pi_\FLS$ proof system.
+
+\item For every $j$, engage in a two-round commitment protocol with $P_j$ for the value $0$, using an instance of $\Com$ with tag $\id_i$. As before, $P_i$ sends the first message to all the $P_j$'s for their respective commitments, and we denote the message send from $P_i$ to $P_j$ by~$\onm_1^{i,j}$.
+
+%\item Parse $r_i$ as $(r^{enc}_i||r^{gen}_i||r^{dec}_i||| \{R_j\}_{j\in[N]\setminus{\{i\}}} )$ and generate the individual key pair by locally computing the output $A$ of protocol $\sf \Pi_{GenSetup}$ (on input $\{\alpha_i\}_{i\in[N]}$) and by  computing $(\pk_i, \sk_i) = \Keygen(\params, {\sf setup};r^{gen}_i)$.
+
+\item For all $j$ broadcast the messages $m^{i,j}_2:=(\nm^{j,i}_2, \onm^{i,j}_1, \WIPOKmsg^{j,i}_2, \FLSmsg^{j,i}_2,\pk_i)$.
+\EE
+
+{\bf Round 3:} For $i\in[N]$ each party $P_i$ proceeds as follows:
+\BE
+\item Generate the second messages $\onm_2^{j,i}$ corresponding to all $\Com_{\id_i}(0)$, the final message $\WIPOKmsg_3^{i,j}$ of the $\Pi_\WIPOK$ protocol, and the third message $\FLSmsg^{i,j}_3$ of $\Pi_\FLS$.
+
+\item Compute the public matrix~$A$ from all the $\alpha_i$'s sent in the first round. Use randomness $r^{gen}_i,r^{enc}_i$ to generate a key pair $(\pk_i,\sk_i)$ relative to~$A$, and an encryption of the private input~$x_i$, $c_i=\Encrypt(pk_i,x_i)$.
+
+\item For $j$ broadcast the message $m^{i,j}_3:=(\onm^{j,i}_2,c_i, \WIPOKmsg^{i,j}_3,\FLSmsg^{i,j}_3)$.
+
+\EE
+{\bf Round 4:} If any $\WIPOKmsg^{j,i}$ does not pass verification then abort. Otherwise each party~$P_i$:
+\BE
+\item Compute the evaluated ciphertext $\hc:= \Evall(\params; F; (c_1,\ldots, c_N))$, and the decryption shares $ev_i  \leftarrow \PartDec(\hc, (\pk_1,\ldots, \pk_N), i, \sk_i)$.
+
+\item Prepare the final message $\FLSmsg^{j,i}_4$ of $\Pi_\FLS$ protocol.
+\item For all $j$, broadcast the message $m^{i,j}_4:=(ev_i, \FLSmsg^{j,i}_4)$. 
+\EE
+
+{\bf Output phase:} If any $\FLSmsg^{j,i}$ does not pass verification then abort. Else run the combining algorithm on the decryption shares, and output $y \leftarrow \FinDec(ev_1,\ldots, ev_N, \hc)$.
+\label{MPC}
+\end{boxfig}
+
+
+
+\begin{boxfig}{$\NP$-Language $\onest$,$\twost$,$\threest$ for $\Pi_\FLS$ and $\Pi_\WIPOK$ proof systems.}{laguages}
+
+\centerline{$\NP$-Language $\stPOK$ and $\stFLS$ for $\Pi_\FLS$ and $\Pi_\WIPOK$ proof systems:}
+
+\medskip\noindent
+Fix the identities $\id_i$, and then for all $i,j$ define:
+\begin{equation*}
+\onest =\left\{
+\left(\begin{array}{r}
+  \hat{R}_i,\hat{R}_j,A,\nm_1^{j,i},\onm_1^{j,i}\\
+  \pk_i,c_i,\hc,\nm_2^{j,i},\onm_2^{j,i}
+\end{array}\right)\left|
+         \begin{split} \exists ~& (x_i,r^{gen}_i,r^{enc}_i,\sk_i,R_i,\omega_i):\\
+         ~& \nm^{j,i}_2
+           =\nmCom_{\id_i}(x_i,r^{gen}_i,r^{enc}_i,R_i;\nm_1^{j,i};\omega_{i}) \\
+         ~& \land~\hat{R}_i = OWF(R_i) \\
+         ~& \land~(\sk_i,\pk_i)=\Keygen(A;r^{gen}_i)\\
+         ~& \land~c_i=\Encrypt(\pk_i,x_i;r^{enc}_i)
+               \end{split}\right.
+    \right\}
+    \end{equation*}
+
+\begin{equation*}
+    \twost =\left\{
+\left(\begin{array}{r}
+  \hat{R}_i,\hat{R}_j,A,\nm_1^{j,i},\onm_1^{j,i}\\
+  \pk_i,c_i,\hc,\nm_2^{j,i},\onm_2^{j,i}
+\end{array}\right)\left| \begin{split} \exists ~& (R', \zeta):~
+  \hat{R}_j=OWF(R')\\
+    ~& ~\land~ \onm_2^{j,i}=\Com_{\id_i}(R';\onm_2^{j,i};\zeta_{i})
+\end{split}
+    \right.\right\}~~~~~~~~~~~~
+    \end{equation*}
+
+\begin{equation*}
+    \threest =\left\{
+\left(\begin{array}{r}
+  \hat{R}_i,\hat{R}_j,A,\nm_1^{j,i},\onm_1^{j,i}\\
+  \pk_i,c_i,\hc,\nm_2^{j,i},\onm_2^{j,i}
+\end{array}\right)\left|
+         \begin{split} \exists ~& (x_i,r^{gen}_i,r^{enc}_i,\sk_i,R_i,\omega_i):\\
+         ~& \nm^{j,i}_2
+           =\nmCom_{\id_i}(x_i,r^{gen}_i,r^{enc}_i,R_i;\nm_1^{j,i};\omega_{i}) \\
+         ~& \land~(\sk_i,\pk_i)=\Keygen(A;r^{gen}_i)\\
+         ~& \land~ev_i= \PartDec(\hc, i, \sk_i)
+               \end{split}\right.
+    \right\}
+    \end{equation*}
+
+We define $\stPOK=\{\onest\lor\twost\}_{j}$ and $\stFLS=\{\threest\}_j$.
+\label{NPL}
+\end{boxfig}
+
+
+%If \nmcom\ has $k>2$ rounds, the first $k-2$ rounds can be performed before the 4 rounds of $\Pi_\PC$ start; this results in a protocol with $k+2$ rounds. If $k<3$, then the protocol has only 4 rounds. %Also, for large $k$, it suffices if the first $k-1$ rounds of \nmcom\ statistically determine the message to be committed;% the notation is adjusted to simply use the transcript up to $k-1$ rounds to define the statements for the proof systems.
+
+\begin{figure}
+\vspace{-1ex}
+\centerline{\fbox{\includegraphics[width=2.8in,height=3.2in]{msg.pdf}}}
+\caption{Messages exchanged between party $P_i$ and $P_j$ in $\Pi_\PC$.
+  $(\nm_1,\nm_2)$ and $(\onm_1,\onm_2)$ are commitments, $(\WIPOKmsg_1, \WIPOKmsg_2, \WIPOKmsg_3)$ belong to the 3-round $\Pi_\WIPOK$, $(\FLSmsg_1, \FLSmsg_2, \FLSmsg_3,\FLSmsg_4)$ belong to the 4-round $\Pi_\FLS$, and $(\alpha,\pk,c,ev)$ denote the $\MFHE$ messages. Blue messages are sub-protocols where party $P_i$ is the prover/committer and party $P_j$ is the verifier/receiver, red messages are the opposite.}
+\label{messages}
+\vspace{-3ex}
+\end{figure}\anti{I have to update the colored picture to include the $f_i$}
+%\input{fig-2-pc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+\input{chapters/proof-mpc}

@@ -1,0 +1,52 @@
+%\section{Proof of the Construction of Garbled Interactive Circuit}
+%\label{A:sec-cons-gic}
+\remove{
+\begin{proof}[Proof of \cref{th:sec-cons-gic}]
+  Correctness is straightforward. Let us prove simulatability.
+  
+  \subparagraph{Simulatability:} We need to prove the computational indistinguishability of the following two distributions:
+  \begin{align*}
+    \distr_0 = &\bigset{\giccir \ : \ (\iC, \vec w, \aux) \getsr \icdistr_{\secpar,
+                 \icind}; \ \giccir \getsr \gicgarble(1^\secpar, \iC) }_{\secpar, \icind}\enspace, \\
+    \distr_1 = &\bigset{\gicsimcir \ : \ (\iC, \vec w, \aux) \getsr \icdistr_{\secpar, \icind}; \ 
+                  \gicsimcir \getsr \gicsim(1^\secpar, \trans(\iC, \nda_\secpar, \vec w)) 
+                 }_{\secpar, \icind} \enspace.
+  \end{align*}
+
+  For that, we introduce $2 \nbrounds+2$ hybrid distributions $\hybrid_{0,0},\hybrid_{0,1},\hybrid_{1,0},\hybrid_{1,1},\hybrid_{2,0},\dots,\hybrid_{\nbrounds,1}$:
+  \begin{description}
+  \item[Hybrid $\hybrid_{\round,0}$:] This hybrid is similar to $\distr_1$, except that $\gcicaugnext^{> \round}$ and $\gckey^{> \round}$ (thus in particular $\vec \wsct^{>\round}$ is not defined) are generated as in $\distr_0$.
+
+  We have the following straightforward claim.
+  
+  \begin{claim}
+    $\hybrid_{0,0}$ and $\distr_{0}$ are the same distribution.
+  \end{claim}
+  
+  \item[Hybrid $\hybrid_{\round,1}$: ]
+    For $\round = 0$, this hybrid is the same as $\hybrid_{0,0}$.
+    
+    For $\round \ge 1$, this hybrid is similar to $\hybrid_{\round,0}$, except that:
+    $\vec\wsct^{\round}$ is computed as:
+    \[ \wsct^\round_k \getsr \wsenc(1^\secpar, q^\round_k, \gckey''^{\round+1}[[a^\round_k]])\enspace, \]
+    where $\gckey''^{\round+1}[i,b] = \gckey[i,a^\round_{k,j}]$ for each $b \in \bits$ and each input wire $i$ corresponding to the $j$-th bit of the input $a^\round_k$ in $\icaugnext^\round$.
+    In other words, for each input wire of the answers $\vec a^\round$, instead of encrypting both possible input labels with the witness selector, we encrypt twice the input label which is actually used.
+    
+    Thanks to consistency between the distributions $\icdistr$ and $\ndadistr$, the semantic security of the witness selector ensures that this hybrid is indistinguishable from the previous one.
+    \begin{claim}
+      If $\icdistr$ and $\ndadistr$ are consistent and if $\ws$ is semantically secure, then for any $\round \in [\nbrounds]$, $\hybrid_{\round,0}$ and $\hybrid_{\round,1}$ are computationally indistinguishable.
+    \end{claim}
+
+    Let $\hybrid_{\nbrounds+1,0}$ be the distribution $\distr_1$.
+    As the only difference between $\hybrid_{\round,1}$ and $\hybrid_{\round+1,0}$ is that in the latter hybrid, $\gcicaugnext^{\round+1}$ and $\gckey^{\round+1}$ are simulated via $\gcsim$ instead of being generated via $\gcgarble$, we have the following claim.
+    
+    \begin{claim}
+      If $\gc$ is simulatable, then for any $\round \in \{0,\dots,\nbrounds\}$, $\hybrid_{\round,1}$ and $\hybrid_{\round+1,0}$ are computationally indistinguishable.
+    \end{claim}
+  \end{description}
+\end{proof}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

@@ -1,0 +1,134 @@
+\begin{figure}
+\begin{center}
+\begin{tikzpicture}
+[
+	xscale	= 1.8,	% to scale horizontally everything but the text
+	yscale	= 1.8,	% to scale vertically everything but the text
+]
+\node (MS1121) [draw = none] at	(-1.5,-3.5) {};
+\node (ME1121) [draw = none] at	(-0.5,-3.5) {};
+\node (MS1122) [draw = none] at	(-1.5,-4.0) {};
+\node (ME1122) [draw = none] at	(-0.5,-4.0) {};
+\node (MS1123) [draw = none] at	(-1.5,-4.5) {};
+\node (ME1123) [draw = none] at	(-0.5,-4.5) {};
+\node (MS1124) [draw = none] at	(-1.5,-5.0) {};
+\node (ME1124) [draw = none] at	(-0.5,-5.0) {};
+
+\node (MS1211) [draw = none] at	(1.5,-3.5) {};
+\node (ME1211) [draw = none] at	(0.5,-3.5) {};
+\node (MS1212) [draw = none] at	(1.5,-4.0) {};
+\node (ME1212) [draw = none] at	(0.5,-4.0) {};
+\node (MS1213) [draw = none] at	(1.5,-4.5) {};
+\node (ME1213) [draw = none] at	(0.5,-4.5) {};
+\node (MS1214) [draw = none] at	(1.5,-5.0) {};
+\node (ME1214) [draw = none] at	(0.5,-5.0) {};
+%\node (K0) [draw = none] at	(-7.5,-5.5) {};
+%\node (K1) [draw = none] at	(-6.5,-5.5) {};
+
+
+\draw (-2,-5.5) -- (2,-5.5) -- (2,-2.6) -- (-2,-2.6) -- (-2,-5.5);
+%\draw (-9,-7) -- (-2,-7) -- (-2,-2) -- (-9,-2) -- (-9,-7);
+
+\node (P11) [draw = none] at	(-1,-2.75) {\small $P_1$};
+
+\node (P12) [draw = none] at	(1,-2.75) {\small $P_2$};
+
+
+%%%%%%%%%%%mmmmm%%%%%%%%%%%%%%%%%%%%
+
+\node (m11) [draw = none] at	(-1,-3.425) {\small $m_1$};
+
+\node (m12) [draw = none] at	(-1,-3.925) {\small $\tld{m}_2$};
+
+\node (m13) [draw = none] at	(-1,-4.425) {\small $m_3$};
+
+\node (m14) [draw = none] at	(-1,-4.925) {\small $\tld{m}_4$};
+
+\node (m21) [draw = none] at	(1,-3.425) {\small $\tld{m}_1$};
+
+\node (m22) [draw = none] at	(1,-3.925) {\small $m_2$};
+
+\node (m23) [draw = none] at	(1,-4.425) {\small $\tld{m}_3$};
+
+\node (m24) [draw = none] at	(1,-4.925) {\small $m_4$};
+\draw
+[
+thick,
+->
+]
+(MS1121) to (ME1121);
+\draw
+[
+thick,
+->
+]
+(MS1122) to (ME1122);
+\draw
+[
+thick,
+->
+]
+(MS1123) to (ME1123);
+\draw
+[
+thick,
+->
+]
+(MS1124) to (ME1124);
+
+%%%%OTHER DIRECTION CASE-1%%%%%
+\draw
+[
+thick,
+->
+]
+(MS1211) to (ME1211);
+\draw
+[
+thick,
+->
+]
+(MS1212) to (ME1212);
+\draw
+[
+thick,
+->
+]
+(MS1213) to (ME1213);
+\draw
+[
+thick,
+->
+]
+(MS1214) to (ME1214);
+
+%\node (empty) [draw=none] at (-3.5,-3.25) {$\stackrel{\footnotesize Rescheduled}{\large{\implies}}$};
+
+%%%%%%%%%%%%%%Rounds%%%%%%%%%%%%%
+
+\draw
+[
+dashed,
+]
+(-1.75,-3.75) to (1.75,-3.75);
+
+\draw
+[
+dashed,
+]
+(-1.75,-4.25) to (1.75,-4.25);
+
+\draw
+[
+dashed,
+]
+(-1.75,-4.75) to (1.75,-4.75);
+
+
+
+
+\end{tikzpicture}
+\end{center}
+\caption{2-PC in the simultaneous message exchange model.}
+\label{fig:2-PC}
+\end{figure}

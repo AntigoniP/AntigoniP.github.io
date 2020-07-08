@@ -1,0 +1,298 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{GGH{\etalchar{+}}13}
+
+\bibitem[AIK05]{AppIshKus05}
+Benny Applebaum, Yuval Ishai, and Eyal Kushilevitz.
+\newblock Computationally private randomizing polynomials and their
+  applications.
+\newblock In {\em 20th Annual {IEEE} Conference on Computational Complexity
+  {(CCC} 2005), 11-15 June 2005, San Jose, CA, {USA}}, pages 260--274, 2005.
+
+\bibitem[AJL{\etalchar{+}}12]{EC:AJLTVW12}
+Gilad Asharov, Abhishek Jain, Adriana {L{\'o}pez-Alt}, Eran Tromer, Vinod
+  Vaikuntanathan, and Daniel Wichs.
+\newblock Multiparty computation with low communication, computation and
+  interaction via threshold {FHE}.
+\newblock In David Pointcheval and Thomas Johansson, editors, {\em
+  EUROCRYPT~2012}, volume 7237 of {\em {LNCS}}, pages 483--501. Springer,
+  Heidelberg, April 2012.
+
+\bibitem[Bar01]{FOCS:Barak01}
+Boaz Barak.
+\newblock How to go beyond the black-box simulation barrier.
+\newblock In {\em 42nd FOCS}, pages 106--115. {IEEE} Computer Society Press,
+  October 2001.
+
+\bibitem[BD10]{TCC:BenDam10}
+Rikke Bendlin and Ivan Damg{\aa}rd.
+\newblock Threshold decryption and zero-knowledge proofs for lattice-based
+  cryptosystems.
+\newblock In Daniele Micciancio, editor, {\em TCC~2010}, volume 5978 of {\em
+  {LNCS}}, pages 201--218. Springer, Heidelberg, February 2010.
+
+\bibitem[BGV12]{ITCS:BraGenVai12}
+Zvika Brakerski, Craig Gentry, and Vinod Vaikuntanathan.
+\newblock ({L}eveled) fully homomorphic encryption without bootstrapping.
+\newblock In Shafi Goldwasser, editor, {\em ITCS 2012}, pages 309--325. {ACM},
+  January 2012.
+
+\bibitem[BL04]{BL04}
+Boaz Barak and Yehuda Lindell.
+\newblock Strict polynomial-time in simulation and extraction.
+\newblock {\em {SIAM} J. Comput.}, 33(4):738--818, 2004.
+
+\bibitem[BMR90]{STOC:BeaMicRog90}
+Donald Beaver, Silvio Micali, and Phillip Rogaway.
+\newblock The round complexity of secure protocols (extended abstract).
+\newblock In {\em 22nd ACM STOC}, pages 503--513. {ACM} Press, May 1990.
+
+\bibitem[BP16]{C:BraPer16}
+Zvika Brakerski and Renen Perlman.
+\newblock Lattice-based fully dynamic multi-key {FHE} with short ciphertexts.
+\newblock In Matthew Robshaw and Jonathan Katz, editors, {\em CRYPTO~2016, Part
+  I}, volume 9814 of {\em {LNCS}}, pages 190--213. Springer, Heidelberg, August
+  2016.
+
+\bibitem[BV11]{FOCS:BraVai11}
+Zvika Brakerski and Vinod Vaikuntanathan.
+\newblock Efficient fully homomorphic encryption from (standard) {LWE}.
+\newblock In Rafail Ostrovsky, editor, {\em 52nd FOCS}, pages 97--106. {IEEE}
+  Computer Society Press, October 2011.
+
+\bibitem[CM15]{C:CleMcg15}
+Michael Clear and Ciaran McGoldrick.
+\newblock Multi-identity and multi-key leveled {FHE} from learning with errors.
+\newblock In Rosario Gennaro and Matthew J.~B. Robshaw, editors, {\em
+  CRYPTO~2015, Part II}, volume 9216 of {\em {LNCS}}, pages 630--656. Springer,
+  Heidelberg, August 2015.
+
+\bibitem[COSV16]{C:COSV16}
+Michele Ciampi, Rafail Ostrovsky, Luisa Siniscalchi, and Ivan Visconti.
+\newblock Concurrent non-malleable commitments (and more) in 3 rounds.
+\newblock In Matthew Robshaw and Jonathan Katz, editors, {\em CRYPTO~2016, Part
+  III}, volume 9816 of {\em {LNCS}}, pages 270--299. Springer, Heidelberg,
+  August 2016.
+
+\bibitem[DI05]{C:DamIsh05}
+Ivan Damg{\aa}rd and Yuval Ishai.
+\newblock Constant-round multiparty computation using a black-box pseudorandom
+  generator.
+\newblock In Victor Shoup, editor, {\em CRYPTO~2005}, volume 3621 of {\em
+  {LNCS}}, pages 378--394. Springer, Heidelberg, August 2005.
+
+\bibitem[DI06]{C:DamIsh06}
+Ivan Damg{\aa}rd and Yuval Ishai.
+\newblock Scalable secure multiparty computation.
+\newblock In Cynthia Dwork, editor, {\em CRYPTO~2006}, volume 4117 of {\em
+  {LNCS}}, pages 501--520. Springer, Heidelberg, August 2006.
+
+\bibitem[FLS99]{FLS99}
+Uriel Feige, Dror Lapidot, and Adi Shamir.
+\newblock Multiple noninteractive zero knowledge proofs under general
+  assumptions.
+\newblock {\em {SIAM} J. Comput.}, 29(1):1--28, 1999.
+
+\bibitem[FS90]{STOC:FeiSha90}
+Uriel Feige and Adi Shamir.
+\newblock Witness indistinguishable and witness hiding protocols.
+\newblock In {\em 22nd ACM STOC}, pages 416--426. {ACM} Press, May 1990.
+
+\bibitem[GGH{\etalchar{+}}13]{FOCS:GGHRSW13}
+Sanjam Garg, Craig Gentry, Shai Halevi, Mariana Raykova, Amit Sahai, and Brent
+  Waters.
+\newblock Candidate indistinguishability obfuscation and functional encryption
+  for all circuits.
+\newblock In {\em 54th FOCS}, pages 40--49. {IEEE} Computer Society Press,
+  October 2013.
+
+\bibitem[GGHR14]{TCC:GGHR14}
+Sanjam Garg, Craig Gentry, Shai Halevi, and Mariana Raykova.
+\newblock Two-round secure {MPC} from indistinguishability obfuscation.
+\newblock In Yehuda Lindell, editor, {\em TCC~2014}, volume 8349 of {\em
+  {LNCS}}, pages 74--94. Springer, Heidelberg, February 2014.
+
+\bibitem[GKPV10]{GKPV10}
+Shafi Goldwasser, Yael~Tauman Kalai, Chris Peikert, and Vinod Vaikuntanathan.
+\newblock Robustness of the learning with errors assumption.
+\newblock In {\em {ICS}}, pages 230--240. Tsinghua University Press, 2010.
+
+\bibitem[GLOV12]{FOCS:GLOV12}
+Vipul Goyal, Chen-Kuei Lee, Rafail Ostrovsky, and Ivan Visconti.
+\newblock Constructing non-malleable commitments: {A} black-box approach.
+\newblock In {\em 53rd FOCS}, pages 51--60. {IEEE} Computer Society Press,
+  October 2012.
+
+\bibitem[GMPP16]{EC:GMPP16}
+Sanjam Garg, Pratyay Mukherjee, Omkant Pandey, and Antigoni Polychroniadou.
+\newblock The exact round complexity of secure computation.
+\newblock In Marc Fischlin and Jean-S{\'{e}}bastien Coron, editors, {\em
+  EUROCRYPT~2016, Part II}, volume 9666 of {\em {LNCS}}, pages 448--476.
+  Springer, Heidelberg, May 2016.
+
+\bibitem[GMW87]{GMW87}
+Oded Goldreich, Silvio Micali, and Avi Wigderson.
+\newblock How to play any mental game or a completeness theorem for protocols
+  with honest majority.
+\newblock In {\em STOC}, pages 218--229, 1987.
+
+\bibitem[Gol04]{Goldreich04}
+Oded Goldreich.
+\newblock {\em Foundations of Cryptography: Basic Applications}, volume~2.
+\newblock Cambridge University Press, Cambridge, UK, 2004.
+
+\bibitem[Goy11]{STOC:Goyal11}
+Vipul Goyal.
+\newblock Constant round non-malleable protocols using one way functions.
+\newblock In Lance Fortnow and Salil~P. Vadhan, editors, {\em 43rd ACM STOC},
+  pages 695--704. {ACM} Press, June 2011.
+
+\bibitem[GSW13]{C:GenSahWat13}
+Craig Gentry, Amit Sahai, and Brent Waters.
+\newblock Homomorphic encryption from learning with errors:
+  Conceptually-simpler, asymptotically-faster, attribute-based.
+\newblock In Ran Canetti and Juan~A. Garay, editors, {\em CRYPTO~2013, Part I},
+  volume 8042 of {\em {LNCS}}, pages 75--92. Springer, Heidelberg, August 2013.
+
+\bibitem[HK07]{C:HorKat07}
+Omer Horvitz and Jonathan Katz.
+\newblock Universally-composable two-party computation in two rounds.
+\newblock In Alfred Menezes, editor, {\em CRYPTO~2007}, volume 4622 of {\em
+  {LNCS}}, pages 111--129. Springer, Heidelberg, August 2007.
+
+\bibitem[HLP11]{C:HalLinPin11}
+Shai Halevi, Yehuda Lindell, and Benny Pinkas.
+\newblock Secure computation on the web: Computing without simultaneous
+  interaction.
+\newblock In Phillip Rogaway, editor, {\em CRYPTO~2011}, volume 6841 of {\em
+  {LNCS}}, pages 132--150. Springer, Heidelberg, August 2011.
+
+\bibitem[IK00]{FOCS:IshKus00}
+Yuval Ishai and Eyal Kushilevitz.
+\newblock Randomizing polynomials: A new representation with applications to
+  round-efficient secure computation.
+\newblock In {\em 41st FOCS}, pages 294--304. {IEEE} Computer Society Press,
+  November 2000.
+
+\bibitem[IPS08]{C:IshPraSah08}
+Yuval Ishai, Manoj Prabhakaran, and Amit Sahai.
+\newblock Founding cryptography on oblivious transfer - efficiently.
+\newblock In David Wagner, editor, {\em CRYPTO~2008}, volume 5157 of {\em
+  {LNCS}}, pages 572--591. Springer, Heidelberg, August 2008.
+
+\bibitem[JS07]{EC:JarShm07}
+Stanislaw Jarecki and Vitaly Shmatikov.
+\newblock Efficient two-party secure computation on committed inputs.
+\newblock In Moni Naor, editor, {\em EUROCRYPT~2007}, volume 4515 of {\em
+  {LNCS}}, pages 97--114. Springer, Heidelberg, May 2007.
+
+\bibitem[KO04]{C:KatOst04}
+Jonathan Katz and Rafail Ostrovsky.
+\newblock Round-optimal secure two-party computation.
+\newblock In Matthew Franklin, editor, {\em CRYPTO~2004}, volume 3152 of {\em
+  {LNCS}}, pages 335--354. Springer, Heidelberg, August 2004.
+
+\bibitem[KOS03]{EC:KatOstSmi03}
+Jonathan Katz, Rafail Ostrovsky, and Adam Smith.
+\newblock Round efficiency of multi-party computation with a dishonest
+  majority.
+\newblock In Eli Biham, editor, {\em EUROCRYPT~2003}, volume 2656 of {\em
+  {LNCS}}, pages 578--595. Springer, Heidelberg, May 2003.
+
+\bibitem[Lin01]{C:Lindell01}
+Yehuda Lindell.
+\newblock Parallel coin-tossing and constant-round secure two-party
+  computation.
+\newblock In Joe Kilian, editor, {\em CRYPTO~2001}, volume 2139 of {\em
+  {LNCS}}, pages 171--189. Springer, Heidelberg, August 2001.
+
+\bibitem[LP11a]{STOC:LinPas11}
+Huijia Lin and Rafael Pass.
+\newblock Constant-round non-malleable commitments from any one-way function.
+\newblock In Lance Fortnow and Salil~P. Vadhan, editors, {\em 43rd ACM STOC},
+  pages 705--714. {ACM} Press, June 2011.
+
+\bibitem[LP11b]{TCC:LinPin11}
+Yehuda Lindell and Benny Pinkas.
+\newblock Secure two-party computation via cut-and-choose oblivious transfer.
+\newblock In Yuval Ishai, editor, {\em TCC~2011}, volume 6597 of {\em {LNCS}},
+  pages 329--346. Springer, Heidelberg, March 2011.
+
+\bibitem[LTV12]{STOC:LopTroVai12}
+Adriana {L{\'o}pez-Alt}, Eran Tromer, and Vinod Vaikuntanathan.
+\newblock On-the-fly multiparty computation on the cloud via multikey fully
+  homomorphic encryption.
+\newblock In Howard~J. Karloff and Toniann Pitassi, editors, {\em 44th ACM
+  STOC}, pages 1219--1234. {ACM} Press, May 2012.
+
+\bibitem[MP12]{MP12}
+Daniele Micciancio and Chris Peikert.
+\newblock Trapdoors for lattices: Simpler, tighter, faster, smaller.
+\newblock In {\em {EUROCRYPT}}, volume 7237 of {\em Lecture Notes in Computer
+  Science}, pages 700--718. Springer, 2012.
+\newblock Full version at \url{http://ia.cr/2011/501}.
+
+\bibitem[MSS11]{MyeSerShe11}
+Steven Myers, Mona Sergi, and Abhi Shelat.
+\newblock Threshold fully homomorphic encryption and secure computation.
+\newblock Cryptology ePrint Archive, Report 2011/454, 2011.
+\newblock \url{http://eprint.iacr.org/2011/454}.
+
+\bibitem[MW16]{EC:MukWic16}
+Pratyay Mukherjee and Daniel Wichs.
+\newblock Two round multiparty computation via multi-key {FHE}.
+\newblock In Marc Fischlin and Jean-S{\'{e}}bastien Coron, editors, {\em
+  EUROCRYPT~2016, Part II}, volume 9666 of {\em {LNCS}}, pages 735--763.
+  Springer, Heidelberg, May 2016.
+
+\bibitem[Nao91]{JC:Naor91}
+Moni Naor.
+\newblock Bit commitment using pseudorandomness.
+\newblock {\em Journal of Cryptology}, 4(2):151--158, 1991.
+
+\bibitem[ORS15]{C:OstRicSca15}
+Rafail Ostrovsky, Silas Richelson, and Alessandra Scafuro.
+\newblock Round-optimal black-box two-party computation.
+\newblock In Rosario Gennaro and Matthew J.~B. Robshaw, editors, {\em
+  CRYPTO~2015, Part II}, volume 9216 of {\em {LNCS}}, pages 339--358. Springer,
+  Heidelberg, August 2015.
+
+\bibitem[Pas04]{STOC:Pass04}
+Rafael Pass.
+\newblock Bounded-concurrent secure multi-party computation with a dishonest
+  majority.
+\newblock In L{\'a}szl{\'o} Babai, editor, {\em 36th ACM STOC}, pages 232--241.
+  {ACM} Press, June 2004.
+
+\bibitem[PPV08]{C:PanPasVai08}
+Omkant Pandey, Rafael Pass, and Vinod Vaikuntanathan.
+\newblock Adaptive one-way functions and applications.
+\newblock In David Wagner, editor, {\em CRYPTO~2008}, volume 5157 of {\em
+  {LNCS}}, pages 57--74. Springer, Heidelberg, August 2008.
+
+\bibitem[PS16]{TCC:PeiShi16}
+Chris Peikert and Sina Shiehian.
+\newblock Multi-key {FHE} from {LWE}, revisited.
+\newblock In Martin Hirt and Adam~D. Smith, editors, {\em TCC~2016-B, Part II},
+  volume 9986 of {\em {LNCS}}, pages 217--238. Springer, Heidelberg,
+  October~/~November 2016.
+
+\bibitem[Wee10]{FOCS:Wee10}
+Hoeteck Wee.
+\newblock Black-box, round-efficient secure computation via non-malleability
+  amplification.
+\newblock In {\em 51st FOCS}, pages 531--540. {IEEE} Computer Society Press,
+  October 2010.
+
+\bibitem[Yao82]{FOCS:Yao82b}
+Andrew Chi-Chih Yao.
+\newblock Protocols for secure computations (extended abstract).
+\newblock In {\em 23rd FOCS}, pages 160--164. {IEEE} Computer Society Press,
+  November 1982.
+
+\bibitem[Yao86]{FOCS:Yao86}
+Andrew Chi-Chih Yao.
+\newblock How to generate and exchange secrets (extended abstract).
+\newblock In {\em 27th FOCS}, pages 162--167. {IEEE} Computer Society Press,
+  October 1986.
+
+\end{thebibliography}

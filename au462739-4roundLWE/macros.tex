@@ -1,0 +1,462 @@
+% !TEX root =./main-optimal.tex
+%\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand{\figlab}[1]{\label{fig:#1}}
+\def\calA{\mathcal{A}}
+\def\calB{\mathcal{B}}
+\def\calC{\mathcal{C}}
+\def\calD{\mathcal{D}}
+
+\newcommand{\thmref}[1]{Theorem~\ref{thm:#1}}
+\newcommand{\corref}[1]{Corollary~\ref{cor:#1}}
+\newcommand{\lemref}[1]{Lemma~\ref{lem:#1}}
+\newcommand{\tblref}[1]{Table~\ref{tbl:#1}}
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}
+\newcommand{\appref}[1]{Appendix~\ref{app:#1}}
+\newcommand{\eqnref}[1]{Eqn.~(\ref{eqn:#1})}
+\newcommand{\defref}[1]{Definition~\ref{def:#1}}
+
+\newcommand{\func}{\mathcal{F}}
+\newcommand{\nmc}{\mathsf{nmc}}
+\newcommand{\tagg}{\mathsf{tag}}
+\newcommand{\rnm}{\ensuremath{k}}
+\newcommand{\id}{\ensuremath{\mathsf{id}}}
+\newcommand{\oid}{\ensuremath{{\mathsf{{tag}}}}}
+\newcommand{\pok}{\ensuremath{\mathsf{pok}}}
+\newcommand{\st}{\ensuremath{\mathsf{st}}}
+\newcommand{\theo}{\ensuremath{\mathsf{th}}}
+\newcommand{\thmm}{\ensuremath{\mathsf{thm}}}
+\newcommand{\prg}{\ensuremath{\mathsf{prg}}}
+\newcommand{\tthm}{\ensuremath{\mathsf{{\widetilde{thm}}}}}
+\newcommand{\dist}{{\cal D}}	
+\newcommand{\compind}{\approx_{\mathrm{c}}}
+\newcommand{\statind}{\approx_{\mathrm{s}}}
+\newcommand{\ok}{\ensuremath{\mathsf{eqthm}}}
+\newcommand{\otm}{\mathsf{OTMsg}}
+\newcommand{\wipokm}{\mathsf{WIPoKMsg}}
+\newcommand{\idind}{\equiv}
+\newcommand{\zkakm}{\mathsf{ZKAKMsg}}
+\newcommand{\Lab}{\mathsf{L}}
+\newcommand{\gc}{\mathsf{GC}}
+\newcommand{\tld}{\widetilde}
+\newcommand{\Ideal}{\textsc{IDEAL}}
+\newcommand{\LWE}{\textsc{LWE}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Calligraphical Alphabet %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cVa}{{\mathcal I_\Com}}
+\newcommand{\cIVa}{{\mathcal J_\Com}}
+\newcommand{\cB}{{\cal B}}
+\newcommand{\cC}{{\cal C}}
+\newcommand{\ccP}{{\cal P}}
+\renewcommand{\P}{{P}}
+
+\newcommand{\SSS}{{\cal SS}}
+
+\newcommand{\cD}{{\cal D}}
+\newcommand{\cE}{{\cal E}}
+\newcommand{\cF}{{\cal F}}
+\newcommand{\cG}{{\cal G}}
+\newcommand{\cH}{{\cal H}}
+\newcommand{\cI}{{\cal I}}
+\newcommand{\cK}{{\cal K}}
+\newcommand{\cL}{{\cal L}}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\cN}{{\cal N}}
+\newcommand{\cO}{{\cal O}}
+
+\newcommand{\cQ}{{\cal Q}}
+\newcommand{\cR}{{\cal R}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\NP}{{{\cal NP}}}
+\newcommand{\cT}{{\cal T}}
+\newcommand{\cU}{{\cal U}}
+\newcommand{\cV}{{\cal V}}
+\newcommand{\cX}{{\cal X}}
+\newcommand{\cY}{{\cal Y}}
+\newcommand{\cZ}{{\cal Z}}
+\newcommand{\cW}{{\cal W}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Blackboard Bold Alphabet %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\AA}{\mathbf{A}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\FF}{\mathbb{F}}
+\newcommand{\GG}{\mathbb{G}}
+\newcommand{\HH}{\mathbb{H}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\ZZ}{\mathbb{Z}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Boldface Math Alphabet %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def \bfa{{\mathbf a}}
+\def \bfb{{\mathbf b}}
+\def \bfc{{\mathbf c}}
+\def \bfe{{\mathbf e}}
+\def \bff{{\mathbf f}}
+\def \bfg{{\mathbf g}}
+\def \bfm{{\mathbf m}}
+\def \bfp{{\mathbf p}}
+\def \bfr{{\mathbf r}}
+\def \bfs{{\mathbf s}}
+\def \bft{{\mathbf t}}
+\def \bfu{{\mathbf u}}
+\def \bfv{{\mathbf v}}
+\def \bfw{{\mathbf w}}
+\def \bfx{{\mathbf x}}
+\def \bfy{{\mathbf y}}
+\def \bfz{{\mathbf z}}
+\def \bfA{{\mathbf A}}
+\def \bfH{{\mathbf H}}
+\def \bfZ{{\mathbf Z}}
+\def \bfS{{\mathbf S}}
+
+
+
+\newcommand{\sprot}{\prot^\simul}
+\newcommand{\spar}{\kappa}
+\newcommand{\prot}{\mathrm{\Pi}}
+\newcommand{\cfprot}{\prot_{\sf flip}}
+\newcommand{\cfprots}{\prot_{\sf flip}^{\simul}}
+\newcommand{\cfprotn}{\prot_{\sf flip}^{\nosimul}}
+\newcommand{\simul}{\Leftrightarrow}
+\newcommand{\nosimul}{{\stackrel{\leftarrow}{\rightarrow}}}
+\newcommand{\pno}{n}
+\newcommand{\advS}{\cS}
+\newcommand{\rlen}{\lambda}
+\newcommand{\tc}{\widetilde{c}}
+\newcommand{\msg}{\mathsf{m}}
+\newcommand{\mprot}[4]{\msg_{#1,#2}^{#3[#4]}}
+\newcommand{\rd}{\mathsf{\rho}}
+%\newcommand{\Sim}{\advS}
+\newcommand{\tP}{{\P}^\simul}
+\newcommand{\tSimu}{\advS^{\simul}}
+\newcommand{\cor}[1]{\overline{#1}}
+\newcommand{\cP}{\cor{\P}}
+
+\newcommand{\Simu}{\cS}
+\newcommand{\view}{\mathsf{view}}
+\newcommand{\real}{\textsc{REAL}}
+\newcommand{\extended}{\text{Extended}}
+
+
+% New commands
+
+
+\def \GCircuit {\ensuremath\mathsf{GenGC}}
+\def \Eval {\ensuremath\mathsf{EvalGC}}
+
+\def \lab {\ensuremath{lab}}
+\def \lbl {\ensuremath{Z}}
+\def \tlbl {{\widetilde{\ensuremath{Z}}}}
+\def \sec {\kappa}
+\def \inp {\ensuremath\mathsf{wires}}
+\newcommand{\inpsz}{n}
+\def \CircSim {\ensuremath\mathsf{SimGC}}
+\def \out {\ensuremath\mathsf{out}}
+
+	\newcommand{\sig}{\textsf{Sig}}
+\newcommand{\tid}{\textsf{mid}}
+\newcommand{\create}{\textsf{create}}
+\newcommand{\run}{\textsf{run}}
+
+
+
+\newcommand{\piOT}{\ensuremath{\mathrm{\Pi_\ot}}}
+
+\newcommand{\Com}{\ensuremath{\mathsf{bCom}}}
+\newcommand{\qCom}{\ensuremath{\mathsf{Eqcom}}}
+\newcommand{\eCom}{\ensuremath{\mathsf{Extcom}}}
+\newcommand{\nmCom}{\ensuremath{\mathsf{aCom}}}
+\newcommand{\open}{\ensuremath{\mathsf{open}}}
+\newcommand{\topen}{{\widetilde{\mathsf{open}}}}
+\newcommand{\tsigma}{{\widetilde{\mathsf{\sigma}}}}
+\newcommand{\tCom}{\ensuremath{\widehat{\mathsf{com}}}}
+
+\newcommand{\hb}{\mathsf{H}}
+\newcommand{\Ext}{\mathsf{Ext}}
+\newcommand{\sCom}{\mathsf{SCom}}
+\newcommand{\com}{\mathsf{com}}
+\newcommand{\scom}{\mathsf{scom}}
+\newcommand{\decom}{\mathsf{decom}}
+\newcommand{\tcom}{\mathsf{tcom}}
+\newcommand{\Open}{\mathsf{Open}}
+\newcommand{\TCom}{\mathsf{TCom}}
+\newcommand{\TCmsg}{\mathsf{TCmsg}}
+\newcommand{\OTmsg}{\mathsf{OTmsg}}
+\newcommand{\WIPOKmsg}{\mathsf{p}}
+\newcommand{\FLSmsg}{\mathsf{fs}}
+\newcommand{\tWIPOKmsg}{{\widetilde{\mathsf{p}}}}
+\newcommand{\tFLSmsg}{{\widetilde{\mathsf{fs}}}}
+
+\newcommand{\TCdecom}{\mathsf{TCdecom}}
+\newcommand{\TOpen}{\mathsf{TOpen}}
+\newcommand{\Share}{\mathsf{Share}}
+\newcommand{\Rec}{\mathsf{Recon}}
+\newcommand{\valid}{\mathsf{valid}}
+\newcommand{\noi}{\noindent}
+\newcommand{\vw}{{\bf D}}
+
+\newcommand{\remove}[1]{}
+\newcommand{\Setup}{{\mathsf{MFHE.Setup}}}
+\newcommand{\DSetup}{{\mathsf{MFHE.DistSetup}}}
+\newcommand{\pp}{{\mathsf{pp}}}
+\newcommand{\gencom}{{\mathsf{GenCom}}}
+\newcommand{\decommit}{{\mathsf{Decommit}}}
+\newcommand{\Inv}{\mathsf{Inv}}
+\newcommand{\PRF}{{\mathsf{PRF}}}
+\newcommand{\Maj}{{\mathsf{Majority}}}
+\newcommand{\TK}{{\mathsf{TK}}}
+\newcommand{\Ver}{{\mathsf{Ver}}}
+
+\newcommand{\WI}{\ensuremath{\mathsf{WI}}}
+\newcommand{\nm}{\ensuremath{\mathsf{acom}}}
+%\newcommand{\onm}{\ensuremath{\overline{\mathsf{nm}}}}
+\newcommand{\onm}{\ensuremath{{\mathsf{bcom}}}}
+\newcommand{\ecom}[1]{\ensuremath{\mathsf{C^{ex}_{#1}}}}
+\newcommand{\tecom}[1]{\ensuremath\widetilde{{\mathsf{C^{ex}_{#1}}}}}
+\newcommand{\lcom}{\mathsf{C}_{\mathsf{lab}}}
+\newcommand{\gccom}{\mathsf{C}_{\mathsf{gc}}}
+\newcommand{\tlcom}{\widetilde{\mathsf{C}}_{\mathsf{lab}}}
+\newcommand{\tgccom}{\widetilde{\mathsf{C}}_{\mathsf{gc}}}
+%\newcommand{\tgccom}{{{\widetilde{{\mathsf{C}}}_{{\mathsf gc}}}}}
+
+
+
+\newcommand{\tnm}{{\widetilde{\mathsf{nm}}}}
+\newcommand{\tr}{{\widetilde{{r}}}}
+\newcommand{\tz}{{\widetilde{{z}}}}
+\newcommand{\tw}{{\widetilde{{\omega}}}}
+
+
+\newcommand{\MFHE}{{\mathsf{MFHE}}}
+\newcommand{\CPA}{{\mathsf{CPA}}}
+
+
+
+%\newcommand{\onest}{{\cL_1^{i,j}}}
+%\newcommand{\twost}{{\cL_2^{i,j}}}
+%\newcommand{\threest}{{\cL_3^{i,j}}}
+%\newcommand{\fourst}{{\cL_4^{i,j}}}
+
+\newcommand{\onest}{{\cL_{i,j,1}}}
+\newcommand{\twost}{{\cL_{i,j,2}}}
+\newcommand{\threest}{{\cL_{i,j,3}}}
+\newcommand{\fourst}{{\cL_{i,j,1}}}
+
+\newcommand{\hhonest}{{\cL_{h,j,1}}}
+\newcommand{\hhtwost}{{\cL_{h,j,2}}}
+\newcommand{\hhstPOK}{{\cL^\WIPOK_{P_h}}}
+
+\newcommand{\stFLS}{{{{\mathsf{\cL}}^{\FLS}_{P_i}}}}
+\newcommand{\stFLSS}{{{{\mathsf{\cL}}^{\FLS}_{P_j}}}}
+\newcommand{\sstFLS}{{{{\mathsf{\cL}}^{\FLS}_{P}}}}
+\newcommand{\stPOK}{{\cL^\WIPOK_{P_i}}}
+\newcommand{\sstPOK}{{\cL^\WIPOK_{P}}}
+
+
+\newcommand{\honest}{{\cL_1^{h,j}}}
+\newcommand{\htwost}{{\cL_2^{h,j}}}
+\newcommand{\hthreest}{{\cL_3^{h,j}}}
+\newcommand{\hstPOK}{{\cL_\WIPOK^{h,j}}}
+
+\newcommand{\tonest}{{\widetilde{\mathsf{\cL_1}}}}
+\newcommand{\ttwost}{{\widetilde{\mathsf{\cL_2}}}}
+\newcommand{\tthreest}{{\widetilde{\mathsf{\cL_3}}}}
+\newcommand{\tfourst}{{\widetilde{\mathsf{\cL_4}}}}
+\newcommand{\tstFLS}{{\widetilde{\mathsf{\cL_\FLS}}}}
+\newcommand{\tstPOK}{{\widetilde{\mathsf{\cL_\WIPOK}}}}
+
+
+\newcommand{\zk}{{\mathsf{ZK}}}
+\newcommand{\CF}{{\mathsf{CF}}}
+\newcommand{\tV}{{\tilde{V}}}
+\newcommand{\tE}{{\tilde{E}}}
+%\newcommand{\tw}{{\tilde{w}}}
+\newcommand{\tomega}{{\widetilde{\omega}}}
+\newcommand{\ty}{{\tilde{y}}}
+\newcommand{\tS}{{\tilde{S}}}
+\newcommand{\tnu}{{\tilde{\nu}}}
+\newcommand{\tC}{{\mathsf{GC}}}
+
+\newcommand{\tl}{{\tilde{l}}}
+\newcommand{\td}{{\tilde{d}}}
+\newcommand{\tPi}{{\tilde{\Pi}}}
+\newcommand{\ngl}{{\mathsf{negl}}}
+\newcommand{\trans}{{\mathsf{trans}}}
+
+\newcommand{\ideall}{\mbox{\textsc IDEAL}}
+\newcommand{\hyb}{{\bf H}}
+\newcommand{\thyb}{{\widetilde{\bf Hybrid}}}
+\newcommand{\whyb}{{\overline{\bf Hybrid}}}
+
+\newcommand{\hybs}{{\bf Hybrids}}
+\newcommand{\reall}{\mbox{\textsc REAL}}
+\newcommand{\eqdef}{\stackrel{\rm def}{=}}
+\newcommand{\indist}{\stackrel{\rm c}{\approx}}
+\newcommand{\deff}{\stackrel{\rm def}{=}}
+\newcommand{\statclose}{\stackrel{\rm s}{\approx}}
+\newcommand{\rnd}{\gets_R}
+\newcommand{\ppt}{{\sc PPT}}
+\newcommand{\prob}{{\rm Pr}}
+\newcommand{\rec}{{P_j}}
+\newcommand{\sen}{{P_i}}
+\newcommand{\recc}{{A_2}}
+\newcommand{\senn}{{A_1}}
+\newcommand{\adv}{\textsc{Adv}}
+\newcommand{\comp}{\textrm{Comp}}
+\newcommand{\GPi}{\Pi^{\glb}}
+\newcommand{\prf}{\mathrm{f}}
+\newcommand{\rlcom}[1]{\mathsf{C^{{\sf eq}}_{#1}}}
+\newcommand{\ct}{{\scriptscriptstyle\mathrm{CT}}}
+\newcommand{\ot}{{\scriptscriptstyle\mathrm{OT}}}
+\newcommand{\FLS}{{\scriptscriptstyle\mathrm{FS}}}
+\newcommand{\WIPOK}{{\scriptscriptstyle\mathrm{WIPOK}}}
+
+
+\newcommand{\PC}{{\scriptscriptstyle\mathrm{MPC}}}
+\newcommand{\CFF}{{\scriptscriptstyle\mathrm{2CF}}}
+\newcommand{\comm}{{\scriptscriptstyle\mathrm{COM}}}
+
+\newcommand{\gate}{{\mathsf{Gate}}}
+\newcommand{\enc}{\mathsf{Enc}}
+\newcommand{\dec}{\mathsf{Dec}}
+\newcommand{\gen}{\mathsf{Gen}}
+\newcommand{\Gen}{{\mathrm{Gen}}}
+\newcommand{\Evall}{{\mathsf{MFHE.Eval}}}
+\newcommand{\Invert}{{\mathrm{Invert}}}
+
+
+
+\newcommand{\Encrypt}{{\mathsf{MFHE.Encrypt}}}
+
+\newcommand{\PartDec}{{\mathsf{MFHE.PartDec}}}
+\newcommand{\FinDec}{{\mathsf{MFHE.FinDec}}}
+
+
+
+\newcommand{\Decrypt}{\mathsf{MFHE.Decrypt}}
+\newcommand{\Expand}{\mathsf{Expand}}
+\newcommand{\Keygen}{\mathsf{MFHE.Keygen}}
+%\newcommand{\Setup}{\mathsf{Setup}}
+\newcommand{\params}{{\mathsf{params}}}
+\newcommand{\pk}{{\mathsf{pk}}}
+\newcommand{\PK}{{{B}}}
+\newcommand{\sk}{{\mathsf{sk}}}
+\newcommand{\hc}{{{\hat{c}}}}
+
+\def\setupOne{{\sf Gen_1}}
+\def\setupTwo{{\sf Gen_2}}
+
+
+\newcommand{\ideal}{{\scriptscriptstyle\mathrm{IDEAL}}}
+\newcommand{\hybrid}{{\scriptscriptstyle\mathrm{HYBRID}}}
+\newcommand{\sh}{{\scriptscriptstyle\mathrm{SH}}}
+\newcommand{\ml}{{\scriptscriptstyle\mathrm{ML}}}
+\newcommand{\mext}{{\scriptscriptstyle\mathrm{mEXTCOM}}}
+\newcommand{\ext}{{\scriptscriptstyle\mathrm{EXTCOM}}}
+
+
+\newcommand{\code}{{\scriptscriptstyle\mathrm{code}}}
+\newcommand{\bb}{{\scriptscriptstyle\mathrm{bb}}}
+\newcommand{\set}{{\scriptscriptstyle\mathrm{TP}}}
+
+\newcommand{\ucset}{{\scriptscriptstyle\mathrm{UCTP}}}
+\newcommand{\uc}{{\scriptscriptstyle\mathrm{UC}}}
+\newcommand{\Hyb}[1]{\mathrm{\mathrm{H}_{#1}}}
+\newcommand{\tHyb}[1]{{\widetilde{\mathrm{\mathrm{H}}}_{#1}}}
+\newcommand{\wHyb}[1]{{\overline{\mathrm{\mathrm{H}}}_{#1}}}
+
+
+
+
+
+
+
+
+
+
+
+
+%\theoremstyle{plain}
+%\newtheorem{innercustomlem}{Lemma}
+%%
+%\newenvironment{customlem}[1]
+%{\renewcommand\theinnercustomlem{#1}\innercustomlem}
+%{\endinnercustomlem}
+%\newtheorem{innercustomthm}{Theorem}
+%%
+%\newenvironment{customthm}[1]
+%{\renewcommand\theinnercustomthm{#1}\innercustomthm}
+%{\endinnercustomthm}
+
+%\newcommand{\set}[2]{\{#1,\ldots,#2\}}
+
+
+\newcommand{\fail}{\texttt{fail}}
+
+
+
+\newcommand{\advA}{\cA}
+
+\newenvironment{boxfig}[2]{% {#1}{#2} = {Caption}{label}
+     \begin{figure}[ht!]
+     \newcommand{\FigCaption}{#1}
+     \newcommand{\FigLabel}{#2}
+       \vspace{-0.8cm}
+     \begin{center}
+       \begin{small}
+         \begin{tabular}{@{}|@{~~}l@{~~}|@{}}
+           \hline
+           \rule[-1.5ex]{0pt}{1ex}\begin{minipage}[b]{1.09\linewidth}
+             \vspace{1ex}
+             \smallskip
+             }{%
+           \end{minipage}\\
+           \hline
+         \end{tabular}
+       \end{small}
+       \vspace{-0.4cm}
+      \caption{\FigCaption}
+       \figlab{\FigLabel}
+     \end{center}
+     \vspace{-0.4cm}
+   \end{figure}
+}
+
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+		
+	
+		\newcommand{\bit}{\{0,1\}}
+		\newcommand{\twoPC}{\ensuremath{\mathsf{2PC}}}
+			\newcommand{\MCF}{\ensuremath{\mathsf{MCF}}}
+		
+
+		
+		\newcommand{\Comment}[2][red]{\marginpar{
+				\fcolorbox{#1}{white}{\parbox{.8in}{
+						\color{#1} \small \sf  #2 }}}}
+		\newcommand{\mcomment}[2]{\textcolor{red}{#1}\Comment{#2}}
+		\newcommand{\TODO}[2][\relax]{\noindent\mcomment{#2}{#1 TODO}}
+		\newcommand{\mytodo}[2]{\mcomment{ #1 }{#2 TODO}}
+	%\newcommand{\ucomment}[3]{\par\noindent{\textcolor{#1}{/* #2 */}}\Comment[#1]{// #3}}
+	\newcommand{\ucomment}[3]{}
+		
+		\newcommand{\anti}[1]{\ucomment{blue}{#1}{Antigoni}}
+		\newcommand{\shai}[1]{\ucomment{red}{#1}{Shai}}
+		\newcommand{\anote}[1]{\ucomment{green}{#1}{Note:}}
+				\newcommand{\znote}[1]{\ucomment{purple}{#1}{Z}}
+		
+		\pagestyle{plain}
+		\sloppy
+		\pagenumbering{arabic}
+
+

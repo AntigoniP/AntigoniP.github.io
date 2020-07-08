@@ -1,0 +1,182 @@
+\newif\iffull
+\newif\ifnotfull
+\fullfalse % Set \fulltrue to get the full version
+\iffull
+\notfullfalse
+\else
+\notfulltrue
+\fi
+
+\iffull % use article style for full version
+\documentclass[11pt]{article}
+%\usepackage[toc]{multitoc}
+%\usepackage{times}
+\usepackage[affil-it]{authblk}
+%\newcommand{\pubinfo}[1]{
+%	\begin{figure}[!t] \vspace*{-5ex} #1\end{figure}}
+\usepackage{fullpage}
+%\usepackage[stable]{footmisc}
+\usepackage{amsthm}
+%\usepackage{mathptmx}
+%\usepackage{lmodern}
+%\usepackage{tikz}
+\usepackage{float}
+\usepackage{protocolj}
+\usepackage{tikz}
+\usepackage{tikzscale}
+\usepackage{amsmath}
+\usepackage{tabularx}
+%\usetikzlibrary{arrows,decorations.pathmorphing,decorations.footprints,
+%	fadings,calc,trees,mindmap,shadows,decorations.text,patterns,positioning,
+%	shapes,matrix,fit}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{claim}{Claim}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem*{remark}{Remark}
+\newenvironment{proofsk}{\begin{proof}[Proof (Sketch)]}{\end{proof}}
+
+\else % use llncs format for short version
+\documentclass[10pt,orivec]{llncs}
+\usepackage{fullpage}
+\newenvironment{proofsk}{\begin{proof}[Proof (Sketch)]}{\end{proof}}
+\newenvironment{prop}{\begin{proposition}}{\end{proposition}}
+\usepackage{protocolj}
+\fi
+
+% packages
+\usepackage{amsfonts,amssymb,amsmath,sectsty,url,float,enumitem}
+%\usepackage[letterpaper,hmargin=.77in,vmargin=.77in]{geometry}
+
+%\usepackage[pdfstartview=FitH,colorlinks,linkcolor=black,filecolor=black,citecolor=black,
+%urlcolor=black]{hyperref}
+%\usepackage{graphicx}
+%%\usepackage{stackrel}
+%\usepackage{ifpdf}
+%\usepackage{multirow}
+%\usepackage{relsize}
+%\usepackage{multicol,color}
+%\usepackage{amsbsy}
+%\usepackage{ragged2e}
+\usepackage{tikz}
+
+\usepackage{amsfonts,amssymb,amsmath,sectsty,url,float,enumitem}
+%\usepackage[letterpaper,hmargin=.77in,vmargin=.77in]{geometry}
+
+%\usepackage[pdfstartview=FitH,colorlinks,linkcolor=black,filecolor=black,citecolor=black,
+%urlcolor=black]{hyperref}
+\usepackage{graphicx}
+%\usepackage{stackrel}
+\usepackage{ifpdf}
+\usepackage{multirow}
+\usepackage{relsize}
+\usepackage{multicol,color}
+\usepackage{amsbsy}
+\usepackage{ragged2e}
+%\usepackage[colorlinks = false]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true, %set true if you want colored links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+    linkcolor=red,  %choose some color if you want links to stand out
+    citecolor=blue,
+}
+
+
+\usetikzlibrary{
+  circuits.logic,
+  circuits.logic.US
+}
+
+\newtheorem{thm}{Theorem}
+%\newcommand{\BT}{\begin{thm}}   \newcommand{\ET}{\end{thm}}
+%\newtheorem{dfn}[thm]{Definition}      %
+%\newcommand{\BD}{\begin{dfn}}   \newcommand{\ED}{\end{dfn}}
+%\newtheorem{corr}[thm]{Corollary}      %
+%\newcommand{\BCR}{\begin{corr}} \newcommand{\ECR}{\end{corr}}
+%---
+\newcommand{\BT}{\begin{thm}}   \newcommand{\ET}{\end{thm}}
+\newtheorem{dfn}{Definition}      %
+\newcommand{\BD}{\begin{dfn}}   \newcommand{\ED}{\end{dfn}}
+\newtheorem{corr}{Corollary}      %
+\newcommand{\BCR}{\begin{corr}} \newcommand{\ECR}{\end{corr}}
+%%%%%%
+\newtheorem{Ithm}{Theorem}[section]     % A counter for Theorems in Intro
+\newcommand{\BIT}{\begin{Ithm}}   \newcommand{\EIT}{\end{Ithm}}
+%---
+\newtheorem{lem}{Lemma}[section]  % A counter for Lemmas etc
+\newcommand{\BL}{\begin{lem}}   \newcommand{\EL}{\end{lem}}
+%\newtheorem{prop}[lem]{Proposition}
+\newcommand{\BP}{\begin{prop}}   \newcommand{\EP}{\end{prop}}
+\newtheorem{clm}{Claim}            %
+\newcommand{\BCM}{\begin{clm}}   \newcommand{\ECM}{\end{clm}}
+\newtheorem{fact}[lem]{Fact}            %
+\newcommand{\BF}{\begin{fact}}   \newcommand{\EF}{\end{fact}}
+\renewenvironment{proof}{\noindent{\bf Proof:~~}}{\qed}
+\newcommand{\BPF}{\begin{proof}} \newcommand {\EPF}{\end{proof}}
+
+\newcommand{\BPR}{\begin{prot}}   \newcommand{\EPR}{\end{prot}}
+\newenvironment{cproof}{\noindent{\bf Proof:~~}}{\hfill $\Box$}
+\newcommand{\BCPF}{\begin{cproof}} \newcommand {\ECPF}{\end{cproof}}
+\newcommand{\Qed}{\hfill $\Box$}
+
+%\newtheorem{remark}[lem]{Remark}
+\newcommand{\BR}{\begin{remark}}   \newcommand{\ER}{\end{remark}}
+
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BE}{\begin{enumerate}}
+\newcommand{\EE}{\end{enumerate}}
+\newcommand{\BI}{\begin{itemize}}
+\newcommand{\EI}{\end{itemize}}
+\newcommand{\BEQ}{\begin{eqnarray*}}
+\newcommand{\EEQ}{\end{eqnarray*}}
+\newcommand{\nmcom}{\nmCom}
+%\newcommand{\sectionbreak}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%   DOCUMENT BEGINS HERE   %%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\iffull
+\title{Witness Encryption from LWE.... }
+\else
+\title{Witness Encryption from LWE.... }
+\fi
+\date{}
+\author{}
+%\ifnotfull
+%\institute{
+%}
+%\fi
+
+\input{macros}
+
+\begin{document}
+\maketitle
+
+\iffull
+\pubinfo{}
+\fi
+
+\input{abstract}
+
+\iffull
+\paragraph{Keywords:}
+\newpage
+\tableofcontents
+\newpage
+\fi
+
+\input{chapters/intro}
+\input{chapters/prelim}
+\input{chapters/ABE}
+\input{chapters/proof}
+
+\bibliographystyle{alpha}
+\bibliography{abbrev1,crypto,refs}
+
+\appendix
+
+\end{document}

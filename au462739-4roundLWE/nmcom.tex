@@ -1,0 +1,128 @@
+%!TEX ROOT=main.tex
+\newcommand{\tv}{\widetilde{v}}
+\newcommand{\hv}{\widehat{v}}
+\newcommand{\tbw}{\textbf{w}}
+\newcommand{\tba}{\textbf{a}}
+\newcommand{\tbalpha}{\boldsymbol{\alpha}}
+\newcommand{\tcA}{\widetilde{\cA}}
+\newcommand{\wtC}{\widetilde{C}}
+\newcommand{\wtR}{\widetilde{R}}
+\newcommand{\wtE}{\widetilde{E}}
+
+\subsection{Corollaries: Black-box 4-round non-malleable commitments and non-malleable zk.}
+
+In \cite{GoyalRRV14}, Goyal et al. constructed 4-round concurrent non-malleable commitment scheme and non-malleable zero-knowledge proof based on one-way functions. Their constructions rely on the underlying one-way function in a non black-box way. This is because they require a 4-round commit-and-prove protocol where the statement is known only in the fourth round and rely on the ZK proof of Feige, Lapidot and Shamir \cite{FeigeLS99} which uses the underlying one-way function in a non black-box way. Therefore, by combining our 4-round commit-and-prove protocol from Section~\ref{sec:cap} with \cite{GoyalRRV14}, we obtain the first constructions of 4-round concurrent non-malleable commitments and 4-round non-malleable zero-knowledge based on one-way permutations where the underlying one-way permutation is used in a black-box way. More precisely, we obtain the following corollary.
+\BCR
+Assuming one-way permutations exist, there is a 4-round concurrent non-malleable commitment scheme and a 4-round non-malleable zero-knowledge proof where the underlying one-way permutation is used in a black-box way.
+\ECR
+Our zero-knowledge achieves optimal round complexity as at least 4-rounds are required for zero-knowledge protocols with black-box simulation \cite{GoldreichK96}.
+
+Recently, Ivan et al found an issue with the proof of the schemes in \cite{GoyalRRV14}. In particular, in the way they rely on the input-delayed zero-knowledge scheme of Lapidot and Shamir. In light of this, we give a self-contained proof of this corollary.
+
+\BPF We start with the following protocol $\inter{C,R}$ of \cite{GoyalRRV14} (that we present almost verbatim): Let $\Com_\sigma(m;r)$ be the Naor commitment algorithm that the sender uses where $\sigma$ is the Receiver's first message $r$ is the random tape for the committer and $m$ is the message. $C$ and $R$ start with common input $t_1,\ldots,t_n$ referred to as tags (that depends on the identity of the session) and security parameter $n$. $C$ has private input a message $m \in \FF_q$ where $q$ is a large prime bigger than all $t_i$'s.
+\BI
+\item $R \rightarrow C$: Send the first message $\sigma$ of the Naor commitment scheme $\Com$:
+\item $C \rightarrow R$: Sample $r_1,\ldots,r_n \in \FF_q$ and random strings $s,s_1,\ldots,s_n$ or appropriate length for generating commitments using $\Com$. Send $\Com_\sigma(m;s),\Com_\sigma(r_1;s_1),\ldots,\Com_\sigma(r_n;s_n)$.
+\item $R \rightarrow C$: Send a random challenge vector $\tbalpha = (\alpha_1,\ldots,\alpha_n)$ where $\alpha_i \in [2^{t_i}] \subset \FF_q$.
+\item $C \rightarrow R$: Send evaluation $\tba = (a_1,\ldots,a_n)$, $a_i = f_i(a_i)$ where $f_i$ is the linear function $f_i(x) = r_i x + m$.
+\item $C \leftrightarrow R$: $C$ proves in $\mathsf{ZK}$ to $R$ that there exists values $(m,s),(r_1,s_1),\ldots,(r_n,s_n)$ that are consistent with the commitment sent in the second message and satisfy the equations $a_i = r_i\alpha_i + m$ for all $i \in [n]$.
+\EI
+
+Theorem~1 in \cite{GoyalRRV14} states that $\inter{C,R}$ is a non-malleable scheme against a synchronizing adversary. Next, we briefly describe their high-level approach. First, we recall the definition of (one-one) non-malleable commitment for synchronizing adversaries.
+
+\paragraph{Defining non-malleable commitments:} Security is defined by comparing a man-in-the-middle experiment  with an adversary $\cA$ and a simulated experinment with an adversary $\cS$. In the (one-one) man-in-the-middle experiment, $\cA$ acting as the receiver interacts with an honest  committer in an execution---referred to as the \emph{left execution}---and receives a commitment to a value $v$ using $\inter{C,R}$ while acting as a committer in another execution---referred to as the \emph{right execution} with an honest receiver and commits to a value $\tilde{v}$. The left and right executions proceed in a lock-step fashion when considering a synchronized adversary. Furthermore, the adversary choses the idenity of both the left and right executions. In a simulated experiment, the simulator $\cS$ simply interacts in a right execution acting as a commmitter with an honest receiver and commits to a value $v$
+Let $\mim_{\cA}(n,z,v)$ denote the view of the adversary and value committed to in the right execution\footnote{Since we are dealing only with statistically-binding commitments, such a value exists and is implicitly defined. This random variable is not efficienly computable.} when it receives a commitment to $v$ in the left execution on common input $n$ and auxiliary input $z$. The output of $\mim$ is set to $\bot$ if the adversary choose the same identity in the left and right execution. Let $\sta_{\cS}(n,z)$ denote the output of $\cS$ and value committed to by $\cS$ in the right execution. 
+
+The commitment scheme  $\inter{C,R}$ is said to be (one-one) non-malleable if for every $\ppt$ adversary $\cA$ there exists a simulator $\cS$ such that the following two distributions are computationally indistinguishable.
+\BI
+\item $\{\mim_{\cA}(n,z,v)\}_{n \in \NN,v \in \{0,1\}^n, z \in \{0,1\}^*}$
+\item $\{\sta_{\cS}(n,z)\}_{n \in \NN,v \in \{0,1\}^n, z \in \{0,1\}^*}$
+\EI
+
+\cite{GoyalRRV14} prove that their construction is (one-one) non-malleable in three steps: 
+
+
+\BE
+\item Define a simulator:  $\cS$ is defined as the machine that on input $n,z$ simply emulates a man-in-the-middle experiment where the left commitment is set to $0^n$ and then finally outputs the view of the adversary $\cA$ from the internal emulation. Therefore, $\sta_{\cS}(n,z) = \min_{\cA}(n,z,0^n)$. 
+\item  Construct an extractor $E$ that can do the following: Given the view of $\cA$ in the man-in-the-middle experiment after the commit phase has concluded, outputs output a value $\widetilde{m}$ that is ``allegedly'' the value committed by $\cA$ in the right-execution part of this view. If such an $E$ can successfully output the correct value in the right execution. More precisely, they show that  %exists a distinguisher $\cD$ that can distinguish  $\mim_\cA(n,z_n,v_n)$ and $\mim_\cA(n,z_n,0^n)$ with probability at least $2p$, 
+conditioned on $\cA$ successfully completing the right execution with an honest receiver in the input fed to $E$, then the value $E$ outputs as the value committed in the right execution is correct with probability at least $1-q$. Moreover, $E$ runs polynomial in $\frac{1}{q}$. 
+\item  Show that $\inter{C,R}$ is a (stand-alone) statistically-binding and (stand-alone) computationally hiding commitment scheme.
+\EE
+Given the three steps, the proof can deduced as follows:
+Assume for contradiction, there exists an adversary $\cA$, distinguisher $\cD$, values $\{v_n\}_{n\in\NN}$ and $\{z_n\}_{n\in\NN}$, and polynomial $p(\cdot)$ such that $\cD$ distinguishes $\mim_\cA(n,z_n,v_n)$ and $\mim_\cA(n,z_n,0^n)$ with probability $\frac{1}{p(n)}$ for infinitely many $n$. We can assume without loss of generality that $\cA$ is convincing in the right execution with probability at least $\frac{1}{2p(n)}$ in both $\mim_\cA(n,z_n,v_n)$ and $\mim_\cA(n,z_n,0^n)$. Then, chose $q=\frac{1}{4p(n)}$. Now we can use $E$ and $\cD$ to violate the stand-alone computationally hiding property of $\inter{C,R}$ by distinguishing a commitment to $v_n$ and $0^n$ for infinitely many $n$  as follows: Consider a malicious $R^*$ that 
+\BI
+\item Runs a man-in-the-middle experiment with  $\cA$ where the left commitment is forwarded from the external committer that $R^*$ interacts with. 
+\item Internally $R^*$ emulates an honest receiver in the right execution. 
+\item After the execution concludes, $R^*$ runs $E$ on the view of the adversary $\cA$ to obtain a value.
+\item  Then it runs $\cD$ on the view of $\cA$ with the value output $E$ and outputs what $D$ outputs. 
+\EI
+Recall that $D$ distinguishes with probabilty at least $\frac{1}{p(n)}$ if the values are correct for the views and   using a union bound, the values are correct except with probability $\frac{1}{2p(n)}$. Therefore, the probability $R^*$ distinguishes a commitment to $v_n$ and $0^n$ with probability at least $\frac{1}{2p(n)}$. 
+
+\paragraph{Proof of concurrent non-malleability:} Proving concurrent non-malleability requires considering non-synchronizing adversaries that interact as receiver in polynomially many interactions as the receiver on the right and polynomially many interactions on the right as the committer. Security now requires that the view of the man-in-the-middle adversary along with all the commitments in the right interactions are indistinguishable from a stand-alone simulator that only interacts in polynomially many right interactions.
+
+The high-level idea of extending the synchronizing to non-synchronizing case is to case all possible interleaving of left and right interactions. We will not get into this proof and will try to argue this directly for our case. The protocol $\inter{C,R}$ described above is at least $7$ rounds if we use a standard zero-knowledge protocol to be executed in the fourth step. To reduce the round complexity to 4-rounds, \cite{GoyalRRV14} use the input-delayed zero-knowledge of Lapidor and Shamir \cite{LapidorS90}. It is precisely in this combining step that the work of \cite{Ivan} describes a flaw.
+
+We will combine the first four rounds of the protocol described above with our input-delayed commit-and-prove protocol from the previous section and argue correctness. 
+
+\paragraph{Description of protocol.}
+
+Our protocol will rely on our input-delayed commit and prove protocol that in turn relied on an adaptive-input secure randomized encodings of polynomial-time computable functions $f$. We will also rely on a non-interactive commitment scheme $\com$ that can be based on one-way permutations. 
+
+In our protocol $\inter{\wtC,\wtR}$, just as in \cite{GoyalRRV14}, $\wtC$ and $\wtR$ start with common input $t_1,\ldots,t_n$ referred to as tags (that depends on the identity of the session) and security parameter $n$. $\wtC$ has private input a message $m \in \FF_q$ where $q$ is a large prime bigger than all $t_i$'s.
+\BI
+\item $\wtR \rightarrow \wtC$: \item  $\wtR$ picks a random $t$-subset $I$ of $[N]$. It also picks $t$ random challenge bits $\{ch_i\}_{i\in I}$ and commits to them.
+\item $\wtC \rightarrow \wtR$: Sample $r_1,\ldots,r_n \in \FF_q$ and proceeds as follows:
+\BE
+\item It first generates $N$ independent additive sharings of the witness $m$ (modulo $q$) say $\{(w_{i,0},w_{i,1})\}_{i \in [N]}$ where each $w_{i,b} \in \FF_q$ and $N$ sharings of each $r_i$, call them $\{(w_{i,j,0},w_{i,j,1})\}$.
+
+\item\label{item:mpc} Next, it generates the views of $2N$ parties $P_{i,0}$ and $P_{i,1}$ for $i \in [N]$ executing a $t$-robust $t$-private MPC protocol, where $P_{i,b}$ has input $\tbw_{i,b} = (w_{i,b},w_{i,1,b},\ldots,w_{i,n,b})$, that realizes the functionality that checks if the sets $\{w_{i,0}+ w_{i,1}\}_{i\in[N]}$ and $\{w_{i,j,0}+w_{i,j,1}\}_{i \in [N]}$ for $j \in [n]$  are all singletons (i.e. all pairs of shares reconstruct to the same secret). Let $V_{i,j}$ be the view of party $P_{i,j}$.
+
+\item Next, it computes $N$ offline encodings of the following set of functions:
+$$
+f_{\tbw_{i,0},V_{i,0}}(x,\tbw_{i,1},V_{i,1}) = (result,x,\tbw_{i,1},V_{i,1})
+$$
+for $i \in [N]$, where $result=1$ if and only if $\cR(x,w_{i,0} \oplus w_{i,1})$ holds and the views $V_{i,0}$ and $V_{i,1}$ are consistent with each other.
+\item
+Finally, $\wtC$ sends:
+$$
+\big\{f^{\off}_{\tbw_{i,0},V_{i,0}}(R_i),\com(R_i),\com(\tbw_{i,0}),\com(\tbw_{i,1}),\com(V_{i,0}),\com(V_{i,1})\big\}_{i \in [N]}.
+$$
+\EE
+\item $\wtR \rightarrow \wtC$: Send a random challenge vector $\tbalpha = (\alpha_1,\ldots,\alpha_n)$ where $\alpha_i \in [2^{t_i}] \subset \FF_q$. It also decommits the set $I$ and the challenges $\{ch_i\}_{i\in[t]}$.
+\item $\wtC \rightarrow \wtR$: Send evaluation $\tba = (a_1,\ldots,a_n)$, $a_i = f_i(a_i)$ where $f_i$ is the linear function $f_i(x) = r_i x + m$. Besides this, $C$ also proves that the values are correct as follows:
+\item For every index $i$ in the $t$ subset $\wtC$ replies as follows:
+\BI
+\item If $ch_i=0$ then it decommits to $R_i$, $\tbw_{i,0}$ and $V_{i,0}$. $\wtR$ then checks if the offline part was constructed correctly (as in our basic proof).
+
+\item If $ch_i=1$ then it sends $f_{\tbw_{i,0},V_{i,0}}^{\on}(R_i,x,\tbw_{i,1},V_{i,1})$ and decommits $\tbw_{i,1}$ and $V_{i,1}$. $\wtR$ then runs the decoder and checks if it obtains $(1,x,\tbw_{i,1},V_{i,1})$ where $x = (\tbalpha,\tba)$.
+\EI
+Furthermore, the receiver checks that the views $V_{i,ch_i}$ are consistent with the MPC-in-the-head protocol.
+\EI
+
+\paragraph{Proof of non-malleability.} %The security definition for concurrent non-malleable commitment is essetially the same as the (one-one) case with the exception that we have another parameter $m = p_0(n)$ representing the number of concurrent interactions on the left and the right. $\mim_\cA(n,z,v_1,\ldots,v_m)$ will represent the view of the adversary and the values $\tv_1,\ldots,\tv_m$ committed to by the adversary in the right interactions when receiving commitments to values $v_1,\ldots,v_m$ on the left. As before $\tv_j$ will be  set to $\bot$ if the identity of the $j^{th}$ session on the right is the same as  any of the left interaction. $\sta_\cS(n,z)$ on the other hand will have a simulator $\cS$ that only interacts in at most $m$ right interactions and represent the output of $\cS$ and the values committed to by $\cS$ in the right interactions.
+
+We will trace the same steps of the proof as in \cite{GoyalRRV14}. Namely,
+\BE
+\item Define a simulator:  Our simulation will follow the same strategy as in \cite{GoyalRRV14} where $\cS$ simply commits to $0^n$ to in the left interaction.  More precisely, $\cS$ internally emulates $\cA$ and forwards the right interactions to external receiver. In the left, it internall emulates the code of an honest committer committing to $0^n$ in the left interaction. At the end of the execution, $\cS$ outputs the view of $\cA$ in the internal emulation. 
+\item  Construct an extractor $\wtE$ that can do the following: Given the view of $\cA$ in the man-in-the-middle experiment after the commit phase has concluded, outputs  a value $\widetilde{m}$ that is ``allegedly'' the value committed by $\cA$ in the right-execution  of this view. %If such an $E$ can successfully output the correct value in the right execution. More precisely, they show that  %exists a distinguisher $\cD$ that can distinguish  $\mim_\cA(n,z_n,v_n)$ and $\mim_\cA(n,z_n,0^n)$ with probability at least $2p$,  conditioned on $\cA$ successfully completing the right execution with an honest receiver in the input fed to $E$, then the value $E$ outputs as the value committed in the right execution is correct with probability at least $1-q$. Moreover, $E$ runs polynomial in $\frac{1}{q}$. 
+\item  Show that $\inter{\wtC,\wtR}$ is a (stand-alone) statistically-binding and (stand-alone) computationally hiding commitment scheme.
+\EE
+
+\paragraph{Defining $\wtE$:} Our extractor will use the \cite{GoyalRRV14} extractor $E$ and extract the values in the right interaction one by one. Given an adversary $\cA$ for our protocol, we will construct an adversary $\tcA$ for the \cite{GoyalRRV14} protocol and run $E$ with $\tcA$. We will use the fact that $E$ operates only the first four rounds of the protocol \cite{GoyalRRV14} and in particular does not rely on the zero-knowledge protocol that is executed after the four rounds. The first four rounds of their protocol is executed as part of our protocol with the exception that we rely on a non-interactive commitment scheme $\com$ based on one-way permutation while they rely on two-round commitment based on one-way functions.
+
+In more detail, given an adversary $\cA$ for our protocol, construct $\tcA$ as follows. It internally emulates $\cA$ and forwards the 
+
+
+
+\EPF
+
+
+
+
+We remark here that one-way permutations are required to make the commitment made by the verifier in the first round non-interactive. If we instead want a construction based on one-way functions, the protocols become 5-rounds. Hence, we obtain the following corollary.
+\BCR
+Assuming one-way functions exist, there is a 5-round concurrent non-malleable commitment scheme and a 5-round non-malleable zero-knowledge proof where the underlying one-way function is used in a black-box way.
+\ECR
+More recently, the work of \cite{GoyalPR15} provided new black-box constructions of 3-round non-malleable commitments based on one-way permutations. However, their protocol is not concurrently secure and only provided bounded non-malleability.
+
+

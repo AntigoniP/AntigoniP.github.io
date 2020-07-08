@@ -1,0 +1,235 @@
+% !TEX root =../main.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Preliminaries}\label{sec:prelim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%
+
+  \paragraph{Notation.}
+  We denote the security parameter by $\lambda$. A function
+  $\ngl:\NN\rightarrow\NN$ is {\em negligible} if for every positive
+  polynomial $p(\cdot)$ and all sufficiently large $\lambda$'s it holds
+  that $\ngl(\lambda)<\frac{1}{p(\lambda)}$. We use the abbreviation
+  \ppt\ to denote probabilistic polynomial-time. For any integer $q \geq 2$, we let $\ZZ_q$
+denote the ring of integers modulo $q$ and we represent $\ZZ_q$ as integers in $(-q/2, q/2]$. We let $\ZZ_q^{n\times m}$ denote the set of $n \times m$ matrices with entries in $\ZZ_q$. The notation $A^{\top}$ denotes the transpose of the matrix $A$. Let $x = (x_1, \ldots, x_n) \in \ZZ^n$ be a
+vector. We often use $[n]$ to denote the set $\{1,...,n\}$ . For any distribution $\dist$, $d \leftarrow \dist$ denotes an element $d$ drawn from distribution $\dist$ or, if $\dist$ is a finite set then $d \leftarrow \dist$ denotes a uniformly random element $d$ from the set $\dist$. If $\dist_1$ and $\dist_2$ are two distributions, then $\dist_1 \statind \dist_2$ denotes that they are statistically close, $\dist_1\compind\dist_2$ denotes that they are computationally indistinguishable. %, and $ \dist_1 \idind \dist_2$ denotes identical  distributions.
+
+
+\subsection{Lattice Preliminaries}
+\paragraph{Learning with Errors (LWE).} The $\LWE$ problem was introduced by Regev \cite{Reg09} and is parametrized by the dimension of the lattice $n$, the number of samples $m$, the modulus $q$ and the error distribution $\chi$. In the following, we recall the definition of the \emph{decisional} version of $\LWE$. 
+
+\begin{definition}[LWE \cite{Reg09}] Let $\lambda$ be the security parameter, $n = n(\lambda), q = q(\lambda)$ be integers and let  $\chi=\chi (\lambda)$, be distributions over $\ZZ$. The $\LWE_{n,q,\chi}$ assumption says that for any polynomial $m = m(\lambda)$,
+$$(A, s\cdot A + e) \compind  (A, z) $$ where $A \leftarrow  \ZZ^{n\times
+    m}_q$, $ s    \leftarrow \ZZ^n_q, e  \leftarrow \chi^m$ and $z
+  \leftarrow  \ZZ^m_q$.
+\label{def:LWE}
+\end{definition}
+
+\paragraph{LWE with Short Secrets.} As in the work of \cite{C:KopWat16}, we will be using a variant of the $\LWE$ problem called 
+\emph{$\LWE$ with
+Short Secrets}. In this variant, introduced by Applebaum et al. \cite{C:ACPS09}, the secret vector is also chosen from
+the noise distribution. They showed that this variant is as hard as LWE for sufficiently large number of
+samples $m$.
+
+
+
+\begin{definition}[LWE with Short Secrets] Let $\lambda$ be the security parameter, $n = n(\lambda), q = q(\lambda)$ be integers and let  $\chi=\chi (\lambda)$, be distributions over $\ZZ$. The $\mathsf{ss}$-$\LWE_{n,q,\chi}$ with short secrets assumption says that for any polynomial $m = m(\lambda)$,
+$$(A, S\cdot A + E) \compind  (A, Z) $$ where $A \leftarrow  \ZZ^{n\times
+    m}_q$, $ S    \leftarrow \chi^{n\times n}, E  \leftarrow \chi^{n\times m}$ and $Z
+  \leftarrow  \ZZ^{n\times m}_q$.
+\label{def:LWE}
+\end{definition}
+
+
+\paragraph{Lattices with Trapdoors}
+\anti{Define trapdoor lattice sampler, algorithms TrapGen and SamplePre}
+
+
+
+\subsection{Witness Encryption}
+In this section we recall the definitions for witness and positional witness encryption according to \cite{C:GenLewWat14}. 
+\BD[Witness Encryption \cite{C:GenLewWat14}]
+ A \emph{witness encryption} scheme for an $\NP$ language $L$ (with corresponding witness
+relation $R$) consists of the following two polynomial-time algorithms:
+
+\BI
+
+\item{\bf Encryption.} The algorithm $\Encrypt(1^\lambda, x,\mu)$ takes as input a security parameter $\lambda$, an
+unbounded-length string $x$, and a message $\mu\in \cM$ for some message space $\cM$, and outputs a ciphertext $\ct$.
+\item{\bf Decryption.} The algorithm $\Decrypt(\ct,w)$ takes as input a ciphertext $\ct$ and an unbounded-length string $w$, and outputs a message $\mu$ or the symbol $\bot$.
+\EI
+\ED
+
+\BD[Correctness of Witness Encryption] For any security parameter $\lambda$, for any $\mu\in \cM$, and for any $x \in L$ such that $R(x, w)$ holds, we have that
+$$Pr\big[\Decrypt(\Encrypt(1^\lambda, x,\mu),w)=\mu\Big]=1$$
+
+\ED
+\paragraph{Soundness Security.} We model soundness security for a witness encryption scheme for a language
+$L$ that is parameterized as for an instance $x$ and two equal length messages $m_0, m_1$. We
+define the (parameterized) advantage of an attacker as
+$$\WEadv^{\WE}_{\cA,x,\mu_0,\mu_1}(\lambda)=Pr[\cA(\Encrypt(1^\lambda, x,\mu_1))=1]-Pr[\cA(\Encrypt(1^\lambda, x,\mu_0))=1]$$
+
+
+\BD[Soundness Security of Witness Encryption] We say that a witness encryption
+scheme for a language $L$ with witness relation $R(\cdot,\cdot)$ is secure if for any probabilistic poly-time
+attack algorithm $\cA$ there exists a negligible function in the security parameter $\ngl(\cdot)$ such that for
+all $x \notin L$ and equal length messages $m_0, m_1$ we have $\WEadv^{\WE}_{\cA,x,\mu_0,\mu_1}(\lambda) \leq \ngl(\lambda)$.
+
+\ED
+
+\subsubsection{Positional Witness Encryption}
+
+\BD[Positional Witness Encryption \cite{C:GenLewWat14}]
+ A \emph{positional witness encryption} scheme for an $\NP$ language $L$ (with corresponding witness
+relation $R$) consists of the following two polynomial-time algorithms:
+
+\BI
+
+\item{\bf Encryption.} The algorithm $\PEncrypt(1^\lambda, x,t,\mu)$ takes as input a security parameter $\lambda$, an
+unbounded-length string $x$, a position index $t \in [0, 2^{\ell}]$ (we let $\ell = \ell(x)$) and a message $\mu\in \cM$ for some message space $\cM$, and outputs a ciphertext $\ct$.
+\item{\bf Decryption.} The algorithm $\PDecrypt(\ct,w)$ takes as input a ciphertext $\ct$ and an unbounded-length string $w$, and outputs a message $\mu$ or the symbol $\bot$.  (We assume the ciphertext specifies
+the instance $x$ and therefore $\ell = \ell(x)$ is known.)
+\EI
+\ED
+
+Given a string $w \in \bit^\ell$ we will sometimes slightly abuse notation and also refer to $w$ as an
+integer in $[0, 2^{\ell ? 1}]$ where the most significant bit is the leftmost bit. In other words, we consider
+the integer $\sum_{i\in[\ell]}w_i\cdot 2^{\ell ? i}$ where $w_i$ is the $i$-th bit of the string $w$.
+
+\BD[(Perfect) Correctness of Positional Witness Encryption] For any security parameter $\lambda$, for any $\mu\in \cM$, and for any $x \in L$ such that $R(x, w)$ holds for $w\geq t$, we have that
+$$\PDecrypt(\PEncrypt(1^\lambda, x,t,\mu),w)=\mu.$$
+
+\ED
+\paragraph{Message Indistinguishability.} The security of a positional witness encryption for language $L$
+is given as two security properties. The first is message indistinguishability, which is parameterized
+by an instance $x$ and two equal length messages $\mu_0, \mu_1$. Intuitively, the security property states
+that if one encrypts to the final position $t = 2^\ell$ (where $\ell$ is the witness length of $x$) then no
+attacker can distinguish whether a ciphertext is an encryption of $\mu_0$ or $\mu_1$. We emphasize that
+this security property is entirely independent of whether $x \in L$. We define the (parameterized)
+advantage of an attacker as
+
+$$\WEadv^{\PWE}_{\cA,x,\mu_0,\mu_1}(\lambda)=Pr[\cA(\PEncrypt(1^\lambda, x,t = 2^\ell,\mu_1))=1]-Pr[\cA(\Encrypt(1^\lambda, x,t = 2^\ell,\mu_0))=1]$$
+
+\BD [Message Indistinguishability Security of Positional Witness Encryption] We say
+that a positional witness encryption scheme for a language $L$ with witness relation $R(\cdot, \cdot)$ is \emph{Message
+Indistinguishability secure} if for any probabilistic poly-time attack algorithm $\cA$ there exists a
+negligible function in the security parameter $\ngl(\cdot)$ such that for all instances $x$ and equal length
+messages $\mu_0, \mu_1$ we have $\WEadv^{\PWE}_{\cA,x,\mu_0,\mu_1}(\lambda) \leq \ngl(\lambda)$.
+\ED
+
+
+\paragraph{Position Indistinguishability.} The second security game is positional indistinguishability. Informally,
+this security game states that it is hard to distinguish between an encryption to position
+$t$ from an encryption to $t + 1$ when $t$ is not a valid witness, that is, $R(x, t) = 0$. (Here we slightly
+abuse notation in the other direction by interpreting the integer $t$ as a bit string.) Positional indistinguishability
+security is parameterized by an instance $x$, a message $m$, and a position $t \in [0, 2^{\ell}-1]$ where $\ell$ is the witness length of $x$. We define the (parameterized) advantage of an attacker as
+
+$$\Padv^{\PWE}_{\cA,x,\mu,t}(\lambda)=Pr[\cA(\PEncrypt(1^\lambda, x,t +1,\mu))=1]-Pr[\cA(\Encrypt(1^\lambda, x,t ,\mu))=1]$$
+
+\BD [Position Indistinguishability Security of Positional Witness Encryption] We say
+that a positional witness encryption scheme for a language $L$ with witness relation $R(\cdot, \cdot)$ is \emph{Position
+Indistinguishability secure} if for any probabilistic poly-time attack algorithm $\cA$ there exists a
+negligible function in the security parameter $\ngl(\cdot)$ such that for all instances $x$, all message $\mu$,
+and any $t \in [0, 2^{\ell }-1]$ where $R(x, t) = 0$ we have $\Padv^{\PWE}_{\cA,x,\mu,t}(\lambda) \leq \ngl(\lambda)$.
+\ED
+We require that both the message length and the problem statement length must be
+bounded by some polynomial of the security parameter.
+
+
+\subsection{LWE Recoding Scheme}
+\anti{I removed the symmetric encryption scheme from the definition of TOR in \cite{STOC:GorVaiWee13} used to encrypt the plaintext and did it directly on LWE}
+
+The work of \cite{STOC:GorVaiWee13} presented an LWE Recoding Scheme where encodings are of the form 
+$$\Encode(A, S)=A^\top S +e $$
+where $A \leftarrow  \ZZ^{n\times
+    m}_q$, $ s    \leftarrow \ZZ^n_q, e  \leftarrow \chi^m$ and $A^\top$ denotes the transpose of matrix $A$ with the following properties. 
+    
+    \BD 
+An LWE Recoding scheme over the input space $\cS = \{\cS_\sec\}$ consists of six polynomial-time algorithms
+$(\Params, \Keygen, \Encode, \ReKeyGen, \SimReKeyGen, \Recode)$ with the following properties:
+
+\BI
+\item $\Params(1^\sec, d_{max})$ is a probabilistic algorithm that takes as input the security parameter $\sec$ and
+an upper bound $d_{max}$ on the number of nested recoding operations (written in binary), outputs
+global public parameters $\pp$.
+
+
+\item $\Keygen(\pp)$ is a probabilistic algorithm that outputs a public/secret key pair $(A, T_A)$.
+\item $\Encode(A, S)$ is a probabilistic algorithm that takes A and an input $S \in \cS$, and outputs an
+encoding $L_A$.\\
+
+There is a recoding mechanism together with two ways to generate recoding keys: given
+one of the two secret keys, or by programming the output public key.\\
+
+
+\item $\ReKeyGen(A_0, A_1, T_{A_0}, A_{\tgt})$ is a probabilistic algorithm that takes a key pair $(A_0, T_{A_0})$,
+another public key $A_1$, a target public key $A_{\tgt}$, and outputs a recoding key $\rk$.
+\item $\SimReKeyGen(A_0,A_1)$ is a probabilistic algorithm that takes two public keys $(A_0, {A_1})$ and
+outputs a recoding key $\rk$ together with a target public key $A_{\tgt}$.
+\item $ \Recode(\rk,  L_{A_0},  L_{A_1})$ is a deterministic algorithm that takes the recoding key $\rk$, two encodings  $L_{A_0}$
+and  $L_{A_1}$, and outputs an encoding $L_{A_\tgt}$.
+
+\EI
+
+\ED
+\remark $Encode(A, S)$ can be inverted to recover $S$
+using the corresponding secret key $T_A$.
+\paragraph{Correctness of LWE Recoding Scheme.}
+Correctness of an LWE Recoding scheme requires the following. First, for every $A$ and $S \in \cS$,
+there exists a family of sets $\bfL_{A,S,j}, j=0,1,\ldots,d_{max}$:
+\BI
+\item$ Pr[\Encode(A; S) \in \bfL_{A,S,0}] = 1$, where the probability is taken over the coin tosses of $\Encode$; \item$\bfL_{A,S,0} \subseteq \bfL_{A,S,1} \subseteq\ldots \subseteq \bfL_{A,S,d_{max}}$.
+
+\EI
+Note that these properties hold trivially if $\Encode$ is deterministic. Secondly, the correctness of recoding requires that for any triple of key pairs
+$(A_0, T_{A_0}), (A_1, T_{A_1}), (A_\tgt, T_{A_\tgt})$, and any encodings $L_{A_0}\in \bfL_{A_0,S,j_0}$ and $L_{A_1}\in\bfL_{A_1,S,j_1}$, 
+$$ \Recode(\rk,  L_{A_0},  L_{A_1}) \in \bfL_{A_\tgt,S,max(j_0,j_1)+1}$$
+
+
+\paragraph{Statistical Security Properties.} Note that we have three ways of sampling recoding keys: using
+$\ReKeyGen$ along with one of two secret keys $T_{A_0}$ or $T_{A_1}$; using $\SimReKeyGen$ while programming $A_{\tgt}$.
+We require that all three ways lead to the same distribution of recoding keys, up to some statistical
+error.
+\BI
+\item (Key Indistinguishability) : Let $A_b, T_{A_b} \leftarrow  \Keygen(\pp)$ for $b = 0, 1$ and $A_\tgt, T_{A_\tgt} \leftarrow  \Keygen(\pp)$ The following two ensembles must be statistically indistinguishable:
+
+$$\Big[\aux,\ReKeyGen(A_0, A_1, T_{A_0}, A_{\tgt})\Big]\statind\Big[Aux,\ReKeyGen(A_0, A_1, T_{A_1}, A_{\tgt})\Big]$$
+where $\aux=((A_0, T_{A_0}), (A_1, T_{A_1}), (A_\tgt, T_{A_\tgt}))$.
+
+\item(Recoding Simulation): Let $A_b, T_{A_b} \leftarrow  \Keygen(\pp)$ for $b = 0, 1$. Then, the following two ways of sampling the tuple $[(A_0, T_{A_0}), (A_1, T_{A_1}), A_\tgt, \rk]$ must be statistically indistinguishable:
+
+
+\[
+\Big{[}(A_0, T_{A_0}), (A_1, T_{A_1}), A_\tgt, \rk: (A_\tgt, T_{A_\tgt}) \leftarrow  \Keygen(\pp); \rk\leftarrow\ReKeyGen(A_0, A_1, T_{A_0}, A_{\tgt})
+\Big{]}~~\statind \]
+\[
+\Big{[}(A_0, T_{A_0}), (A_1, T_{A_1}), A_\tgt, \rk: (A_\tgt,\rk) \leftarrow\SimReKeyGen(A_0,A_1)
+\Big{]}.
+\]
+
+\EI
+
+\paragraph{Computational Security Property.} We require that given the encoding of a random $S$ on
+$\ell = poly(\sec)$ keys, the evaluation at a fresh key is pseudorandom.
+\BI
+\item (Correlated Pseudorandomness) : For every polynomial $\ell =\ell (\sec)$, let $(A_i, T_{A_i}) \leftarrow  \Keygen(\pp)$ for $i \in[\ell+1]$. Let $S \xleftarrow{\$} \cS$, and let $L_{A_i}\leftarrow \Encode(A_i, S)$ for $i \in[\ell+1]$. Then, the following two
+ensembles must be computationally indistinguishable:
+
+$$\Big[(A_i, L_{A_i})_{i\in[\ell]},A_{\ell+1},L_{A_{\ell+1}} \Big]\compind
+\Big[(A_i, L_{A_i})_{i\in[\ell]},A_{\ell+1},L_{A}:L_{A}\xleftarrow{\$} \cK \Big]$$
+
+We define the advantage function $\adv_\cA^{\sf CP}(\sec)$ to be:
+
+\[ \
+\Pr\left[ \begin{split}& \pp\leftarrow \Setup(1^\sec);S \xleftarrow{\$} \cS  \\& (A_i, T_{A_i}) \leftarrow  \Keygen(\pp),\\ & L_{A_i}\leftarrow \Encode(A_i, S), i=1,\ldots,\ell; \\&L'_0\leftarrow \Encode(A_{\ell+1}, S);  \\& b \xleftarrow{\$}\bit; L'_1\xleftarrow{\$} \cK \\& b'\leftarrow \cA(A_1,\ldots,A_{\ell+1}, L_{A_1},\ldots,L_{A_\ell},L'_b)\\ \end{split}\right]-\frac{1}{2}\\
+\]
+
+and we require that for all PPT $\cA$, the advantage function $\adv_\cA^{\sf CP}(\sec)$ is a negligible function in $\sec$.
+\EI
+\anti{need to write some details about the analysis}
+
+
+
+
+

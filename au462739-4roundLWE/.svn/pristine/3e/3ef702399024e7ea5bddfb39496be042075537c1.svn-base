@@ -1,0 +1,234 @@
+% !TEX root =../main-optimal.tex
+
+% !TEX root =../main-optimal.tex		--- NOT TRUE ANYMORE
+% % !TEX root =./appendix.tex
+
+\section{Secure Computation Definitions}
+\label{sec:mpc}
+
+For completeness, we recall the definition of secure computation based on \cite[Chapter 7]{Goldreich04} here. We only recall the two party case as it is most relevant to our proofs. The description naturally extends to multi-party case as well (details can be found in \cite{Goldreich04}).
+
+
+\paragraph{Two-party computation.} A two-party protocol problem is cast by specifying a random process
+that maps pairs of inputs to pairs of outputs (one for each party). We refer to such a process as
+a functionality and denote it $\mathbf{\func} : \bit^* \times \bit^*\rightarrow\bit^* \times \bit^*$ where $\mathbf{\func} = (F_1, F_2)$. That is,
+for every pair of inputs $(x, y)$, the output-pair is a random variable $(F_1(x, y), F_2(x, y))$ ranging over
+pairs of strings. The first party (with input $x$) wishes to obtain $F_1(x, y)$ and the second party (with
+input $y$) wishes to obtain $F_2(x, y)$.
+
+
+\paragraph{Adversarial behavior.} Loosely speaking, the aim of a secure two-party protocol is to protect
+an honest party against dishonest behavior by the other party. In this paper, we consider malicious
+adversaries who may arbitrarily deviate from the specified protocol. When considering malicious
+adversaries, there are certain undesirable actions that cannot be prevented. Specifically, a party
+may refuse to participate in the protocol, may substitute its local input (and use instead a different
+input) and may abort the protocol prematurely. One ramification of the adversary's ability to
+abort, is that it is impossible to achieve {\em fairness}. That is, the adversary may obtain its output
+while the honest party does not. In this work we consider a static corruption model, where one of the parties is adversarial and the other is honest, and this is fixed before the execution begins.
+
+
+\paragraph{Communication channel.} In our results we consider a secure simultaneous message exchange channel in which all parties can simultaneously send messages over the channel at the same communication round. Moreover, we assume an asynchronous network\footnote{The fact that the network is asynchronous means that the messages are not necessarily delivered in the order which
+they are sent.} where the communication is open (i.e. all the communication between the parties is seen by the adversary) and delivery of messages is not guaranteed. For simplicity, we assume that the delivered messages are authenticated. This can be achieved using standard methods.
+
+
+
+\paragraph{Security of protocols (informal).} The security of a protocol is analyzed by comparing what an
+adversary can do in the protocol to what it can do in an ideal scenario that is secure by definition.
+This is formalized by considering an ideal computation involving an incorruptible trusted third
+party to whom the parties send their inputs. The trusted party computes the functionality on the
+inputs and returns to each party its respective output. Loosely speaking, a protocol is secure if
+any adversary interacting in the real protocol (where no trusted third party exists) can do no more
+harm than if it was involved in the above-described ideal computation.
+
+
+
+\paragraph{Execution in the ideal model. } As we have mentioned, some malicious behavior cannot be
+prevented (for example, early aborting). This behavior is therefore incorporated into the ideal
+model. An ideal execution proceeds as follows:
+\BDE
+\item {\bf Inputs:} Each party obtains an input, denoted $w$ ($w = x$ for $\sen$, and $w = y$ for $\rec$).
+\item  {\bf Send inputs to trusted party:} An honest party always sends $w$ to the trusted party. A malicious
+party may, depending on $w$, either abort or send some $w' \in\bit^{|w|}$ to the trusted party.
+\item  {\bf Trusted party answers first party:} In case it has obtained an input pair $(x, y)$, the trusted
+party first replies to the first party with $F_1(x, y)$. Otherwise (i.e., in case it receives only one
+valid input), the trusted party replies to both parties with a special symbol $\bot$.
+\item  {\bf Trusted party answers second party: } In case the first party is malicious it may, depending on
+its input and the trusted party's answer, decide to stop the trusted party by sending it $\bot$ after
+receiving its output. In this case the trusted party sends $\bot$ to the second party. Otherwise
+(i.e., if not stopped), the trusted party sends $F_2(x, y)$ to the second party.
+\item  {\bf Outputs:} An honest party always outputs the message it has obtained from the trusted party. A
+malicious party may output an arbitrary (probabilistic polynomial-time computable) function
+of its initial input and the message obtained from the trusted party.
+\EDE
+Let $\mathbf{\func} : \bit^* \times \bit^*\rightarrow\bit^* \times \bit^*$ be a functionality where $\mathbf{\func} = (F_1, F_2)$ and let $\cS =
+(\cS_1, \cS_2)$ be a pair of non-uniform probabilistic expected polynomial-time machines (representing
+parties in the ideal model). Such a pair is {\em admissible} if for at least one $i\in \{1, 2\}$ we have that $\cS_i$
+is honest (i.e., follows the honest party instructions in the above-described ideal execution). Then,
+the {\em joint execution of $F$ under $\cS$ in the  ideal model} (on input pair $(x, y)$ and security parameter $\kappa$), denoted $\ideall_{\mathbf{\func},\cS}(\kappa,x,y)$
+is defined as the output pair of $\cS_1$ and $\cS_2$ from the above ideal execution.
+
+
+\paragraph{Execution in the real model.} We next consider the real model in which a real (two-party)
+protocol is executed (and there exists no trusted third party). In this case, a malicious party
+may follow an arbitrary feasible strategy; that is, any strategy implementable by non-uniform
+probabilistic polynomial-time machines. In particular, the malicious party may abort the execution
+at any point in time (and when this happens prematurely, the other party is left with no output).
+Let $\mathbf{\func}$ be as above and let $\Pi$ be a two-party protocol for computing $\mathbf{\func}$. Furthermore, let $\cA =
+(\cA_1, \cA_2)$ be a pair of non-uniform probabilistic polynomial-time machines (representing parties in
+the real model). Such a pair is {\em admissible} if for at least one $i \in \{1, 2\}$ we have that $\cA_i$
+is honest (i.e., follows the strategy specified by $\Pi$). Then, the {\em joint execution of $\Pi$ under $\cA$ in the real model}, denoted $\reall_{\Pi,\cA}(\kappa,x,y)$, is defined as the output pair of $\cA_1$ and $\cA_2$ resulting
+from the protocol interaction.
+
+\paragraph{Security as emulation of a real execution in the ideal model.} Having defined the ideal
+and real models, we can now define security of protocols. Loosely speaking, the definition asserts
+that a secure two-party protocol (in the real model) emulates the ideal model (in which a trusted
+party exists). This is formulated by saying that admissible pairs in the ideal model are able to
+simulate admissible pairs in an execution of a secure real-model protocol.
+
+
+
+\BD[secure two-party computation] Let $\mathbf{\func}$ and $\Pi$ be as above. Protocol $\Pi$ is said to
+securely compute $\mathbf{\func}$ (in the malicious model) if for every pair of admissible non-uniform probabilistic
+polynomial-time machines $\cA =
+(\cA_1, \cA_2)$ for the real model, there exists a pair of admissible non-uniform
+probabilistic expected polynomial-time machines $\cS =(\cS_1, \cS_2)$  for the ideal model, such that:
+
+$$
+\left\{\ideall_{\mathbf{\func},\cS}(\kappa,x,y)\right\}_{\kappa\in\NN,x,y ~{\text  s.t. } ~|x|=|y|} \indist
+\left\{\reall_{\Pi,\cA}(\kappa,x,y)\right\}_{\kappa\in\NN,x,y ~{\text  s.t. } ~|x|=|y|}
+$$
+
+%Namely, the two distributions are computationally indistinguishable.
+\ED
+
+We note that the above definition assumes that the parties know the input lengths (this can be
+seen from the requirement that $|x| = |y|$). Some restriction on the input lengths is unavoidable,
+see \cite[Section 7.1]{Goldreich04} for discussion. We also note that we allow the ideal adversary/simulator to
+run in expected (rather than strict) polynomial-time. This is essential for constant-round
+protocols \cite{BL04}.
+%We denote the security parameter by $\kappa$ and, for the sake of simplicity, unify it with the length
+%of the inputs (thus we consider security for ``all sufficiently long inputs''). 
+
+%The above naturally extends to the multi-party computation setting. 
+\remove{\section{General Definitions}
+\subsection{Witness Relations}
+
+We recall the definition of a witness relation for an NP language \cite{Goldbook,STOC:LinPas11}.
+\BD[Witness relation] A \emph{witness relation} for a language $L \in \NP$ is a binary relation
+$R_L$ that is polynomially bounded, polynomial time recognizable and characterizes $L$ by $L = \{x: ~\exists~ y ~\text{s.t.} ~(x,y)\in R_L\}$
+\ED
+We say that $y$ is a witness for the membership $x \in L$ if  $(x,y)\in R_L$. We will also let $R_L(x)$
+denote the set of witnesses for the membership $x \in L$, i.e., $R_L(x) = \{y:(x,y)\in L \}$. In the
+following, we assume a fixed witness relation $R_L$ for each language $L \in \NP$.
+
+\subsection{Interactive Proofs}
+%We use the standard definitions of interactive proofs (and interactive Turing machines) [GMR89]
+%and arguments (a.k.a. computationally-sound proofs) [BCC88]. 
+
+Given a pair of interactive Turing
+machines, $P$ and $V$ , we denote by $\langle P(w), V \rangle(x)$ the random variable representing the (local) output
+of $V$, on common input $x$, when interacting with machine $P$ with private input $w$, when the random
+input to each machine is uniformly and independently chosen.
+
+\BD [Interactive Proof System] A pair of interactive machines $\langle P, V \rangle$ is called an \emph{interactive proof system} for a language $L$ if there is a negligible function $\mu(\cdot)$ such that the following two conditions hold:
+\BI
+\item Completeness: For every $x \in L$, and every $w\in R_L(x)$, $Pr [\langle P(w), V \rangle(x)= 1] = 1$. 
+\item  Soundness: For every $x \notin L$, and every interactive machine $P^*, Pr [\langle P^*, V \rangle(x) = 1] \leq\mu(\kappa)$
+\EI
+In case the soundness condition is required to hold only with respect to a computationally
+bounded prover, the pair $\langle P, V \rangle$ is called an interactive argument system.
+\ED
+
+\subsection{Zero-Knowledge}
+We recall the standard definition of ZK proofs. Loosely speaking, an interactive proof is said to be
+zero-knowledge (ZK) if a verifier $V$ learns nothing beyond the validity of the assertion being proved,
+it could not have generated on its own. As ``feasible''computation in general is defined though
+the notion of probabilistic polynomial-time, this notion is formalized by requiring that the output
+of every (possibly malicious) verifier interacting with the honest prover $P$ can be ``simulated" by
+a probabilistic expected polynomial-time machine $\cS$ (a.k.a. the simulator). The idea behind this
+definition is that whatever $V^*$ might have learned from interacting with $P$, he could have learned
+by himself by running the simulator $\cS$. 
+
+\BD [ZK]. Let $L$ be a language in $\NP$, $R_L$ a witness relation for $L$, $(P,V )$ an interactive
+proof (argument) system for $L$. We say that $(P, V )$ is \emph{statistical/computational ZK}, if for every
+probabilistic polynomial-time interactive machine $V$ there exists a probabilistic algorithm $\cS$ whose
+expected running-time is polynomial in the length of its first input, such that the following ensembles
+are statistically close/computationally indistinguishable over $L$.
+\BI
+\item $\{\langle P(y), V(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, y \in R_L(x), z\in\bit^*}$
+\item $\{\cS (x,z)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, y \in R_L(x), z\in\bit^*}$
+\EI
+
+where $\langle P(y), V(z) \rangle(x)$ denotes the view of $V$ in interaction with $P$ on common input $x$ and private
+inputs $y$ and $z$, respectively.
+
+\ED
+
+\subsection{Witness Indistinguishability}
+An interactive proof (or argument) is said to be witness indistinguishable (WI) if the verifier's
+output is ``computationally'' independent of the witness used by the prover for proving the statement.
+In this context, we focus on languages $L \in \NP$ with a corresponding witness relation $R_L$.
+Namely, we consider interactions in which, on common input $x$, the prover is given a witness in
+$R_L(x)$. By saying that the output is computationally independent of the witness, we mean that
+for any two possible $\NP$-witnesses that could be used by the prover to prove the statement $x \in L$,
+the corresponding outputs are computationally indistinguishable.
+
+\BD [Witness-indistinguishability]. Let $\langle P, V \rangle$ be an interactive proof (or argument) sys-
+tem for a language $L \in \NP$. We say that $\langle P, V \rangle$ is \emph{witness-indistinguishable} for $R_L$, if for every
+probabilistic polynomial-time interactive machine $V^*$ and for every two sequences $\{w^1_{\kappa,x}\}_{\kappa\in \NN,x\in L}$ and $\{w^2_{\kappa,x}\}_{\kappa\in \NN,x\in L}$, such that $w^1_{\kappa,x}, w^2_{\kappa,x}\in R_L(x)$ for every $x \in L\cap \bit^\kappa$, the following probability
+ensembles are computationally indistinguishable over $\kappa\in \NN$.
+\ED
+
+\BI
+\item $\{\langle P(w^1_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$
+\item $\{\langle P(w^2_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$
+\EI
+\subsection{Proofs (Arguments) of Knowledge}
+Loosely speaking, an interactive proof is a proof of knowledge if the prover convinces the verifier
+that it possesses, or can feasibly compute, a witness for the statement proved. The notion of a
+proof of knowledge is essentially formalized as follows: an interactive proof of $x \in L$ is a proof of
+knowledge if there exists a probabilistic expected polynomial-time extractor machine $E$, such that
+for any prover $P$, $E$ on input the description of $P$ and any statement $x \in L$ readily outputs a valid
+witness for $x \in L$ if $P$ succeeds in convincing the Verifier that $x \in L$. Formally,
+
+\BD[Proof of knowledge] Let $(P, V )$ be an interactive proof system for the language
+$L$. We say that $(P, V )$ is a proof of knowledge for the witness relation $R_L$ for the language $L$ it there
+exists an probabilistic expected polynomial-time machine $E$, called the extractor, and a negligible
+function $\mu(\cdot)$ such that for every machine $P^*$, every statement $x \in \bit^\kappa$, every random tape
+$x \in \bit^*$, and every auxiliary input $z \in \bit^*$,
+$$Pr [ \langle P^*_r(z), V \rangle(x) = 1]\leq Pr[E^{P^*_r(x,z)}(x) \in R_L(x)] + \mu(\kappa)$$
+\ED
+
+An interactive argument system $\langle P, V \rangle$ is an argument of knowledge if
+the above condition holds w.r.t. probabilistic polynomial-time provers.
+
+\paragraph{Special-sound WI proofs.} A $4$-round public-coin interactive proof for the language $L \in \NP$ with
+witness relation $R_L$ is special-sound with respect to $R_L$, if for any two transcripts $(\delta,\alpha,\beta, \gamma)$ and $(\delta',\alpha',\beta', \gamma')$ such that the initial two messages, $(\delta,\delta')$ and $(\alpha,\alpha')$ are the same but the challenges $(\beta,\beta')$ are different, there is a deterministic procedure to extract the witness from the two transcripts
+and runs in polynomial time. Special-sound WI proofs for languages in $\NP$ can be based on
+the existence of $2$-round commitment schemes, which in turn can be based on one-way functions.
+%[GMW91, FS90, HILL99, Nao91].
+\paragraph{Adaptive-Input Witness Indistinguishability.}
+The most recent $3$-round adaptive-Input Witness Indistinguishability we can use appears in the work of \cite{COSV16}. 
+The notion of adaptive-input WI formalizes security of the prover with respect to an adversarial
+verifier $A$ that adaptively chooses the input instance to the protocol, after seeing the first message of the prover. More specifically, for a delayed-input $3$-round complete protocol , we
+consider game ${\sf ExpAWI}$ between a challenger $C$ and an adversary $A$ in which the instance $x$ and
+two witnesses $w_0$ and $w_1$ for $x$ are chosen by $A$ after seeing the first message of the protocol played
+by the challenger. The challenger then continues the game by randomly selecting one of the two
+witnesses and by computing the third message by running the prover's algorithm on input the
+instance $x$, the selected witness $w_b$ and the challenge received from the adversary. The adversary
+wins the game if she can guess which of the two witnesses was used by the challenger.
+The experiment is parameterized by a delayed-input $3$-round complete protocol  $(P, V)$ for a relation $R$ and by a $\ppt$
+adversary $A$. The experiment has as input the security parameter and auxiliary information for $A$. 
+The experiment ${\sf ExpAWI}$ proceeds as follows: 
+\BE
+\item $C$ randomly selects coin tosses $r$ and runs P on input $(1^\kappa; r)$ to obtain $a$;
+\item $A$, on input $a$ and $aux$, outputs instance $x$, witnesses $w_0$ and $w_1$ such that
+$(x,w_0), (x,w_1) \in R$, challenge $c$ and internal state $\sf state$;
+\item $C$ randomly selects $b\leftarrow \bit$ and runs $P$ on input $(x,w_b, c)$ to obtain $z$;
+\item $b'  \leftarrow A((a, c, z), aux, \sf state)$;
+\item if $b = b'$ then output $1$ else output $0$.
+\EE
+ 
+\BD[Adaptive-Input Witness Indistinguishability]. A delayed input $3$-round complete
+protocol is adaptive-input WI if for any $\ppt$ adversary $A$ there exists a negligible function $\mu(\cdot)$ such that for any $aux \in\bit^*$ it holds that ${\sf AdvAWI}_A(\kappa, aux)\leq \mu(\kappa)$ where ${\sf AdvAWI}_A(\kappa, aux) = |Pr[{\sf AdvAWI}_A(\kappa, aux)=1]-1/2|$
+\ED}

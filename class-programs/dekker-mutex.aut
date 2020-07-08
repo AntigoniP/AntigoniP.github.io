@@ -1,0 +1,5 @@
+symbol=,type=bit_type,name=wantp,offset=0,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 0 0,},
+symbol=,type=bit_type,name=wantq,offset=1,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 1 0,},
+symbol=,type=byte_type,name=turn,offset=2,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 1 0,byte_store 2 0,},
+symbol=,type=bit_type,name=csp,offset=3,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 3 0,},
+symbol=,type=bit_type,name=csq,offset=4,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 4 0,},

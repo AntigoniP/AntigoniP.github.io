@@ -1,0 +1,95 @@
+% \section{Security Proof of the Construction of 2-Round Semi-Honest MPC}
+% \label{A:sec-sh-mpc}
+
+% \subsection{Proof of \cref{th:sec-sh-mpc}}
+% \label{A:th-sec-sh-mpc}
+\remove{
+\begin{proof}[Proof of \cref{th:sec-sh-mpc}]
+  
+  Correctness is straightforward. Let us prove security against semi-honest adversaries.
+  
+  We need to exhibit a polynomial-time simulator of the view of any subset $I \subseteq [N]$ of corrupted parties, namely:
+  \[ \tmpcview_I(1^\secpar, I, \mpcvecin, \tmpcvecrand) = (\mpcvecin_I,\tmpcvecrand_I,\tvecmsg) \]
+  where $\tmpcvecrand = \smallset{\tmpcrand_i}_{i \in [N]}$ are honestly-generated random tapes of the parties. We recall that $\mpcvecin_I = \smallset{\mpcin_i}_{i \in I}$ and $\tmpcvecrand_I = \smallset{\tmpcrand_i}_{i \in I}$.
+
+  The simulator first run the simulator of the inner MPC protocol and get $(\mpcvecrand_I, \vecmsg)$. It then simulates all the messages $\tvecmsg$ together with the random tapes $\tmpcvecrand_I$ of the corrupted parties as follows.
+  \vspace{\baselineskip}
+
+  \noindent \ul{\em First round}:
+  \begin{itemize}
+  \item For each corrupted party $P_\iii$ with $\iii \in I$, generate the commitments $\hcc_{\iii}^\round = \hccom(1^\secpar,
+    (\mpcin_{\iii},\mpcrand_{\iii}); \hcr_\iii^\round)$ and the first message $\tmsg_{\iii}^1 =
+    \smallset{\hcc^\round_{\iii}}_{\round \in [\nbrounds]}$ as in the real protocol.
+  \item For each honest party $P_\iii$ with $\iii \notin I$, simulate the commitments:
+    \[ (\hcc_\iii^\round,\hcd_\iii^\round) \getsr \hcsim(1^\secpar,G_\iii^\round,\msg_\iii^\round)\enspace, \]
+    for $\round \in [\nbrounds]$ and for the circuit $\G_\iii^\round$ defined by $G_\iii^{\round-1}(\star,\star) = \mpcnext_\iii(\star,\star,\vec \msg^{< \round-1})$. Then set the first message $\tmsg_{\iii}^1 =
+    \smallset{\hcc^\round_{\iii}}_{\round \in [\nbrounds]}$.
+  \end{itemize}
+
+  \noindent \ul{\em Second round}:
+  \begin{itemize}
+  \item For each corrupted party $P_\iii$ with $\iii \in I$, generate the garbled interactive circuit $ \giccir_\iii \getsr \gicgarble(1^\secpar, \icnext_\iii)$ and the second message $\tmsg_{\iii}^2 = \giccir_\iii$, as in the real protocol.
+  \item For each honest party $P_\iii$ with $\iii \notin I$, compute $\vec q^\round = \smallset{\hcc_j^{\round-1}, G_j^{\round-1}}_{j \in [N]}$, $\vec w^\round = \smallset{\msg_j^\round,\hcd_j^\round}_{j \in [N]}$, and $o^\round = (\msg_\iii^\round,\hcd_\iii^\round)$, for $\round \in [\nbrounds]$, and simulate the garbled interactive circuit:
+    \[ \gicsimcir_\iii \getsr \gicsim(1^\secpar, \smallset{\vec q^\round,\vec w^\round,o^\round}_{\round \in [\nbrounds]}) \enspace. \]
+    The second message is $\tmsg_{\iii}^2 = \gicsimcir_\iii$.
+  \end{itemize}
+
+  We now need to prove that the simulated view is indistinguishable from the real view.
+  More formally we need to prove that the following two distributions are computationally indistinguishable:
+  \begin{align*}
+    \distr_0 &= {\left\{
+               \left(
+               \mpcview_I(1^\secpar, \mpcvecin, \mpcvecrand),\;
+               \mpcoutput_I(\mpcvecin,\mpcvecrand)\right)
+               \ : \
+               \mpcvecrand \getsr {(\bits^{\mpcrandlen})}^N
+               \right\}}_{\secpar,I \subseteq [N],\mpcvecin} \enspace, \\
+    \distr_1 &= {\left\{\left(\mpcsim(1^\secpar, I, \mpcvecin_{I},
+          \mpcfunc_{I}(\mpcvecin)),\;
+          \mpcfunc_I(\mpcvecin)\right)\right\}}_{\secpar,I \subseteq [N],\mpcvecin} \enspace.
+  \end{align*}
+
+  For that, we consider a sequence of $N+N^2$ hybrids $\smallset{\hybrid_{1,\istar}}_{\istar \in [N]}$ and $\smallset{\hybrid_{2,(\roundstar,\jstar)}}_{\roundstar \in [\nbrounds],\jstar \in [N]}$:
+  \begin{description}
+  \item[Hybrid $\hybrid_{1,\istar}$:] This hybrid is similar to $\distr_0$ (the real protocol), except that for the second messages of parties $P_i$ for $i \le \istar$ which are simulated as in $\distr_1$: when $i \notin I$, $\tmsg_{i}^2 = \gicsimcir_i = \gicsim(1^\secpar, \smallset{\vec q^\round,\vec w^\round,o^\round}_{\round \in [\nbrounds]})$.
+
+    Let $\hybrid_{1,0} = \distr_0$. We have the following claim.
+    \begin{claim}
+      If $\gic$ is simulatable, then for any $\istar \in [N]$, $\hybrid_{1,\istar-1}$ and $\hybrid_{1,\istar}$ are computationally indistinguishable.
+    \end{claim}
+    \begin{proof}
+      First, if $P_\istar$ is corrupted ($\istar \in I$), then $\hybrid_{1,\istar-1}$ and $\hybrid_{1,\istar}$ are actually the same distribution. Let us focus on the case $\istar \notin I$.
+
+      % Since $\hc$ is semi-honest functionally binding, $\ndadistr^\hc$ is unique-answer and $\icdistr$ is unique-transcript.
+      The only difference between  $\hybrid_{1,\istar-1}$ and $\hybrid_{1,\istar}$ is that $\tmsg_{i}^2 = \gicsimcir_i$ is simulated in the latter distribution. Thus, these two distributions are computationally indistinguishable if $\gic$ is simulatable.
+    \end{proof}
+    
+  \item[Hybrid $\hybrid_{2,(\roundstar,\jstar)}$:] We consider the lexicographic order $\prec$ (or any linear order) over the pairs $(\roundstar,\jstar) \in [\nbrounds] \times [N]$, and we define ${(\roundstar,\jstar)}^{-}$ to be the predecessor of $(\roundstar,\jstar)$.
+
+    The hybrid $\hybrid_{2,(\roundstar,\jstar)}$ is similar to $\distr_1$ (the simulated protocol), except that for all $(\round,j) \succ (\roundstar,\jstar)$, $\hcc_j^\round$ and $\hcd_j^\round$ are generated as in the real protocol ($\distr_0$):
+    \[ \hcc_{j}^\round = \hccom(1^\secpar,
+      (\mpcin_{j},\mpcrand_{j}); \hcr_j^\round); \
+      \hcd_j^\round = \hcopen(\hcc_j^\round, G_j^\round,\msg^\round_{j}, \hcr_j^\round)
+      \enspace, \]
+    where $\hcr_j^\round$ is a uniform random tape.
+
+    Let $\hybrid_{1,N} = \hybrid_{2,{(1,1)}^{-}}$. We have the straightforward following claim.
+    \begin{claim}
+      If $\hc$ is simulatable, then for any $(\roundstar,\jstar) \in [\nbrounds] \times [N]$, $\hybrid_{2,{(\roundstar,\jstar)}^-}$ and $\hybrid_{2,(\roundstar,\jstar)}$ are computationally indistinguishable.
+    \end{claim}
+
+    Furthermore, the only difference between $\hybrid_{2,(N,N)}$ and $\distr_1$ is that in the latter distribution, the inner MPC messages $\vec \msg$ are simulated by the inner MPC simulator.
+    Thus, we have the following claim.
+    \begin{claim}
+      If the inner MPC is secure against semi-honest adversaries, then $\hybrid_{2,(N,N)}$ and $\distr_1$ are computationally indistinguishable.
+    \end{claim}
+  \end{description}
+
+
+  We remark that we do not directly use the semi-honest functional binding property of the FC scheme, as it is implied by the simulatability property of the GIC scheme.
+\end{proof}}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

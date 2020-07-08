@@ -1,0 +1,1054 @@
+% !TEX root =../main.tex
+
+\section{2-Round Semi-Malicious MPC}
+
+
+\begin{mydefinition}[(Semi-Malicious) Equivocal Functional Commitment]
+  \label{def:hc}
+  Let $\hccirclass = {\{\hccirclass_\secpar\}}_{\secpar \in \N}$ be a
+  $\poly$-size circuit class. A \emph{(semi-malicious) equivocable functional commitment} scheme $\hc$ for $\hccirclass$ % with
+  % polynomial universal circuits 
+  is a tuple of eight polynomial-time algorithms $\hc=(\setup, \hccom,\hcopen,\wsenc,\wsdec,\csim,\Equiv)$:
+  \begin{description}
+  
+   \item[Setup:] $\setup$ can be viewed as a pair of PPT algorithms $(\hcsetup, \ehcsetup)$ such that the following holds:
+   \BI
+   \item $\ck \getsr  \hcsetup(1^\secpar)$ expects as input the unary representation of the security parameter $\secpar$ and
+outputs a public parameter $\ck$.
+    \item $(\ck,\teq) \getsr \ehcsetup(1^\secpar)$ outputs a public parameter $\ck$ together with a trapdoor $\teq$ (used for equivocation).
+  \EI
+  
+  \item[Commitment:] $\hcc = \hccom(\ck, \hcmsg;\hcr)$  generates a commitment $\hcc$ of $\hcmsg \in \bits^{\poly(\secpar)}$ using random tape $\hcr \in \bits^{\poly(\secpar)}$;
+  \item[Functional Opening:] $\hcd = \hcopen(\ck, \hcc, \hccir, \hcmsg, \hcr)$  derives from the commitment~$\hcc$ and the random tape $\hcr$ used to generate it, a functional decommitment $\hcd$ of~$\hcc$ to $\hcout = \hccir(\hcmsg)$ for $\hccir \in \hccirclass_\secpar$;
+%  \item[Functional Verification:] $b = \hcver(\hcc, \hccir, \hcout, \hcd)$  outputs $b=1$ if $\hcd$ is a valid functional decommitment of $\hcc$ to $\hcout$ for $\hccir \in \hccirclass_\secpar$; and outputs $b=0$ otherwise;
+  
+  \item[Encryption:] $\wsct = \wsenc(\ck, \hcc, \hccir, \hcout,
+    \wsmsg;\renc)$  encrypts messages $\wsmsg
+    =\smallset{\wsmsg[i,b]}_{i \in [\ndaylen],b\in \bits}$ for $(\hccir, \hcout)$ using random tape $\renc$, into a ciphertext $\wsct$, where each
+    message has the same length $|\wsmsg[i,b]| =
+    \poly(\secpar)$;
+  \item[Decryption:] $\wsmsg' = \wsdec(\ck, \hcc, \wsct,\hcd)$ 
+    decrypts a ciphertext $\wsct$ into messages $\wsmsg' =
+    \smallset{\wsmsg'[i]}_{i \in [\ndaylen]}$ using decommitment $\hcd$;
+    \item[Commitment Simulation:] $\csim$ can be viewed as a pair of PPT algorithms $(\hcsim,\encsim)$ such that the following holds:
+    
+    \BI
+    \item $(\hcc,\state^\cc)\getsr \hcsim({\ck},{\teq})$ simulates an (equivocal) commitment $\hcc$ together with $\state^\cc$;
+    \item $(\wsct,\state^\ee) \getsr \encsim(\ck, \hcc, {\teq}, \rho)$ simulates an (equivocal) ciphertext $\wsct$ together with $\state^\ee$;
+    \EI
+    
+  \item[Commitment Equivocation:] $\Equiv$ can be viewed as a triple of PPT algorithms $(\ehcsimd,\encequiv, \fequiv)$ such that the following holds. Let $({\ck},\teq)\getsr \ehcsetup(1^\secpar)$: 
+ \BI
+ \item $\hcd \getsr \fequiv(\ck, \hcc,\ehctrap,\hccir,\hcout)$ equivocates the commitment $\hcc$ and output a functional decommitment $\hcd$ of $\hcc$ to $\hcout$ for $\hccir \in \hccirclass_\secpar$;
+ \item ${\hcr}' \getsr\ehcsimd({\ck},{\teq},\hcc,\state^\cc,\hcmsg)$ such that $\hccom({\ck},\hcmsg;\hcr')={\hcc}$;
+\item ${\renc}' \getsr\encequiv({\ck},{\teq},\wsct,\state^\ee, \wsmsg,\hccir,\hcout, \hcd)$ such that $ \wsenc(\ck, \hcc, \hccir, \hcout,
+    \wsmsg;\renc')=\wsct $; 
+
+
+  \EI
+  %  \item[Commitment Equivocation:] $\rho \getsr \ehcsimd(\hcc,\ehctrap, \hcmsg)$ equivocates the commitment $\hcc$ and outputs a string $\rho'$;
+%  \item[Encryption Equivocation:] $\renc'\getsr \encequiv(\wsct,\ehctrap,\hccir,\hcout, \hcd)$ equivocates the ciphertext $\wsct$ and outputs
+%a string $\renc'$. 
+
+  
+  \end{description}
+  satisfying the following properties:
+  \begin{description}
+  \item[Correctness:] For any security parameter $\secpar \in
+    \N$, for any messages $\wsmsg =\smallset{\wsmsg[i,b]}_{i,b}$, for any $\hcmsg \in \bits^{\poly(\secpar)}$, for any circuit $\hccir \in
+    \hccirclass_{\secpar}$, for any $\hcr \in \bits^{\poly(\secpar)}$, it holds that if $\hcd= \hcopen(\hcc, \hccir, \hcmsg, \hcr)$ is a valid functional decommitment of $\hcc$ to $ \hccir (\hcmsg)$ then:
+   \[ \Pr\Big[ \wsdec(\ck, \wsenc(\ck, \hcc,\hccir, \hcout,
+    \wsmsg),\; \hcd) =  \smallset{\wsmsg[i,\hcout_i]}_{i \in [\ndaylen]} \Big] = 1 \enspace; \]
+
+ % \item[Semi-Malicious Functional Binding:] For any polynomial-time
+ %    circuit family $\advA=\smallset{\advA_\secpar}_{\secpar \in \N}$,
+ %    there exists a negligible function $\negl$, such that for any $\secpar \in \N$, for any $\hcmsg \in
+ %    \bits^{\hccirinlen}$, for any circuit $\hccir \in
+ %    \hccirclass_{\secpar}$, for any random tape $\hcr \in \bits^\comrlen$: 
+ %    \begin{multline*}
+ %      \Pr\Big[
+ %      \hcc = \hccom(\ck, \hcmsg;\hcr) \text{ and } \hcout \neq
+ %      \hccir(\hcmsg)
+ %      \ :\\
+ %      \hcc = 
+ %      \hccom(\ck, \hcmsg; \hcr); \ (\hcout, \hcd) \getsr
+ %      \advA_\secpar(1^\secpar,\hcmsg,\hcr)
+ %      \Big] \le \negl(\secpar)\enspace;      
+ %    \end{multline*}
+  \item[Commitment Simulatability:]
+    For any polynomial-time circuit family $\advA =\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in N$ and for any $\hcmsg \in
+    \bits^{\hccirinlen}$:
+    \begin{multline*}
+      \Bigg| \Pr\bigg[
+      \advA_\secpar(\state,\hcc,\hcd) = 1
+      \ : \
+      \begin{array}{l}
+        \hcr \getsr \bits^{\poly(\secpar)}; \ \hcc=
+        \hccom(1^\secpar,\hcmsg;\hcr); \\
+        (\state,\hccir) \getsr \advA_\secpar(\hcc); \ \hcd = \hcopen(\hcc, \hccir, \hcmsg,
+        \hcr)
+      \end{array}
+      \bigg] - \\
+      \Pr\bigg[
+      \advA_\secpar(\state,\hcc,\hcd) = 1
+      \ : \
+      \begin{array}{l}
+        (\hcc, \ehctrap) \getsr
+        \ehcsimc(1^\secpar); \\
+        (\state,\hccir) \getsr \advA_\secpar(\hcc); \ 
+        \hcd \getsr \fequiv(\hcc,\ehctrap,\hccir,\hccir(\hcmsg))
+      \end{array}
+      \bigg]
+      \Bigg| \le \negl(\secpar) \enspace.
+    \end{multline*}
+
+   
+    The same applies to the algorithms $(\ehcsimd,\hcsim)$ and $(\encsim,\encequiv)$. We require that for $\hcmsg, \wsmsg \in \{0,1\}$ the distribution of $\{({\ck},{\hcc},{\hcr}_\hcmsg)\}$ and $\{({\ck},{\wsct},\renc_ \wsmsg)\}$ generated via $(\ehcsimd,\hcsim)$ and $(\encsim,\encequiv)$ is computationally indistinguishable from the distribution $\{({\ck},\hcc,{\hcr}_\hcmsg)\}$ and $\{({\ck},{\wsct},\renc_ \wsmsg)\}$ where $\hcc = \hccom({\ck}, \hcmsg;\hcr_\hcmsg)$ and $ \wsenc(\ck, \hcc, \hccir, \hcout,
+    \wsmsg;\renc_ \wsmsg)$, respectively. \anti{write formal definitions in the appendix}
+    
+    \remove{
+      \item[Encryption Simulatability:]
+    For any polynomial-time circuit family $\advA =\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in N$ and for any $\hcmsg \in
+    \bits^{\hccirinlen}$:
+    \begin{multline*}
+      \Bigg| \Pr\bigg[
+      \advA_\secpar(\state,\wsct,\hcc,\hcd) = 1
+      \ : \
+      \begin{array}{l}
+       \hcr \getsr \bits^\hcrlen; \ \hcc=
+        \hccom(1^\secpar,\hcmsg;\hcr); \\
+        \renc\getsr \bits^\hcrlen; \ \wsct = \wsenc(\hcc, \hccir, \hcout,
+    \wsmsg;\renc); \\
+        (\state,\hccir) \getsr \advA_\secpar(\hcc,\wsct); \ \hcd = \ehcopen(\hcc, \hccir, \hcmsg,
+        \hcr)
+      \end{array}
+      \bigg] - \\
+      \Pr\bigg[
+      \advA_\secpar(\state,\wsct,\hcc,\hcd,\renc') = 1
+      \ : \
+      \begin{array}{l}
+       (\wsct,\eehctrap) \getsr \encsim(1^\secpar,\hcc,\rho); \\
+        (\state,\hccir) \getsr \advA_\secpar(\wsct,\hcc); \ 
+      \renc'\getsr \encequiv(\wsct,\ehctrap,\hccir,\hccir(\hcmsg), \hcd)
+      \end{array}
+      \bigg]
+      \Bigg| \le \negl(\secpar) \enspace.
+    \end{multline*}}
+    
+    
+  \item[Soundness Security:] For any polynomial-time
+    circuit family $\advA=\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in \N$, for any circuit $\hccir \in
+    \hccirclass_{\secpar}$, for any $\hcmsg,\hcr \in
+    \bits^{{\poly(\secpar)}}$, $\hcc=\hccom(1^\secpar, \hcmsg;\hcr) \text{ and } \hcout \neq  \hccir(\hcmsg)
+    $ and equal length
+    messages $ \wsmsg$ and  $\wsmsg'$: 
+    
+    \[
+      \Pr[\advA_\secpar(\wsenc(\ck, \hccir, \hcout, \wsmsg))=1]
+      -
+      Pr[\advA_\secpar(\wsenc(\ck, \hccir, \hcout, \wsmsg'))=1]
+      \leq
+      \negl(\secpar)
+    \]
+    
+    
+  
+    \item[ Indistinguishability of Public Parameters:] We require that:
+\begin{equation}\nonumber
+\begin{split}
+\Big|\Pr\Big{[}(\ck,\mu)\leftarrow& \hcsetup(1^\secpar): \mathcal{A}(\ck)=1\Big{]}-\\ &
+\Pr\Big{[}({\ck},{\mu,\nu})\leftarrow \ehcsetup(1^\secpar) :\mathcal{A}({\ck})=1\Big{]}\Big| < \negl(\secpar).
+\end{split}
+\end{equation}
+   
+  \end{description}
+\end{mydefinition}
+
+\smallskip
+
+Note that the simulatability property implies the standard hiding
+property of commitments, if each circuit class $\hccirclass_\secpar$ contains a constant circuit: Consider indeed any constant circuit $C(x) = \alpha$, the fact
+that $(\hcc, \hcd)$ can be simulated from $C$ and $\alpha$ implies
+that $\hcc$ hides the message committed inside. 
+
+\smallskip
+
+\remove{\begin{mydefinition}
+  \label{def:nda-for-hc}
+  Let $\hccirclass = {\{\hccirclass_\secpar\}}_{\secpar \in \N}$ be a
+  $\poly$-size circuit class. Let $\hc=(\hccom,\allowbreak\hcopen,\hcver,\allowbreak\hcsim)
+  $ be a \emph{functional commitment} scheme for~$\hccirclass$.
+  We define the following \emph{associated non-deterministic oracle family} $\nda^\hc = \smallset{\nda^\hc_{\secpar}}_{\secpar \in \N}$:
+  \[
+    \nda^\hc_\secpar((\hcc, \hccir), (\hcout, \hcd)) =
+    \begin{cases}
+      \hcout &\text{if } \hcver(\hcc,\hccir,\hcout,\hcd) = 1 \\
+      \perp &\text{otherwise;}
+    \end{cases}
+  \]
+%   and the following \emph{associated unique-answer distribution} $\ndadistr^\hc =
+%   \smallset{\ndadistr^\hc_{\secpar,\hccir,\hcmsg}}$ where $\secpar \in \N$, $\hccir \in \hccirclass_\secpar$, and $\hcmsg \in \bits^{\hccirinlen}$:
+%   \begin{align*}
+%     \ndadistr^\hc_{\secpar,\hccir,\hcmsg} = \bigset{
+%     \begin{array}{l}
+%       \hcr \getsr \bits^{\hcrlen}; \ \hcc = \hccom(1^\secpar,\hcmsg;\hcr); \\
+%       \hcout = \hccir(\hcmsg); \ \hcd = \hcopen(\hcc,\hccir,\hcmsg,\hcr)
+%     \end{array}
+%     \ : \ ((\hcc,\hccir),\;(\hcout,\hcd),\;\ndaaux=\hcr) }\enspace.
+%   \end{align*}
+%   Finally, a \emph{witness selector} associated to $\hc$ is a witness selector for $(\nda^\hc,\ndadistr^\hc)$.
+ \end{mydefinition}}
+
+ \smallskip
+
+% The unique-answer property of $\ndadistr^\hc$ for $\nda^\hc$ follows from the semi-honest functional binding property of the functional commitment $\hc$.
+
+
+
+\subsection{Construction of 2-Round Semi-Honest MPC}
+\label{sec:cons-sh-mpc}
+
+
+{\small\BPR [Adaptive malicious protocol $\Pi_f$]\label{prot:semimpc} Let $\mpcfunc$ be an arbitrary $N$-party functionality.\footnote{Formal definitions of MPC protocol and $N$-party functionality are provided in \cref{A:def-MPC}.}
+Protocol $\Pi_f$ relies on the following components: 
+\BI
+\item 
+
+
+An adaptive malicious $L$-round $N$-party protocol
+  $\mpc=(\mpcnext, \mpcoutput)$ for $\mpcfunc$. Without
+loss of generality, we will assume that in each round $\round$ of $\mpc$, each party $P_i$
+broadcasts a single message that depends on its input $\mpcin_i$, randomness $\mpcrand_i$ and on the messages $\Msg^{< \round} = \smallset{\msg_j^{\round'}}_{j \in [N], \round' < \round}$ that it
+received from all parties in all previous rounds, i.e. $\msg_{j}^\round = \mpcnext_j(\mpcin_j,\mpcrand_j,\Msg^{< \round})$, where $\mpcnext$ is the next message function. In the last round $L$ of $\mpc$ each party $P_i$ locally computes the output $\mpcout_i =
+  \mpcoutput_i(\mpcin_i,\mpcrand_i,\Msg)$ after receiving all the messages $\Msg = \smallset{\msg_j^\round}_{j \in [N],\round \in [\nbrounds]}$.
+
+ \item A malicious adaptive oblivious transfer scheme $\ot = (\OTSetup,\otsendone,\otsendtwo,\\\otoutput,\ROTequiv,\SOTequiv,\otextr)$. 
+
+ % The security parameter $\secpar$ is an implicit parameter $1^\secpar$ of $\mpcnext$ and $\mpcoutput$.
+%\item A semi-malicious equivocal functional commitment scheme
+%  $\hc=(\setup, \hccom,\\\hcopen,\wsenc,\wsdec,\csim,\Equiv)$ for the class of all
+%  $\cirsize$-size circuits with a sufficiently large polynomial bound
+%  $\cirsize$.  %We denote by $\nda^\hc$ the associated non-deterministic oracle family defined in \cref{def:nda-for-hc}.
+%   We denote by $\nda^\hc$ and $\ndadistr^\hc$ the associated
+%   non-deterministic oracle family and unique-answer distribution
+%   defined in \cref{def:nda-for-hc}.
+\item A garbled circuit scheme $\gc=(\gcgen,\gcgarble,\gceval,\gcsim)$ for the class of all
+  $\cirsize$-size circuits with a sufficiently large polynomial bound
+  $\cirsize$.
+  
+  \EI
+\medskip\noindent\textsc{Input:} Parties $P_1,\ldots, P_N$ are given input $(x_1,\ldots,x_N)$, respectively. 
+\BI
+\item \textsc{Round 1:} 
+
+For $\round$ from  $\nbrounds$ to $1$ each party $P_\istar$ proceeds as follows: 
+
+%Each party $P_\istar$ generates and broadcasts $\hcc_{\istar}^\round = \hccom(\ck,
+ %   (\mpcin_{\istar},\mpcrand_{\istar}); \hcr_\istar^\round)$ for $\round \in [\nbrounds]$ where $\mpcrand_{\istar}$ is the random tape for running $\mpc$. 
+
+
+  \begin{enumerate}
+  \item Generate input labels $\ckey_\istar^\round \getsr \gcgen(1^\secpar)$ (using a random tape derived from $\hcr$).
+  \item Garble $\cir_\istar^\round = \univcirc_\secpar(\star,(\mpcin_{\istar},\mpcrand_{\istar}))$, which is the universal circuit partially evaluated on~$(\mpcin_{\istar},\mpcrand_{\istar})$: $\gccir_\istar^\round \getsr \gcgarble(\ckey_\istar^\round,\cir_\istar^\round)$ where $\mpcrand_{\istar}$ is the random tape for running $\mpc$. 
+
+  \item For each $k \in [\cirsize]$, for each bit $b \in \bits$, broadcast OT receiver messages $\otflowonet_{\istar,k,b}^\round= \otsendone(1^\secpar,\ckey_{\istar,k}^\round[b]; \otrandone^\round_{\istar,k,b})$.  % and where the random tape $\otrandone_{k,b,j,\istar}$ is derived from $\hcr$.
+  
+  \end{enumerate}
+%  Output $\hcc_\istar^\round = (\gccir_\istar^\round, \smallset{\otflowonet_{\istar,k,b}^\round})$.
+
+
+
+
+\item \textsc{Round 2:} For $\round$ from  $\nbrounds$ to $1$ each party $P_\istar$ garbles $\iF_\istar  = \smallset{\ifnext_\istar ^\round}_{\round \in [\nbrounds]}$, defined in \cref{fig:ic-mpc}, as follows: 
+\BE
+
+\item Generate input labels $\Gckey_{\istar} ^\round,\smallset{\gckey_{\istar,j} ^\round}_{j\in[N]} \getsr \gcgen(1^\secpar)$ for $j\in[N]$. \Fnote{Maybe in the Figure of $\ifnext$, we should say to what correspond $\Gckey$ and $\gckey$.}
+\item Garble the circuit $\ifnext^\round_\istar$  and broadcast $\gifcir_\istar=\smallset{\gifcir_\istar ^\round}_{\round \in [\nbrounds]}$:
+  \[ \gifcir_\istar^\round \getsr \gcgarble(\Gckey_{\istar}^\round, \smallset{\gckey_{\istar,j}^\round}_{j}, \ifnext_{\istar}^\round) \enspace. \]
+
+\EE
+\item \textsc{Output phase:} Each party evaluates the garbled circuits. In particular $P_\istar$ proceeds as follows in $\nbrounds$ iterations ($\round \in [\nbrounds]$): 
+
+\BE
+\item If $\ell=1$, for $i \in [N]$, execute $(\Gckey^{2}_{i}, \smallset{\givcir_{\iii,j}^1,\otflowtwot_{\iii,j,k}^1,\hcd_{i,k}^1}_{j,k},\; \msg_i^1)= \gceval(\gifcir_i^1,\emptyset)$ for all $ j \in [N]$ (we recall that $\Gckey^{1}_{i}=\emptyset$ and $\smallset{\gckey^1_{i,j}}_j = \emptyset$).\Fnote{In $\smallset{\givcir_{\iii,j}^1,\otflowtwot_{\iii,j,k}^1,\hcd_{i,k}^1}_{j,k}$, the last element does not depend on $j$ and the first one does not depend on $k$, so this notation is slightly abusive. But we can keep it for conciseness if you prefer. }
+
+ 
+\item For every $1<\round \le L$, for $i \in [N]$, for each $j \in [N]$, proceed as follows for the circuit $G_j^{{\round-1}}(\star,\star) = \mpcnext_j(\star,\star, \Msg^{< \round-1})$ where $\gval_{j,k}^{\round-1}={[G_j^{\round-1}]}_k$: \Fnote{maybe sligthly better to add braces around square brackets so that the indice was ok: ${[G_j^{\round-1}]}_k$ is better than $[G_j^{\round-1}]_k$}
+    
+  
+  \begin{align*}
+    \forall k \in [S], \; \smallset{ \vkey_{i,j,k'}^{\round-1}[\gval_{j,k}^{\round-1}]}_{k'}
+    &= \otoutput(\otflowtwot_{\iii,j,k}^{\round-1},\ckey_{j,k}^{\round-1}[\gval_{j,k}^{\round-1}], \hcd_{j,k}^{\round-1}) \enspace, \\
+    \gckey^{\round}_{i,j}[\msg^{\round-1}_j]
+    &=  \gceval(\givcir_{i,j}^{\round-1},\smallset{ \vkey_{i,j,k'}^{\round-1}[\gval_{j,k}^{\round-1}]}_{k,k'} ) \enspace,
+  \end{align*}
+
+
+  where $(k-1) \cdot \len<k'\leq k\cdot\len$ \Fnote{$\lambda$ is also used for the security parameter. And $\len$ needs to be defined.}
+  \Fnote{Important: $\smallset{ \vkey_{i,j,k'}^{\round-1}[\gval_{j,k}^{\round-1}]}_{k'}$ should be $\smallset{ \vkey_{i,j,k'}^{\round-1}[{[\ckey_{j,k}^{\round-1}[\gval_{j,k}^{\round-1}]]}_{k' - (k-1)\len}]}_{k'}$. We need a better solution...}
+  
+  
+
+  
+  
+  
+  and compute,
+  \begin{multline*} 
+    (\Gckey^{\round+1}_{i}[\Msg^{<\round}], \smallset{\givcir_{\iii,j}^\round,\otflowtwot_{\iii,j,k}^\round,\hcd_{i,k}^{\round}}_{j},\; \msg_j^{\round})= \\
+    \gceval(\gifcir_i^{\round}, \Gckey^{\round}_{i}[\Msg^{<\round-1}], \smallset{\gckey^{\round}_{i,j}[\msg^{\round-1}_j]}_j)
+  \end{multline*}
+  
+  for the case where $\ell=L$, $\Gckey^{\round+1}_{i}[\Msg^{<\round}],\smallset{\givcir_{\iii,j}^\round,\otflowtwot_{\iii,j,k}^\round}_{j}=\emptyset$.
+  
+  % \item if $\ell=L$, for each $k \in [|\vec \wsct^\round|]$ decrypt    \[ m^{\round+1} = \wsdec(\wsct^\round_k,(\msg^\round_k,\hcd^\round_k))\enspace\]
+\item After all $\nbrounds$ iterations, $P_\istar$ obtains the set of all
+  messages $\Msg$, and computes the output $
+  y_\istar =  \mpcoutput_\istar\left(\mpcin_\istar,\mpcrand_\istar,\Msg\right)
+  $.
+\EE
+
+
+\EI
+\EPR
+}
+
+
+\pprotocol{Circuit $\ifnext_\iii^\round$
+}{Pseudocode of circuit $\ifnext_\iii^\ell$}{fig:ic-mpc}{htbp}{
+  
+  \textbf{Hardwired Values: } $1^\secpar$, $\round$, $\iii$, $\mpcin_\iii$,
+  $\mpcrand_\iii$, $\smallset{\hcr_{\iii,k,b}^\round}_{k\in [\cirsize], b\in \bits}$, $\smallset{\otflowonet_{j,k,b}^\round}_{j\in[N],k\in[\cirsize],b\in\bits}$, $\smallset{\gccir_j^\round}_{j \in [N]},\Gckey^{\round+1}_{i}$, $\smallset{\gckey^{\round+1}_{i,j}}_{j\in[N]}$. \\
+  \smallskip
+    \textbf{Inputs: } $(\Msg^{< \round-1}, \vec \msg^{\round-1})$ where $\vec \msg^{\round-1}:= \smallset{\msg_j^{\round-1}}_{j\in[N]}$.
+    
+% \[ \msg^{\round-1} = \wsdec(\wsct^{\round-1}_k,(\msg^{\round-1}_k,\hcd^{\round-1}_k))\enspace. \]
+  
+
+
+ % These inputs define $\vec \msg^{< \round}$.
+
+  \smallskip
+
+  \textbf{Procedure: }
+  \begin{enumerate}
+  \item Define the circuit $G_j^\round$ as $G_j^{\round}(\star,\star) = \mpcnext_j(\star,\star,\Msg^{< \round-1}, \vec \msg^{\round-1})$, for $j \in [N]$ and set $\gval_{j,k}^\round=[G_j^\round]_k$ as the $k$-th bit of $G_j^\round$.
+  \item Compute the $\round$-th message of $P_\iii$ in the inner MPC:\\ $\msg_{\iii}^\round =
+      \mpcnext_\iii\left(\mpcin_\iii,\mpcrand_\iii, (\Msg^{< \round-1}, \vec \msg^{\round-1})\right)$.
+
+  \item For all $k\in[\cirsize]$, set $\hcd_{\iii,k}^\round=\hcr_{\iii,k,\gval_{\iii,k}^\round}^\round$.
+ 
+ \item Generate input labels $\vkey_{\iii,j}^\round \getsr \gcgen(1^\secpar)$ for $j\in[N]$. 
+ \item For all $j\in[N],k\in[\cirsize]$, generate the circuit: %set $\aval_{j,k}^{\round-1}=\ckey_{j,k}^{\round-1}[\gval_{j,k}^{\round-1}]$ and
+ 
+   \[ \iV_{\iii,j}^\round(\aval_{j,k}^{\round}) =
+      \begin{cases}
+      \msg_j^{\round}= 
+    \gceval(\giccir_j^{\round}, \aval_{j,k}^{\round}) \\
+       \text{output}~ \gckey^{\round+1}_{i,j}[\msg^{\round}_j]
+      \end{cases}
+    \]
+    \anti{This should be $(\giccir_j^{\round}$. Do you agree or am I confused?}
+    \Fnote{I agree. I've changed. Same for $\aval_{j,k}^\round$.}
+ 
+\item Garble the circuit $\givcir_{\iii,j}^\round \getsr \gcgarble(\smallset{\vkey_{\iii,j}^\round}_{j\in[N]},\iV_{\iii,j}^\round) \enspace.$
+
+ \item Generate $\otflowtwot_{\iii,j,k}^\round= \otsendtwo(\otflowonet_{j,k,\gval_{j,k}^\round}^\round,\smallset{\vkey_{\iii,j,k'}^\round}_{(k-1) \cdot \len<k'\leq k\cdot\len} ) \enspace.$
+ 
+  \item Select the input labels $\Gckey^{\round+1}_{i}[\Msg^{< \round-1}, \vec \msg^{\round-1}]$ for the next step for all $j\in[N]$, corresponding to the messages $\Msg^{< \round-1}, \vec \msg^{\round-1}$. 
+ %     By convention, $\st^\round$ and $\gckey^{\round+1}[\st^\round]$ are empty if $\round = \nbrounds$.
+
+  \end{enumerate}
+
+  \textbf{Output: } $
+    (\Gckey^{\round+1}_{i}[\Msg^{< \round-1}, \vec \msg^{\round-1}], \smallset{\givcir_{\iii,j}^\round,\otflowtwot_{\iii,j,k}^\round,\hcd_{\iii,k}^\round}_{j,k}, \msg_\iii^\round)
+  $.
+
+  \smallskip
+}
+
+
+
+
+\anti{old stuff}
+
+{\small\BPR [Adaptive semi-malicious protocol $\sMPC$]\label{prot:semimpc} Let $\mpcfunc$ be an arbitrary $N$-party functionality.\footnote{Formal definitions of MPC protocol and $N$-party functionality are provided in \cref{A:def-MPC}.}
+Protocol $\Pi_f$ relies on the following components: 
+\BI
+\item 
+
+
+An adaptive semi-honest $L$-round $N$-party protocol
+  $\mpc=(\mpcnext, \mpcoutput)$ for $\mpcfunc$. Without
+loss of generality, we will assume that in each round $\round$ of $\mpc$, each party $P_i$
+broadcasts a single message that depends on its input $\mpcin_i$, randomness $\mpcrand_i$ and on the messages $\Msg^{< \round} = \smallset{\msg_j^{\round'}}_{j \in [N], \round' < \round}$ that it
+received from all parties in all previous rounds, i.e. $\msg_{j}^\round = \mpcnext_j(\mpcin_j,\mpcrand_j,\Msg^{< \round})$, where $\mpcnext$ is the next message function. In the last round $L$ of $\mpc$ each party $P_i$ locally computes the output $\mpcout_i =
+  \mpcoutput_i(\mpcin_i,\mpcrand_i,\Msg)$ after receiving all the messages $\Msg = \smallset{\msg_j^\round}_{j \in [N],\round \in [\nbrounds]}$.
+
+
+ % The security parameter $\secpar$ is an implicit parameter $1^\secpar$ of $\mpcnext$ and $\mpcoutput$.
+\item A semi-malicious equivocal functional commitment scheme
+  $\hc=(\setup, \hccom,\\\hcopen,\wsenc,\wsdec,\csim,\Equiv)$ for the class of all
+  $\cirsize$-size circuits with a sufficiently large polynomial bound
+  $\cirsize$.  %We denote by $\nda^\hc$ the associated non-deterministic oracle family defined in \cref{def:nda-for-hc}.
+%   We denote by $\nda^\hc$ and $\ndadistr^\hc$ the associated
+%   non-deterministic oracle family and unique-answer distribution
+%   defined in \cref{def:nda-for-hc}.
+\item A garbled circuit scheme $\gc=(\gcgen,\gcgarble,\gceval,\gcsim)$ for the class of all
+  $\cirsize$-size circuits with a sufficiently large polynomial bound
+  $\cirsize$.
+  
+  \EI
+\medskip\noindent\textsc{Input:} Parties $P_1,\ldots, P_N$ are given input $(x_1,\ldots,x_N)$ each of length $\kappa$, respectively. 
+\BI
+\item \textsc{Round 1:} Each party $P_\istar$ generates and broadcasts $\hcc_{\istar}^\round = \hccom(\ck,
+    (\mpcin_{\istar},\mpcrand_{\istar}); \hcr_\istar^\round)$ for $\round \in [\nbrounds]$ where $\mpcrand_{\istar}$ is the random tape for running $\mpc$. 
+
+
+\item \textsc{Round 2:} For $\round$ from  $\nbrounds$ to $1$ each party $P_\istar$ garbles $\iC_\istar  = \smallset{\icnext_\istar ^\round}_{\round \in [\nbrounds]}$, defined in \cref{fig:ic-mpc}, as follows: 
+\BE
+
+\item Generate input labels $\Gckey_{\istar} ^\round,\smallset{\gckey_{\istar,j} ^\round}_{j\in[N]} \getsr \gcgen(1^\secpar)$ for $j\in[N]$.
+\item Garble the circuit $\icnext^\round_\istar$  and broadcast $\giccir_\istar=\smallset{\giccir_\istar ^\round}_{\round \in [\nbrounds]}$:
+  \[ \giccir_\istar^\round \getsr \gcgarble(\Gckey_{\istar}^\round, \smallset{\gckey_{\istar,j}^\round}_{j}, \icnext_{\istar}^\round) \enspace. \]
+
+\EE
+\item \textsc{Output phase:} Each party evaluates the garbled circuits. In particular $P_\istar$ proceeds as follows in $\nbrounds$ iterations ($\round \in [\nbrounds]$): 
+
+\BE
+\item If $\ell=1$, for $i \in [N]$, execute $(\Gckey^{2}_{i}, \smallset{\wsct^1_{i,j}}_{j},\; \msg_j^1,\hcd_j^1)= \gceval(\giccir_i^1,\emptyset)$ for all $ j \in [N]$ (we recall that $\Gckey^{1}_{i}=\emptyset$ and $\smallset{\gckey^1_{i,j}}_j = \emptyset$).
+
+ 
+\item For every $1<\round \le L$, for $i \in [N]$, for each $j \in [N]$, decrypt $\wsct^{\round-1}_{i,j}$ using as witness $(\msg^{\round-1}_j,\hcd^{\round-1}_j)$ for the circuit $G_j^{{\round-1}}(\star,\star) = \mpcnext_j(\star,\star, \Msg^{< \round-1})$:
+  \[ \gckey^{\round}_{i,j}[\msg^{\round-1}_j] = \wsdec(\ck, \wsct^{\round-1}_{i,j},(\msg^{\round-1}_j,\hcd^{\round-1}_j))\enspace\]
+  
+  and compute,
+  \begin{multline*} 
+    (\Gckey^{\round+1}_{i}[\Msg^{<\round}], \smallset{\wsct^{\round}_{i,j}}_{j},\; \msg_j^{\round},\hcd_j^{\round})= \\
+    \gceval(\giccir_i^{\round}, \Gckey^{\round}_{i}[\Msg^{<\round-1}], \smallset{\gckey^{\round}_{i,j}[\msg^{\round-1}_j]}_j)
+  \end{multline*}
+  
+  for the case where $\ell=L$, $\Gckey^{\round+1}_{i,j}[\Msg^{<\round}],\smallset{\wsct^{\round}_{i,j}}_{j}=\emptyset$.
+  
+  % \item if $\ell=L$, for each $k \in [|\vec \wsct^\round|]$ decrypt    \[ m^{\round+1} = \wsdec(\wsct^\round_k,(\msg^\round_k,\hcd^\round_k))\enspace\]
+\item After all $\nbrounds$ iterations, $P_\istar$ obtains the set of all
+  messages $\Msg$, and computes the output $
+  y_\istar =  \mpcoutput_\istar\left(\mpcin_\istar,\mpcrand_\istar,\Msg\right)
+  $.
+\EE
+
+
+\EI
+\EPR
+}
+
+
+
+
+
+
+
+
+%{We will show that using the constructions in \cref{sec:cons-gic,sec:cons-hc-ws}, we can construct the two last tools from 2-round (semi-honest) OT.}
+\remove{
+\subparagraph{The First Round:} Each party $P_{\iii}$ computes its
+first message 
+% $\tmsg_{\iii}^1$ 
+  $\tmsg_{\iii}^1 = \tmpcnext_{\iii}(\mpcin_{\iii},\allowbreak\tmpcrand_{\iii},\allowbreak \emptyset)$, 
+using security parameter $\secpar$, input $\mpcin_{\iii}$,
+random tape $\tmpcrand_{\iii}$, and no messages, as follows.
+\begin{enumerate}
+\item Take a sufficient long substring $\mpcrand_{\iii}$ of
+  $\tmpcrand_{\iii}$ as the random tape for running the inner
+  MPC protocol $\mpc$.
+
+\item Commit $\nbrounds$ times to $(\mpcin_{\iii},\mpcrand_{\iii})$ using the functional
+  commitment scheme $\hc$: for $\round \in [\nbrounds]$,
+  %\begin{align*}
+    $\hcc_{\iii}^\round = \hccom(1^\secpar,
+    (\mpcin_{\iii},\mpcrand_{\iii}); \hcr_\iii^\round)$, %\enspace,
+  %\end{align*}
+    where all the $\hcr_\iii^\round$'s (and $\mpcrand_i$) are non-overlapping substrings of $\tmpcrand_\iii$. %is a fresh substring of the random tape $\tmpcrand_\iii$.
+\item  Broadcast the first message $\tmsg_{\iii}^1 =
+  \smallset{\hcc^\round_{\iii}}_{\round \in [\nbrounds]}$, and keep $\smallset{\hcr^\round_\iii}_{\round \in [\nbrounds]}$ secret. 
+\end{enumerate}}
+
+\remove{\subparagraph{The Second Round:} Each party $P_{\iii}$ computes
+its second message 
+  $\tmsg_\iii^2 = \tmpcnext_{\iii}(\mpcin_{\iii},\allowbreak\tmpcrand_{\iii},\allowbreak \smallset{\tmsg_j^1}_{j \in N})$,
+using all first messages $\smallset{\tmsg_j^1}_{j \in N}$ as follows: 
+
+
+  \begin{enumerate}
+  \item[]$\giccir_\iii \getsr \gicgarble(1^\secpar, \iC_\iii)$ garbles the interactive circuit $\iC_\iii  = \smallset{\icnext_\iii ^\round}_{\round \in [\nbrounds]}$ into $\giccir_\iii $ as follows: For $\round$ from  $\nbrounds$ to $1$, 
+  \item Generate input labels $\gckey_\iii ^\round \getsr \gcgen(1^\secpar)$.
+\item Garble the circuit $\icnext^\round_\iii$ defined in \cref{fig:ic-mpc}:
+  \[ \giccir_\iii^\round \getsr \gcgarble(\gckey_\iii^\round, \icnext_\iii^\round) \enspace. \]
+\item Broadcast the second message $\tmsg_{\iii}^2 = \giccir_\iii$. 
+\end{enumerate}}
+
+\pprotocol{Circuit $\icnext_\iii^\round$
+}{Pseudocode of circuit $\icnext_\iii^\ell$}{fig:ic-mpc}{htbp}{
+  
+  \textbf{Hardwired Values: } $1^\secpar$, $\round$, $\iii$, $\mpcin_\iii$,
+  $\mpcrand_\iii$, $\hcr_\iii^\round$, $\Gckey^{\round+1}_{i}$, $\smallset{\gckey^{\round+1}_{i,j},\hcc_j^\round}_j$, $\mpcnext_\iii$. \\
+  \smallskip
+    \textbf{Inputs: } $(\Msg^{< \round-1}, \vec \msg^{\round-1})$ 
+    
+% \[ \msg^{\round-1} = \wsdec(\wsct^{\round-1}_k,(\msg^{\round-1}_k,\hcd^{\round-1}_k))\enspace. \]
+  
+
+
+ % These inputs define $\vec \msg^{< \round}$.
+
+  \smallskip
+
+  \textbf{Procedure: }
+  \begin{enumerate}
+  \item Define the circuit $G_j^\round$ as $G_j^{\round}(\star,\star) = \mpcnext_j(\star,\star,\Msg^{< \round})$, for $j \in [N]$.
+  \item Compute the $\round$-th message of $P_\iii$ in the inner MPC:\\ $\msg_{\iii}^\round =
+      \mpcnext_\iii\left(\mpcin_\iii,\mpcrand_\iii, (\Msg^{< \round-1}, \vec \msg^{\round-1})\right)$.
+
+  \item Compute the associated functional decommitment of $\hcc_\iii^\round$:\\
+    $ \hcd_\iii^\round = \hcopen(\ck, \hcc^\round_\iii, G_\iii^\round, (\mpcin_\iii,\mpcrand_\iii), \hcr^\round_\iii)$.
+
+ % \item Compute the next queries: for every $j \in [N]$, $q^\round_j = (\hcc_j^{\round},G_j^\round)$.
+
+%  \item Define the output by $\icout^\round_\iii = (\msg_\iii^\round,\hcd_\iii^\round)$.
+ \item For every $j \in [N]$, generate using a hardcoded random tape:
+      \[ \wsct^\round_{i,j} = \wsenc(\ck,\hcc_j^{\round},G_j^\round,\gckey^{\round+1}_{i,j})\enspace, \]
+  %    where $\gckey^{\round+1}[[\msg_k^\round,\hcd_k^\round]]$ is the tuple of input labels $\gckey^{\round+1}[i,b]$ for all $b \in \bits$ and for the input wires 
+% set $\vec \wsct^\round = \smallset{\wsct^\round_j}_j$.
+ 
+ 
+  \item Select the input labels $\Gckey^{\round+1}_{i}[\Msg^{<\round}]$ for the next step for all $j\in[N]$, corresponding to the messages $\Msg^{< \round} $. 
+ %     By convention, $\st^\round$ and $\gckey^{\round+1}[\st^\round]$ are empty if $\round = \nbrounds$.
+
+  \end{enumerate}
+
+  \textbf{Output: } $
+    (\smallset{\Gckey^{\round+1}_{i}[\Msg^{<\round}]}_j, \smallset{\wsct^\round_{i,j}}_j,\; \msg_\iii^\round,\hcd_\iii^\round)
+  $.
+
+  \smallskip
+}
+
+
+
+% We have the following lemma proven in \cref{A:lem-mpc-ic-nda-cons}.
+
+% \begin{lemma}
+%   \label{lem:mpc-ic-nda-cons}
+%   The distribution $\icdistr$ defined above is consistent with $\ndadistr^\hc$.
+% \end{lemma}
+
+
+\begin{theorem}
+  \label{th:sec-sh-mpc}
+ Assume the existence of an equivocal semi-malicious functional commitment scheme $\hc$, a garbled circuit scheme $\gic$ and an $N$-party adaptive semi-honest
+protocol $\mpc$. Then the two-round protocol $\sMPC$, presented in Protocol \ref{prot:semimpc}, securely realizes
+any multi-party functionality against an adaptive semi-malicious adversary in the CRS model.
+
+
+\end{theorem}
+
+
+\subsubsection{Description of the Simulator.}\label{sec:simu}
+Let $\ccP = \{P_1,\ldots, P_N\}$ be the set of parties, let $\cA$ be a malicious, adaptive adversary, and let $\ccP^* \subseteq \ccP$ be the set of parties corrupted by~$\cA$. We construct a simulator $\cS$ (the ideal world adversary) with access to the ideal functionality $\mathbf{\func}$, such that the ideal world experiment with $\cS$ and $\mathbf{\func}$ is indistinguishable from a real execution of $\sMPC$ with $\cA$. %The simulator $\cS$ only generates messages on behalf of parties $\ccP\backslash \ccP^*$, as follows:
+
+
+\paragraph{Simulated CRS:} $\cS$ runs the algorithm $\ehcsetup(1^\secpar)$ of the semi-malicious equivocal functional commitment scheme $\hc$ and obtains $(\ck,\teq)$. $\cS$ sets the common reference string equal to $\ck$ and locally stores $\teq$.
+
+
+
+\paragraph{Round 1 Messages $\cS \rightarrow \cA$:} In the first round, $\cS$ generates messages on behalf of each honest party $P_i \notin \ccP^*$, as follows:
+
+\BI
+\item Generate a fake commitment $(\hcc_i^\round,\state^\cc)\getsr \hcsim({\ck},{\teq})$ for $\round \in [\nbrounds]$ and for the circuit $G_\iii^\round$. 
+ \item Send $\hcc_i$ to $\Adv$ on behalf of party $P_i$ and internally save $\state_i^\cc$.
+\EI
+
+
+
+
+
+\paragraph{Round 1 Messages $\cA \rightarrow \cS$:} Also in the first round the adversary $\cA$ generates the messages $\hcc_{j}^\round = \hccom(\ck,
+    (\mpcin_{j},\mpcrand_{j}); \hcr_j^\round)$ on behalf of corrupted parties $P_j\in\ccP^*$ to honest parties $P_i\notin\ccP^*$. 
+
+\paragraph{Completion of Round 1:} $\cS$ receives the random tapes $\smallset{\hcr_i^\round}_{j \in \ccP^*, \round \in [\nbrounds]}$ and the inputs and randomness $\smallset{\mpcin_j,\mpcrand_j}_{P_j \in \ccP^*}$ of the inner protocol $\pi$. $\cS$ runs the simulator of the inner protocol $\pi$ to receive $\Msg$. 
+
+\paragraph{Simulating corruption of parties in Round 1:}  When $\cA$ corrupts a real world party $P_i$, then $\cS$ corrupts the corresponding ideal world party $P_i$ and prepares the internal state on behalf of $P_i$ such that it will be consistent with the commitment value $\hcc_i$ that it had provided to $\cA$ earlier. In particular, $\cS$ computes ${\hcr}_i^{\round} \getsr\ehcsimd({\ck},{\teq},\hcc_i^\round,\state^\cc_i,\hcmsg)$ for $\round \in [\nbrounds]$ such that ${\hcc}_i^\round=\hccom({\ck},\hcmsg;\hcr_i^\round)$. $\cS$ provides $\{{\hcr}_i^\round\}_{\round \in [\nbrounds]}$ as the randomness of party $P_i$ to $\cA$. 
+
+
+\paragraph{Round 2 Messages $\cS \rightarrow \cA$:} In the first round, $\cS$ generates messages on behalf of each honest party $P_i \notin \ccP^*$, as follows:
+
+\BI
+\item Equivocate the commitment $\hcd_\iii^\round \getsr \fequiv(\ck,\hcc^\round_\iii,\ehctrap^\round_\iii,G_\iii,\msg_\iii^\round) \enspace$ for $\round \in [\nbrounds]$.
+\item For $\round$ from $\nbrounds$ to $1$, the simulator does the following:
+  \BE
+%  \item Define $\gckey^{\round}, \Gckey^{\round}$ to be such that $\gckey^{\round}[i,b] = \gckey'^{\round}[i]$ for all input wire $i$ and all bits $b \in \bits$. $\gckey'^{\nbrounds+1}$ and $\gckey^{\nbrounds+1}$ are empty.
+\item Choose input labels $\Gckey_{\iii} ^\round,\smallset{\gckey_{\iii,j} ^\round}_{j\in[N]}$ for $j\in[N]$ at random.
+ \item Simulate the garbling of $\icnext^\round_\iii$:
+
+    \[ \giccir^\round_i \getsr \gcsim(1^\secpar,(\Gckey^{\round}_{i}[\Msg^{<\round+1}],\smallset{\wsct^\round_{i,j}}_j,\msg^\round_i,\hcd^\round_i)) \enspace. \] 
+  \item Encrypt the labels generated for the round $\round+1$ corresponding to $\msg_j^\round,\hcd_j^\round$ for each $j$:
+  
+    \[ \wsct^\round_{i,j}  \getsr \wsenc(\ck,\hcc_j^{\round},G_j^\round,\gckey^{\round+1}_{i,j}[\msg_j^\round])\enspace, \]
+
+  
+%    \[ \wsct^\round_k \getsr \wsenc(1^\secpar, \vec q^\round, \gckey^{\round+1}[[a^\round_k]])\enspace. \]
+    (For $\round = L$, $\{\wsct_{i,j}^\round\}$ and $\gckey^{\round+1}$ are empty.)
+ 
+  \EE
+
+\EI
+
+
+
+
+
+\paragraph{Round 2 Messages $\cA \rightarrow \cS$:} Also in the second round the adversary $\cA$ generates the garble circuits $\giccir_j=\smallset{\giccir_j^\round}_{\round \in [\nbrounds]}$ on behalf of corrupted parties $j\in\ccP^*$ to honest parties $h\notin\ccP^*$. 
+
+\paragraph{Simulating corruption of parties during/at the end of Round 2:}
+When $\cA$ corrupts a party $P_i$ in the real word, then $\cS$ corrupts the corresponding party $P_i$ in the ideal world and prepares the internal state on behalf of $P_i$ such that it will be consistent with messages it had sent on behalf of $P_i$.
+As explained before, $\cS$ generates randomness ${\hcr}_i^{\round} \getsr\ehcsimd({\ck},{\teq},\hcc_i^\round,\state^\cc_i,\hcmsg)$ for $\round \in [\nbrounds]$ such that ${\hcc}_i^\round=\hccom({\ck},\hcmsg;\hcr_i^\round)$ and $\hcd_\iii^\round \getsr \fequiv(\hcc^\round_\iii,\ehctrap^\round_\iii,G_\iii,\msg_\iii^\round) \enspace$.
+Next, $\cS$ needs to explain ciphertexts $\wsct^\round_{i,j}$ and garble circuits $\giccir^\round_i$.
+To this end, $\cS$ generates ${\renc}'_{i,j} \getsr\encequiv({\ck},{\teq},\wsct_{i,j}^\round,\state^\ee_{i,j}, \wsmsg,\hccir_j^\round,M, \hcd_j^\round)$ such that  $\wsct^\round_{i,j}  = \wsenc(\ck,\hcc_j^{\round},G_j^\round,\wsmsg;{\renc}'_{i,j})$ where $\wsmsg=\{\gckey^{\round+1}_{i,j}[\msg_j^\round]\}_j$.
+Then, $\cS$ generates randomness $\sigma \getsr \gcequiv( 
+    \giccir^\round_i,\cirin_i, \Gckey^{\round}_{i}[\Msg^{<\round-1}], \smallset{\gckey^{\round}_{i,j}[\msg^{\round-1}_j]}_j)$. \\
+
+
+
+
+
+
+% \item ${\hcr}' \getsr\ehcsimd({\ck},{\teq},\hcc,state^\cc,\hcmsg)$ such that $\hccom({\ck},\hcmsg;\hcr')={\hcc}$;
+%\item ${\renc}' \getsr\encequiv({\ck},{\teq},\wsct,\state^\ee, \wsmsg,\hccir,\hcout, \hcd)$ such that $ \wsenc(\ck, \hcc, \hccir, \hcout,
+ %   \wsmsg;\renc')=\wsct $
+
+This completes the description of the simulator.
+
+
+\subsubsection{Proof of Indistinguishability.}
+We need to prove that for any semi-malicious adaptive adversary $\cA$, the view generated by the simulator $\cS$ above is indistinguishable from the real view, namely:
+
+
+  \[ \smallset{\mpcideal_{\ccP^*,\mpcsim}(1^\secpar,\mpcvecin)}_{\secpar,\ccP^*,\mpcvecin} \approx \smallset{\mpcrealsm_{\ccP^*,\advA}(1^\secpar,\mpcvecin)}_{\secpar,\ccP^*,\mpcvecin} \enspace. \]
+
+%$$
+%\left\{\ideall_{\mathbf{\func},\cS}(\kappa,\cdot)\right\}_{\kappa} \indist
+%\left\{\reall_{\Pi,\cA}(\kappa,\cdot)\right\}_{\kappa}
+%$$
+To prove indistinguishability, we consider a sequence of hybrid experiments. Let $H_0$ be the hybrid describing the real-world execution of the protocol, and we modify it in steps:
+
+
+%---------------------------------------------------------------------
+\paragraph{$\hyb{0}$:}
+This hybrid is the real execution. In particular, $H_0$ starts the execution of $\cA$ providing it fresh randomness and input $\{x_j\}_{P_j \in\ccP^* }$, and interacts with it honestly by performing all actions of the honest parties with uniform randomness and input. The output consists of $\cA$'s view.
+
+
+\paragraph{$\hyb{1}$:} In this hybrid we change the way the public parameters of the commitment scheme are generated. In particular, $\cS$ runs the setup algorithm $(\ck,\teq) \getsr \ehcsetup(1^\secpar)$ and stores trapdoor $\teq$.
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follows from the indistinguishability of public parameters of the commitment scheme $\hc$. 
+\end{proof}
+
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to hybrid $\hyb{1}$, except that the ciphertexts $\{\wsct_i^\round\}_i$ are simulated: $(\wsct_i^\round,\state_i^\ee) \getsr \encsim(\ck, \hcc_i^\round, {\teq}, \rho_i^\round)$.
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follows from the soundness security of the commitment scheme $\hc$. 
+\end{proof}
+
+
+\paragraph{$\hyb{3}$:}
+In this hybrid, we change how the internal randomness of the corrupted party is explained to $\cA$ on being adaptively corrupted. Specifically we change the randomness that is used to explain the ciphertext $\cS$ generates on behalf of parties in round 2 of protocol $\sMPC$: 
+${\renc}'_i \getsr\encequiv({\ck},{\teq},\wsct_i^\round,\state^\ee_i, \wsmsg,\hccir_i^\round,M, \hcd_i^\round)$.
+
+
+
+
+
+\begin{lemma}
+$\hyb{2}\compind \hyb{3}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follows from the equivocation property of the commitment scheme $\hc$. 
+\end{proof}
+
+
+\paragraph{$\hyb{4}$:} This hybrid is similar to $\hyb{3}$, except that we encrypt twice the input labels that correspond to the actual inputs instead of encrypting both possible input labels: 
+  \[ \wsct^\round_j = \wsenc(\ck, \hcc_j^{\round},G_j^\round,\smallset{\gckey^{\round}_{i,j}[{\msg_j^\round}]}_j)\enspace\]
+
+\begin{lemma}
+$\hyb{3}\compind \hyb{4}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{2}$ from $\hyb{3}$ follows from the soundness security of the commitment scheme $\hc$. 
+\end{proof}
+
+
+\paragraph{$\hyb{5}$:} This hybrid is similar to hybrid $\hyb{4}$, except that the garble circuits are simulated:  
+\BE
+\item $\cS$ chooses input labels $\{\Gckey_{\iii,j} ^\round,\gckey_{\iii,j} ^\round\}_{j\in[N]}$ for $j\in[N]$ at random.
+ \item $\cS$ simulates the garbling of $\icnext^\round_\iii$:
+
+    \[ \giccir^\round_i \getsr \gcsim(1^\secpar,(\Gckey^{\round+1}_{i,j}[\Msg^{<\round+1}],\smallset{\wsct^\round_j}_j,\msg^\round_i,\hcd^\round_i)) \enspace. \]
+    
+  \item $\cS$ equivocates $\giccir^\round_i$ by generating randomness:
+
+    \[\sigma \getsr \gcequiv( 
+    \giccir^\round_i,\cirin_i, (\Gckey^{\round}_{i}[\Msg^{<\round-1}],\smallset{\gckey^{\round}_{i,j}[\msg^{\round-1}_j]}_j))\enspace. \]
+\EE
+
+\begin{lemma}
+$\hyb{4}\compind \hyb{5}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{3}$ from $\hyb{4}$ follows from the simulation and equivocation property of the garble circuit scheme $\gc$. 
+\end{proof}
+\paragraph{$\hyb{6}$:} In this hybrid we change the way $\cS$ generates the message $\smallset{\hcc_j^\round,\hcd_j^\round}_{j \notin I, \round \in [\nbrounds]}$ on behalf of the honest parties. Instead of computing
+
+       \[ \hcc_{j}^\round = \hccom(\ck,
+      (\mpcin_{j},\mpcrand_{j}); \hcr_j^\round); \
+      \hcd_j^\round = \hcopen(\ck,\hcc_j^\round, G_j^\round,\mpcrand_{j}, \hcr_j^\round)
+      \enspace, \]
+   $\cS$ simulates:
+   
+   
+   \[ (\hcc_i^\round,\state^\cc)\getsr \hcsim({\ck},\ehctrap_j^\round), \hcd \getsr \fequiv(\ck,\hcc_j^\round, \ehctrap_j^\round,G_j^\round,\msg_{j}^\round) \enspace. \]
+     
+
+
+
+\begin{lemma}
+$\hyb{5}\compind \hyb{6}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{4}$ from $\hyb{5}$ follows from the simulation and equivocation property of the commitment scheme $\hc$. 
+\end{proof}
+   
+   
+      \paragraph{$\hyb{7}$:} In this hybrid we change the way $\cS$ generates the commitments on behalf of the honest parties. In particular we will remove the inputs and make these commitments equivocal. In particular, $\cS$ generates randomness ${\hcr}_i^{\round} \getsr\ehcsimd({\ck},{\teq},\hcc_i^\round,\state^\cc,\msg_{j}^\round)$ for $\round \in [\nbrounds]$ such that ${\hcc}_i^\round=\hccom({\ck},\msg_{j}^\round;\hcr_i^\round)$. 
+      
+      
+\begin{lemma}
+$\hyb{6}\compind \hyb{7}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{5}$ from $\hyb{6}$ follows from the equivocation property of the commitment scheme $\hc$. 
+\end{proof}
+   
+   \paragraph{$\hyb{8}$:} In this hybrid $\cS$ essentially simulates the inner mpc protocol messages $\Msg$ after seeing the random tapes and inputs of the semi-malicious adversary for $\pi$.
+    \begin{lemma}
+$\hyb{7}\compind \hyb{8}$.
+    \label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+We base the indistinguishability between hybrids $\hyb{6}$ and  $\hyb{7}$ on the simulation property of the the inner protocol $\pi$. 
+\end{proof}
+
+    
+
+
+
+\subsection{Recall: 2-Round Adaptive Semi-Malicious Oblivious Transfer}
+We recall the definition of 2-round OT.
+\begin{mydefinition}
+  \label{def:2ot}
+  A \emph{2-round adaptive semi-malicious oblivious transfer (OT)} is a tuple of three polynomial-time algorithms $\ot = (\OTSetup,\otsendone,\otsendtwo,\\\otoutput,\ROTequiv,\SOTequiv)$:
+  \begin{description}
+   \item[Setup:] $\OTSetup$ can be viewed as a pair of PPT algorithms $(\qOTsetup,\OTsetup)$ such that the following holds:
+   \BI
+   \item $\crs \getsr \OTsetup(1^\secpar)$ expects as input the unary representation of the security parameter $\secpar$ and
+outputs a public parameter $\crs$.
+    \item $(\crs,\teq) \getsr \OTSetupq(1^\secpar)$ outputs a public parameter $\crs$ together with a trapdoor $\teq$ (used for equivocation).
+  \EI
+
+  \item[First Round:] $\otflowone = \otsendone(\crs,\otsel;\otrandone)$ generates the first flow $\otflowone$ (from the receiver to the sender) for the selection bit $\otsel \in \bits$, the security parameter~$\secpar$, and the random tape $\otrandone \in \bits^{\otrandonelen}$, where $\otrandonelen$ is polynomial in $\secpar$;
+  \item[Second Round:] $\otflowtwo \getsr \otsendtwo(\crs,\otflowone,\otmsg_0,\otmsg_1;\zeta)$  generates the second flow (from the sender to the receiver) for the messages $(\otmsg_0,\otmsg_1) \in {(\bits^\otmsglen)}^2$, where the message length $\otmsglen$ is polynomial in $\secpar$;
+  \item[Output:] $\otmsg = \otoutput(\otflowtwo,\otsel,\otrandone)$ computes the output $\otmsg \in \bits^\otmsglen$ of the receiver;
+  
+  
+  \item[Sender Equivocation:] ${\zeta} \getsr\SOTequiv({\crs},{\teq},\otflowtwo,\otflowone,\otmsg_b)$
+ such that  $\otflowtwo \getsr \otsendtwo(\otflowone,\otmsg_b,\otmsg_{1-b};\zeta)$. 
+ 
+   \item[Receiver Equivocation:] $\otrandone \getsr\ROTequiv({\crs},{\teq},\otflowone,\otsel)$ such that $\otflowone = \otsendone(1^\secpar,\otsel;\otrandone)$.\anti{update both syntax according to the last section}
+   
+
+  
+  
+  
+  
+  
+  \end{description}
+  satisfying the following properties:
+  \begin{description}
+  \item[Correctness:] For any security parameter $\secpar \in \N$, for any selection bit $\otsel \in \bits$, for any messages $(\otmsg_0,\otmsg_1) \in {(\bits^\otmsglen)}^2$, for any $\otrandone \in \bits^{\otrandonelen}$, it holds that:
+        \begin{multline*}
+      \Pr\Big[\otflowone = \otsendone(1^\secpar,\otsel;\otrandone); \ \otflowtwo \getsr \otsendtwo(\otflowone,\otmsg_0,\otmsg_1) \ : \\
+       \otmsg_\otsel = \otoutput(\otflowtwo,\otsel,\otrandone) \Big] = 1 \enspace;
+    \end{multline*}
+  \item[Receiver Privacy:] The following two distributions are computationally indistinguishable:
+    \begin{align*}
+      \big\{ \otsendone(1^\secpar,0;\otrandone) \ &: \ \otrandone \getsr \bits^\otrandonelen {\big\}}_{\secpar}\enspace, \\
+      \big\{ \otsendone(1^\secpar,1;\otrandone) \ &: \ \otrandone \getsr \bits^\otrandonelen {\big\}}_{\secpar}
+        \enspace;
+    \end{align*}
+  \item[Semi-Malicious Sender Privacy:] The following two distributions are computationally indistinguishable:
+    \begin{align*}
+      \big\{ (\otrandone, \otsendtwo(\otflowone,\otmsg_0,\otmsg_1))\ &: \otflowone = \otsendone(1^\secpar,\otsel;\otrandone)  {\big\}}_{\secpar, \otsel, \otmsg_0, \otmsg_1} \enspace, \\
+      \big\{ (\otrandone, \otsendtwo(\otflowone,\otmsg_\otsel,\otmsg_\otsel)) \ &: \otflowone = \otsendone(1^\secpar,\otsel;\otrandone) {\big\}}_{\secpar, \otsel, \otmsg_0, \otmsg_1} \enspace.
+    \end{align*}
+    \Fnote{I think $\otrandone$ should also be an index of the distributions.}
+        \item[ Indistinguishability of Public Parameters:] We require that:   
+         \begin{equation}\nonumber
+\begin{split}
+\Big|\Pr\Big{[}(\crs)\leftarrow&  \OTsetup(1^\secpar): \mathcal{A}(\ck)=1\Big{]}-\\ &
+\Pr\Big{[}({\crs},{\teq})\leftarrow \OTSetupq(1^\secpar) :\mathcal{A}({\crs})=1\Big{]}\Big| < \negl(\secpar).
+\end{split}
+\end{equation}
+    
+    
+  \end{description}
+\end{mydefinition}
+\anti{receiver and sender equivocation properties are defined in the OT transformation, sections, bring them here}
+\subsection{Functional Commitment with WS from 2-Round OT}
+
+Let $\hccirclass = {\{\hccirclass_\secpar\}}_{\secpar \in \N}$ be a $S$-size circuit class (where $S$ is polynomial in $\secpar$).
+To construct a functional commitment scheme $\hc=(\hccom,\hcopen,\hcver,\allowbreak\hcsim)$ with an associated witness selector $\ws = (\wsenc,\wsdec)$, we rely on the following tools:
+\begin{itemize}
+\item A $\poly$-size universal circuit family $\smallset{\univcirc_\secpar}_{\secpar \in \N}$ for $\hccirclass$; we recall that $\univcirc_\secpar(\hcmsg,\hccir) = \hccir(\hcmsg)$, for $\hccir \in \hccirclass_\secpar$ and $\hcmsg \in \bits^{\hccirinlen}$.
+\item A garbled circuit scheme $\gc=(\gcgen,\gcgarble,\gceval,\gcsim)$ for the circuit class $\smallset{\smallset{\univcirc_\secpar(\star,\hcmsg)}_{\hcmsg \in \bits^{\hccirinlen}}}_{\secpar \in \N}$ of partially evaluated universal circuits on any possible input $\hcmsg$; we recall that the input of the circuit $\univcirc_\secpar(\star,\hcmsg)$ is a circuit $\hccir \in \hccirclass_\secpar$ represented by a $S$-bit string $(\hccir[1],\dots,\hccir[S]) \in \bits^S$.
+\item A garbled circuit scheme $\tgc = (\tgcgen, \tgcgarble, \tgceval, \tgcsim)$ for the class of
+  $\tcirsize$-sized circuits with a sufficiently large polynomial bound
+  $\tcirsize$. The prefix ``$\mathsf{o}$'' stands for ``outer'' as this garbled circuit scheme will be used in the WS encryption procedure to garble a circuit containing the $\gceval$.
+\item A 2-round OT $\ot = (\otsendone,\otsendtwo,\otoutput)$ with sufficiently large message size $k = |\otmsg_0| = |\otmsg_1|$.\footnote{This is without loss of generality, as we can always repeat in parallel a 1-bit-message 2-round OT to get a $\poly(\secpar)$-bit-message 2-round OT.}
+\end{itemize}
+
+The construction proceeds as follows:
+\begin{description}
+\item[Commitment:] $\hcc = \hccom(1^\secpar, \hcmsg;\hcr)$ commits to $\hcmsg \in \bits^\hccirinlen$ as follows:
+  \begin{enumerate}
+  \item Generate input labels $\gckey \getsr \gcgen(1^\secpar)$ (using a random tape derived from $\hcr$).
+  \item Garble $\cir = \univcirc_\secpar(\star,\hcmsg)$, which is the universal circuit partially evaluated on~$\hcmsg$: $\gccir \getsr \gcgarble(\gckey,\cir)$.
+  \item For each $i \in [S]$, for each bit $b \in \bits$, for each $j \in [|\gckey[i,b]|]$, generate a first flow $\otflowone_{i,b,j} = \otsendone(1^\secpar,\gckey[i,b]_j; \otrandone_{i,b,j})$, where $\gckey[i,b]_j$ is the $j$-th bit of the input label $\gckey[i,b]$ and where the random tape $\otrandone_{i,b,j}$ is derived from $\hcr$.
+  \end{enumerate}
+  And returns $\hcc = (\gccir, \smallset{\otflowone_{i,b,j}})$.
+\item[Functional Opening:] $\hcd = \hcopen(\hcc, \hccir, \hcmsg, \hcr)$ derives the functional decommitment $\hcd$ of $\hcc$ to $\hcout = \hccir(\hcmsg) = \univcirc_\secpar(\hccir, \hcmsg)$ as follows: $\hcd = \smallset{\gckey'[i], \smallset{\otrandone'_{i,j}}_j}_{i \in [S]}$, 
+  where $
+    \gckey'[i] = \gckey[i,\hccir[i]]$ and $\otrandone'_{i,j} = \otrandone_{i,\hccir[i],j}$.
+\item[Functional Verification:] $\hcver(\hcc,\hccir,\hcout,\hcd)$ returns $1$, if and only if for all $i \in [S]$ and $j \in [|\gckey'[i]|]$:
+  \begin{align*}
+    \otflowone_{i,\hccir[i],j} &= \otsendone(1^\secpar,\gckey'[i]_j; \otrandone'_{i,j})
+    &&\text{ and }
+    &\hcout &= \gceval(\gccir, \gckey')\enspace.
+  \end{align*}        
+\item[Simulation:] $(\hcc,\hcd) \getsr \hcsim(1^\secpar, \hccir, \hcout)$ generates the commitment $\hcc$ and its functional decommitment $\hcd$ as follows:
+  \begin{enumerate}
+  \item Simulate the garble circuit and its partial key: $(\gckey',\gcsimcir) \getsr \gcsim(1^\secpar,\hcout)$.
+  \item Define $\gckey$ as follows: $\gckey[i,\hccir[i]] = \gckey'[i]$ and $\gckey[i,1-\hccir[i]] = 0^{|\gckey'[i]|}$.
+  \item For each $i \in [S]$, for each bit $b \in \bits$, for each $j \in [|\gckey[i,b]|]$, generate a first flow $\otflowone_{i,b,j} = \otsendone(1^\secpar,\gckey[i,b]_j; \otrandone_{i,b,j})$, where $\gckey[i,b]_j$ is the $j$-th bit of the input label $\gckey[i,b]$ and where the random tape $\otrandone_{i,b,j}$ is derived from $\hcr$.
+  \end{enumerate}
+  And sets
+  $\hcc = (\gcsimcir, \smallset{\otflowone_{i,b,j}})$
+  and
+  $\hcd = \smallset{\gckey'[i], \smallset{\otrandone'_{i,j}}_j}_{i \in [S]}$,
+  where $\gckey'[i] = \gckey[i,\hccir[i]]$ and $\hcr'_{i,j} = \hcr_{i,\hccir[i],j}$.
+\item[Encryption:] $\wsct \getsr \wsenc(1^\secpar, (\hcc,\hccir), \wsmsg)$ encrypts the messages $\wsmsg
+  =\smallset{\wsmsg[I,B]}_{I,B}$ for $\ndax=(\hcc,\hccir)$ into $\wsct$ as follows: 
+  \begin{enumerate}
+  \item For every $I \in [\hcciroutlen]$ and $B \in \bits$, create the circuit:
+    \[ \tcir_{I,B}(\gckey') =
+      \begin{cases}
+        \wsmsg[I,B] &\text{if } \hcout_I = B \text{ where } \hcout = \gceval(\gccir,\gckey'), \\
+        \perp &\text{otherwise.}
+      \end{cases}
+    \]
+    
+    
+  \item For every $I \in [\hcciroutlen]$ and $B \in \bits$, garble this circuit: $\tgckey_{I,B} \getsr \tgcgen(1^\secpar)$ and $\tgccir_{I,B} \getsr \tgcgarble(\tgckey, \tcir_{I,B})$; we write $\tgckey_{I,B}[i,j,b]$ the key corresponding to the $j$'bit of the input $\gckey'[i]$ of $\tcir_{I,B}$ being~$b$ (i.e., $\gckey'[i]_j = b$, where $\gckey' = \smallset{\gckey'[i]}$ is the input of the circuit $\tcir_{I,B}$).
+  \item Define the OT messages: $\otmsg_{i,j,b} = \smallset{\tgckey_{I,B}[i,j,b]}_{I,B}$.
+  \item Compute the second flows of the OT corresponding to the first flows $\otflowone_{i,\hccir[i],j}$: $\otflowtwo_{i,j} \getsr \otsendtwo(\otflowone_{i,\hccir[i],j},\otmsg_{i,j,0},\otmsg_{i,j,1})$;
+  \end{enumerate}
+  and return
+  $ \wsct = (\smallset{\tgccir_{I,B}}_{I \in [\hcciroutlen],B \in \bits}, \smallset{\otflowtwo_{i,j}}_{i \in [S], j \in [|\gckey[i,0]|]})$.
+\item[Decryption:] $\wsmsg = \wsdec(\wsct, (\hcout,\hcd))$ decrypts $\wsct$ as follows:
+  \begin{enumerate}
+  \item For every $i \in [S]$ and $j \in [|\gckey'[i]|]$, compute:
+    \[ \smallset{\tgckey'_{I,B}[i,j]}_{I,B} = \otmsg_{i,j,\gckey'[i]_j} = \otoutput(\otflowtwo_{i,j}, \gckey'[i]_j, \otrandone'_{i,j}) \enspace; \]
+  \item For every $I \in [\hcciroutlen]$ and $B = \hcout_I$, evaluate the garble circuit $\tgccir_{I,B}$:
+    \[ \wsmsg[I,B] = \tgceval(\tgccir_{I,B},\smallset{\tgckey'_{I,B}[i,j]}_{i,j}) \]
+  \end{enumerate}
+  and return $\wsmsg = \smallset{\wsmsg[I,\hcout_I]}_{I \in [\hcciroutlen]}$.
+\end{description}
+
+\vspace{\baselineskip}
+
+Correctness of the functional commitment scheme is straightforward.
+Correctness for the decryption of the witness selector comes from the fact that:
+\[ \smallset{\tgckey'_{I,B}[i,j]}_{I,B} = \smallset{\tgckey_{I,B}[i,j,\gckey[i,\hccir[i]]_j]}_{I,B} \]
+and therefore $\tgceval(\tgccir_{I,B},\smallset{\tgckey'_{I,B}[i,j]}_{i,j})$ is a correct evaluation of the garbled circuit $\tgccir_{I,B}$ on the input $\gckey' = \smallset{\gckey[i,\hccir[i]]}_{i \in [S]}$, satisfying $\gceval(\gccir,\gckey') = \cir(\hccir) = \hccir(\hcmsg) = \hcout$.
+
+\medskip
+\subparagraph{Security:} 
+Correctness for the decryption of the witness selector comes from the fact that:
+\iftoggle{full}{We have the following theorem.}{We prove the following security theorem in \appref{}.}
+\begin{theorem}
+  \label{th:sec-hc-ws}
+  If $\ot$ is correct, receiver-private, and (semi-honest) sender-private, then the functional commitment scheme $\hc$ defined above is correct, semi-honest functionally binding, and simulatable.
+  Furthermore, the associated witness selector $\ws$ is correct and semantically secure.
+\end{theorem}
+
+\Fnote{was 2-Round Semi-Malicious MPC}
+\label{sec:sm-mpc}
+
+
+Our construction of semi-malicious 2-round MPC is very similar to our
+construction of semi-honest 2-round MPC in \cref{sec:sh-mpc} with the
+following two main differences: the functional commitment $\hc$ is
+replaced by a stronger (semi-malicious) equivocable functional
+commitment $\ehc$ and the inner MPC is supposed to be secure against
+semi-malicious adversaries instead of just semi-honest adversaries.
+
+
+
+\subsection{Equivocable FC with WS from 2-Round Semi-Malicious OT}
+\label{sec:cons-ehc-ws}
+
+To conclude the construction of semi-malicious 2-round MPC, we need to construct an equivocable functional commitment with witness selector from semi-malicious 2-round OT.
+
+\subparagraph{Semi-Malicious 2-Round OT:} Let us first define the notion of semi-malicious 2-round OT.
+
+\begin{mydefinition}
+  A \emph{semi-malicious 2-round oblivious transfer (OT)} is a 2-round oblivious OT (see \cref{def:2ot}) satisfying the following additional property:
+  \begin{description}
+      \item[Semi-Malicious Sender Privacy:] The following two distributions are computationally indistinguishable:
+    \begin{align*}
+      \big\{ \otsendtwo(\otflowone,\otmsg_0,\otmsg_1) \ &: \ \otflowone = \otsendone(1^\secpar,\otsel;\otrandone) {\big\}}_{\secpar, \otsel, \otmsg_0, \otmsg_1,\otrandone} \enspace, \\
+      \big\{ \otsendtwo(\otflowone,\otmsg_\otsel,\otmsg_\otsel) \ &: \ \otflowone = \otsendone(1^\secpar,\otsel;\otrandone) {\big\}}_{\secpar, \otsel, \otmsg_0, \otmsg_1,\otrandone} \enspace.
+    \end{align*}
+  \end{description}
+\end{mydefinition}
+
+We remark that semi-honest sender privacy is clearly implied by semi-malicious sender privacy. The only difference between the two notions is that the former notion just needs to hold when the first flow is honestly generated using a uniform random tape $\otrandone \getsr \bits^\otrandonelen$, while the latter one needs to hold for any random tape $\otrandone \in \bits^\otrandonelen$.
+
+\subparagraph{Construction of Equivocable Functional Commitment:}
+Let $\hccirclass = {\{\hccirclass_\secpar\}}_{\secpar \in \N}$ be a $S$-size circuit class (where $S$ is polynomial in $\secpar$).
+To construct an equivocable functional commitment scheme $\ehc=(\ehccom,\ehcopen,\ehcver,\allowbreak\ehcsimc,\allowbreak\ehcsimd)$ with an associated witness selector $\ws = (\wsenc,\wsdec)$, we rely on the same tools as in \cref{sec:cons-hc-ws}, except that we suppose the 2-round OT to also be semi-malicious sender-private.
+
+The construction is very similar to the one of \cref{sec:cons-hc-ws}.
+The semi-malicious binding property easily follows from the semi-malicious sender privacy property of the OT.
+The main difficulty is to add the equivocation property.
+In the construction of \cref{sec:cons-hc-ws}, first flows of the OT protocol are used to commit to the input labels of a garbled circuit of $\univcirc(\star,\hcmsg)$.
+The issue is that since the garbled circuit is in the clear and the input labels are committed (in a possibly statistically binding way), there is no way to do any equivocation.
+The idea is to commit both the input labels and the garbled circuit of $\univcirc(\star,\hcmsg)$ in an equivocable way (and compatible with a witness selector): for each bit $\beta$ of the input labels and of the garbled circuit, we generate two first OT flows both for the selector bit~$\beta$.
+The associated ``decommitment'' is the random tape used to generate the $(\beta+1)$-th (first) OT flow (i.e., the first one if $\beta=0$ and the second one if $\beta=1$).
+In a simulated commitment generated by $\ehcsimc$, for each bit, the first (first) OT flow is generated for the selector bit~$0$, while the second (first) OT flow is generated is generated for the selector bit~$1$.
+But a commitment generated by a semi-malicious adversary remains binding, as even a semi-malicious adversary has to use the same selector bit for both OTs.
+
+More precisely, the construction is as follows:
+\begin{description}
+\item[Commitment:] $\hcc = \ehccom(1^\secpar, \hcmsg;\hcr)$ commits to $\hcmsg \in \bits^\hccirinlen$ as follows:
+  \begin{enumerate}
+  \item Generate input labels $\gckey \getsr \gcgen(1^\secpar)$ (using a random tape derived from $\hcr$).
+  \item Garble $\cir = \univcirc_\secpar(\star,\hcmsg)$, which is the universal circuit partially evaluated on~$\hcmsg$: $\gccir \getsr \gcgarble(\gckey,\cir)$.
+  \item For each $k \in [|\gccir|]$, for each bit $b' \in \bits$, generate a first flow $\otflowone_{k,b'} = \otsendone(1^\secpar,\gccir[k]; \allowbreak \otrandone_{k,b'})$, where $\gccir[k]$ is the $k$-th bit of the garbled circuit $\gccir$ (seen as a bitstring) and where the random tape $\otrandone_{k,b'}$ is derived from $\hcr$.
+  \item For each $i \in [S]$, for each bit $b \in \bits$, for each $j \in [|\gckey[i,b]|]$, for each bit $b' \in \bits$, generate a first flow $\otflowone_{i,b,j,b'} = \otsendone(1^\secpar,\gckey[i,b]_j; \otrandone_{i,b,j,b'})$, where $\gckey[i,b]_j$ is the $j$-th bit of the input label $\gckey[i,b]$ and where the random tape $\otrandone_{i,b,j,b'}$ is derived from $\hcr$.
+  \end{enumerate}
+  And returns:
+  \[ \hcc = (\smallset{\otflowone_{k,b'}}_{k,b'}, \smallset{\otflowone_{i,b,j,b'}}_{i,b,j,b'}) \enspace. \]
+\item[Functional Opening:] $\hcd = \ehcopen(\hcc, \hccir, \hcmsg, \hcr)$ derives the functional decommitment $\hcd$ of $\hcc$ to $\hcout = \hccir(\hcmsg) = \univcirc_\secpar(\hccir, \hcmsg)$ as follows:
+  \[ \hcd = (\gccir, \smallset{\otrandone'_{k}}_{k}, \smallset{\gckey'[i], \smallset{\otrandone'_{i,j}}_j}_{i \in [S]}) \enspace, \]
+  where
+    $\otrandone'_{k} = \otrandone_{k,\gccir[k]}$,
+    $\gckey'[i] = \gckey[i,\hccir[i]]$, and 
+    $\otrandone'_{i,j} = \otrandone_{i,\hccir[i],j,\gckey'[i]}$.
+\item[Functional Verification:] $\ehcver(\hcc,\hccir,\hcout,\hcd)$ returns $1$, if and only if for all $i \in [S]$ and $j \in [|\gckey'[i]|]$ and $k \in [|\gccir|]$:
+  \begin{align*}
+    \otflowone_{k,\gccir[k]} &= \otsendone(1^\secpar,\gccir[k]; \otrandone'_{k})\enspace,
+    \\
+    \otflowone_{i,\hccir[i],j,\gckey'[i]_j} &= \otsendone(1^\secpar,\gckey'[i]_j; \otrandone'_{i,j})\enspace,\\
+    \hcout &= \gceval(\gccir, \gckey')\enspace.
+  \end{align*}
+\item[Simulation:] $(\hcc,\ehctrap) \getsr \ehcsimc(1^\secpar)$ generates the simulated commitment $\hcc$ as $\ehccom$, except that:
+  \begin{align*}
+    \otflowone_{k,b'} &= \otsendone(1^\secpar,b'; \otrandone_{k,b'})
+    && \text{ and }
+    & \otflowone_{i,b,j,b'} &= \otsendone(1^\secpar,b'; \otrandone_{i,b,j,b'}) \enspace,
+  \end{align*}
+  i.e., the first flows $\otflowone_{k,b'}$ and $\otflowone_{i,b,j,b'}$ are for the selector bit~$b'$ instead of $\gccir[k]$ and $\gckey[i,b]_j$. The trapdoor $\ehctrap$ is the random tape.
+\item[Equivocation:] $\hcd \getsr \ehcsimd(\hcc,\ehctrap,\hccir,\hcout)$ equivocate the commitment $\hcc$ by simulating $(\gckey', \gcsimcir) \getsr \gcsim(1^\secpar,\hcout)$ and then generating the functional decommitment $\hcd$ similarly to $\hcopen$ as follows:
+    \[ \hcd = (\gcsimcir,\; \smallset{\otrandone'_{k}}_k,\; \smallset{\gckey'[i], \smallset{\otrandone'_{i,j}}_j}_{i \in [S]}) \enspace, \]
+  where
+    $\otrandone'_{k} = \otrandone_{k,\gcsimcir[k]}$,
+    $\gckey'[i] = \gckey[i,\hccir[i]]$,
+    $\otrandone'_{i,j} = \otrandone_{i,\hccir[i],j,\gckey'[i]}$.
+\item[Encryption:] $\wsct \getsr \wsenc(1^\secpar, (\hcc,\hccir), \wsmsg)$ encrypts the messages $\wsmsg
+  =\smallset{\wsmsg[I,B]}_{I,B}$ for $\ndax=(\hcc,\hccir)$ into $\wsct$ as follows: 
+  \begin{enumerate}
+  \item For every $I \in [\hcciroutlen]$ and $B \in \bits$, create the circuit:
+    \[ \tcir_{I,B}(\gccir,\gckey') =
+      \begin{cases}
+        \wsmsg[I,B] &\text{if } \hcout_I = B \text{ where } \hcout = \gceval(\gccir,\gckey'), \\
+        \perp &\text{otherwise.}
+      \end{cases}
+    \]
+  \item For every $I \in [\hcciroutlen]$ and $B \in \bits$, garble this circuit: $\tgckey_{I,B} \getsr \tgcgen(1^\secpar)$ and $\tgccir_{I,B} \getsr \tgcgarble(\tgckey, \tcir_{I,B})$; we write $\tgckey_{I,B}[k,b]$ (resp., $\tgckey_{I,B}[i,j,b]$) the key corresponding to the $k$-th bit of the input $\gccir$ of $\tcir_{I,B}$ (resp., the $j$-th bit of the input $\gckey'[i]$ of $\tcir_{I,B}$) being~$b$.
+  \item Define the OT messages: $\otmsg_{k,b} = \smallset{\tgckey_{I,B}[k,b]}_{I,B}$ and $\otmsg_{i,j,b} = \smallset{\tgckey_{I,B}[i,j,b]}_{I,B}$.
+  \item Compute the second flows of the OT corresponding to the first flows $\otflowone_{k,b'}$ and $\otflowone_{i,\hccir[i],j,b'}$:
+    \begin{align*}
+      \otflowtwo_{k,0} &\getsr \otsendtwo(\otflowone_{k,0},\otmsg_{i,j,0},\perp)\enspace, \\  
+      \otflowtwo_{k,1} &\getsr \otsendtwo(\otflowone_{k,1},\perp,\otmsg_{i,j,1})\enspace, \\
+      \otflowtwo_{i,j,0} &\getsr \otsendtwo(\otflowone_{i,\hccir[i],j,0},\otmsg_{i,j,0},\perp)\enspace, \\  
+      \otflowtwo_{i,j,1} &\getsr \otsendtwo(\otflowone_{i,\hccir[i],j,1},\perp,\otmsg_{i,j,1})\enspace,
+    \end{align*}
+    where $\perp$ is an arbitrary message.
+  \end{enumerate}
+  And return
+  \[ \wsct = (\smallset{\tgccir_{I,B}}_{I \in [\hcciroutlen],B \in \bits}, \smallset{\otflowtwo_{k,b'}}_{k,b'},  \smallset{\otflowtwo_{i,j,b'}}_{i,j,b'})\enspace. \]
+\item[Decryption:] $\wsmsg = \wsdec(\wsct, (\hcout,\hcd))$ decrypts $\wsct$ as follows:
+  \begin{enumerate}
+  \item For every $k$, compute:
+    \[ \smallset{\tgckey'_{I,B}[k]}_{I,B} = \otmsg_{k,\gccir[k]} = \otoutput(\otflowtwo_{k,\gccir[k]}, \gccir[k], \otrandone'_{k}) \enspace. \]
+  \item For every $i$ and $j$, compute:
+    \[ \smallset{\tgckey'_{I,B}[i,j]}_{I,B} = \otmsg_{i,j,\gckey'[i]_j} = \otoutput(\otflowtwo_{i,j,\gckey'[i]_j}, \gckey'[i]_j, \otrandone'_{i,j}) \enspace. \]
+  \item For every $I \in [\hcciroutlen]$ and $B = \hcout_I$, evaluate the garble circuit $\tgccir_{I,B}$:
+    \[ \wsmsg[I,B] = \tgceval(\tgccir_{I,B},(\smallset{\tgckey'_{I,B}[k]}_k,\smallset{\tgckey'_{I,B}[i,j]}_{i,j})) \]
+  \end{enumerate}
+  and return $\wsmsg = \smallset{\wsmsg[I,\hcout_I]}_{I \in [\hcciroutlen]}$.
+\end{description}
+
+We have the following theorem.
+\begin{theorem}
+  If $\ot$ is correct, receiver-private, and semi-malicious sender-private, then the equivocable functional commitment scheme $\ehc$ defined above is correct, semi-malicious functionally binding, and simulatable.
+  Furthermore, the associated witness selector $\ws$ is correct and semantically secure.
+\end{theorem}
+
+\begin{proof}
+  As in the proof of \cref{th:sec-hc-ws}, correctness is straightforward and semi-malicious functional binding follows from the semantic security of the witness selector.
+  Furthermore simulatability of $\ehc$ and semantic security of the witness selector $\ws$ can be proven similarly as in the proof of \cref{th:sec-hc-ws}.
+\end{proof}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

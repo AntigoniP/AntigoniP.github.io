@@ -1,0 +1,2 @@
+symbol=,type=byte_type,name=n,offset=0,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 0 0,},
+symbol=,type=bit_type,name=flag,offset=1,length=1,size=1,parameter=0,scope=global_scope,byte code={iconst 0 0,byte_store 1 0,},

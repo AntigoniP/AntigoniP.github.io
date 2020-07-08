@@ -1,0 +1,187 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% !TEX root =../main-optimal.tex
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Secure Multi-party Computation (MPC) \cite{FOCS:Yao82b,FOCS:Yao86,GMW87} allows mutually suspicious parties to evaluate a function on their joint private inputs without revealing these inputs to each other.
+%\shai{a few paragraphs about round complexity, major prior works, current status. with/without setup, 2-party/multi-party, ordered/simultaneous, etc. In particular mention Mukherjee-Wichs \cite{EC:MukWic16}.}
+One particularly fruitful line of investigation is concerned with the \emph{round complexity} of these protocols, more specifically how many rounds of broadcast are needed.
+
+There are many variants of this question, depending on the exact model. In particular, the availability (or lack thereof) of a \emph{Common Reference String} (CRS) plays an important role in the study of round complexity. It is known that at least two rounds of interaction are necessary even if such trusted CRS is available (e.g., \cite{C:HalLinPin11}), and several works in the literature construct optimal (two) round secure computation protocols both in the two-party and multi-party settings (see \secref{relatedCRS} for related works).
+
+In the plain model without trusted setup, Katz and Ostrovsky \cite{C:KatOst04} proved that five rounds are necessary and sufficient for secure computation in the two-party setting where both parties rceive output. In the multi-party setting, it is long known that \emph{constant round protocols} are possible \cite{STOC:BeaMicRog90,EC:KatOstSmi03,STOC:Pass04,C:DamIsh05,C:DamIsh06,C:IshPraSah08,C:PanPasVai08,FOCS:Wee10,STOC:Goyal11,STOC:LinPas11,FOCS:GLOV12}, however there is no known round optimal multi-party computation protocol. 
+
+In a recent work by Garg et al. \cite{EC:GMPP16}, it is shown that when simultaneous messages are allowed, then the Katz-Ostrovsky lower bound drops to only \emph{four} rounds (for either two or many parties). In terms of constructions, \cite{EC:GMPP16} show how to transform any $t$-round (parallel) non-malleable commitment into a $\max(4,t+1)$-round protocol for the specific coin-flipping functionality in the multi-party setting. Instantiating this protocol with the non-malleable commitments from \cite{C:PanPasVai08,C:COSV16}, Garg et al. obtained a four round protocol for the multi-party {\em coin-flipping} functionality. Relying on this coin-flipping protocol they showed how to transform the two-round multi-party protocol for general functionalities of Garg et al. \cite{TCC:GGHR14} based on indistinguishability Obfuscation (iO) \cite{FOCS:GGHRSW13} in the CRS model to a five-round protocol in the plain model, and the two-round LWE-based protocol of Mukherjee and Wichs \cite{EC:MukWic16} to a six-round protocol.
+
+A lot of work has been done on the round complexity of non-malleable commitments as well. However, the only candidates for parallel non-malleable commitments that run in less than four rounds are constructed in the works of \cite{C:PanPasVai08,C:COSV16}. The two round parallel non-malleable commitment of \cite{C:PanPasVai08} is based on adaptive pseudorandom generators (PRGs) and the three round non-malleable commitment of \cite{C:COSV16} is based on one-way permutations with sub-exponential security.
+
+%Combining their coin flipping protocol with the $3$-round parallel non-malleable commitment of \cite {} or the 2-round parallel non-malleable commitment of \cite{C:PanPasVai08} they obtain a $4$ coin-flipping protocol. 
+
+Even under very strong assumptions, prior works leave the following fundamental question open:
+\begin{quote}
+\emph{Can we obtain round-optimal multi-party computation protocols in the plain model (without setup)?}
+\end{quote}
+
+We answer the above question in the affirmative, obtaining a round-optimal multi-party computation protocol in the plain model for general functionalities in the presence of a malicious adversary. 
+Our starting point is the observation that we can replace the four-round coin-tossing from \cite{EC:GMPP16} by an extremely simple \emph{single round protocol}. That protocol yeilds a common somewhat-random string, which is much weaker than a truly random string but still ``good enough for LWE''. This lets us run (a variant of) the Mukherjee-Wichs protocol \cite{EC:MukWic16}, yeilding a three-round protocol with ``semi-malicious'' security, under the LWE assumption.
+
+To get security in the malicious adversary model, we rely on other strong assumptions. In particular, we use the two-round adaptively secure commitment scheme of Pandey, Pass and Vaikuntanathan \cite{C:PanPasVai08} (which is just Naor's protocol from \cite{JC:Naor91}, when instantiated with adaptive PRGs). Moreover, we need a sub-exponential version of the LWE assumption. Hence, we prove the following:
+\BT\label{thm:mpctoken}(Informal)
+Assuming the existence of adaptive commitments, as well as the sub-exponential hardness of Learning-with-Errors, there exists a four-round protocol that securely realizes any multi-party functionality against a malicious adversary in the plain model without setup.
+\ET
+
+%Their non-malleable commitment is also the only $3$-robust parallel candidate that can be used in the $6$-round protocol of Garg et al. \cite{EC:GMPP16} from $\LWE$ together with the non-malleable commitment scheme of \cite{COSV16} which is based on complexity leveraging. 
+\subsection {Related Work} \label{sec:relatedCRS}
+\paragraph{Related work in the CRS model.}
+The works of Jarecki and Shmatikov \cite{EC:JarShm07} and Horvitz and Katz~\cite{C:HorKat07} present {\em two-party} protocols where the former is constant-round and the latter is optimal (two)-round. Asharov et al.~\cite{EC:AJLTVW12} first show a three-round \emph{multi-party} computation protocol in the CRS model and a two-round multi-party computation protocol in the reusable PKI model, under LWE, by constructing threshold FHE schemes (based on the FHE schemes from \cite{FOCS:BraVai11,ITCS:BraGenVai12}). The works of \cite{TCC:BenDam10,MyeSerShe11} also present threshold FHE schemes but their protocols required more than two rounds of interaction. The work of Garg et al.~\cite{TCC:GGHR14} gives a two-round multi-party protocol under strong assumptions, namely, the existence of indistinguishability obfuscation for polynomial circuits and statistically-sound NIZKs.  
+
+More recently, the work of \cite{EC:MukWic16}, and its extensions \cite{C:BraPer16,TCC:PeiShi16}, based on multi-key FHE \cite{STOC:LopTroVai12,C:CleMcg15}, shows how to obtain optimal 2-round constructions based on LWE and NIZKs in the CRS model.% \footnote{The protocol of \cite{EC:MukWic16} only assumes a common random string (as opposed to a common reference string which is sampled form a specific distribution.} %An alternative approach using randomized polynomials \cite{AppIshKus05} combined with \cite{STOC:GolMicWig87} yields a four-round multi-party computation protocol based on the assumption of semi-honest OT. 
+
+\paragraph{Related work in the plain model.}
+For the computational setting and the special case of two party computation, the semi-honest secure protocol of Yao \cite{FOCS:Yao82b,FOCS:Yao86,TCC:LinPin11} consists of only three rounds (see Section \ref{sec:prelim}).  An alternative approach
+using randomized polynomials was also given by \cite{FOCS:IshKus00,AppIshKus05}. For malicious security, the first constant round protocol based on GMW was presented by Lindell~\cite{C:Lindell01}. The work of \cite{C:IshPraSah08} presented a different approach which also results in a constant round protocol.
+
+The exact round complexity of two party computation was studied in the work of Katz and Ostrovsky~\cite{C:KatOst04} who provided a $5$ round protocol for computing any two-party functionality. They also ruled out the possibility of a four round protocol for coin-flipping, thus completely resolving the case of two party. Recently \cite{C:OstRicSca15} constructed a $5$-round protocol for the general two-party computation by only relying on \emph{black-box} usage of the underlying assumptions.
+
+
+% \paragraph{Broadcast/Simultaneous Message Model.} However, all prior works considered a setting where in each round only one party is allowed to send a message. We call this model the \emph{non-simultaneous} message model or model \emph{without broadcast}. In contrast, in this work we consider a more inclusive model where in each round all party can simultaneously broadcast messages over the channel and at the end of the round everyone receives everyone else's message. We call this model \emph{broadcast} or \emph{simultaneous} message model. Though this is the standard and the most  natural model for multi-party computations (MPC), surprisingly  for 2-PC, to the best of our knowledge, this model haven't been considered at all in the literature. Moreover, a closer look into the $4$-round impossibility~\cite{C:KatOst04} reveals that it actually does not hold in broadcast setting. Evidently, this leaves hope for a 4-round 2-PC protocol with broadcast.
+
+ 
+For the multi-party setting, the exact round complexity has remained open for a long time. The work of \cite{STOC:BeaMicRog90} gave the first constant-round non black-box protocol for honest majority (improved by the black-box protocols of \cite{C:DamIsh05,C:DamIsh06}). Katz, Ostrovsky, and Smith \cite{EC:KatOstSmi03} constructed logarithmic-round protocols for any multi-party functionality for the dishonest majority case based on polynomial-time assumptions and constant round protocols based on  exponential-time assumptions. Pass \cite{STOC:Pass04} 
+constructed a constant-round protocol based on polynomial-time assumption. The constant-round protocols of \cite{EC:KatOstSmi03,STOC:Pass04} relied on non-black-box use of the adversary's algorithm \cite{FOCS:Barak01}. Constant-round protocols making black-box use of the adversary were constructed by \cite{C:PanPasVai08,STOC:LinPas11,STOC:Goyal11}, and making black-box use of one-way functions by Wee in $\omega(1)$ rounds \cite{FOCS:Wee10} and by Goyal in constant rounds \cite{STOC:Goyal11}. Furthermore, based on the non-malleable commitment scheme of \cite{STOC:Goyal11},  the work of \cite{FOCS:GLOV12} constructs a constant-round multi-party coin-tossing protocol.
+ 
+The recent work of \cite{EC:GMPP16} examined the exact round complexity of secure computation in the multi-party setting and proved a lower bound of four rounds for general functionalities. They also constructed six-round protocols based on LWE and adaptive PRGs and five-round protocols based on iO and adaptive PRGs.
+%The standard setting for two-party computation does not consider simultaneous message exchange channels, and hence the negative results for the two-party setting do not apply to the multi-party setting where simultaneous message exchange channels are standard. Prior to our work \cite{EC:GMPP16}, the case of the two-party setting in the presence of a simultaneous message exchange channel was not explored in the context of the exact round complexity of secure computation.
+
+\shai{At some point we need to also mention the Abhishek etal work on 4-round MPC, bu tI think it is not out yet.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Overview of our Protocol}
+The starting point for the current work is the observation that the Mukherjee-Wichs protocol in \cite{EC:MukWic16} does not seem to need the full power of the common-random string. The Mukherjee-Wichs protocol uses a multi-key homomorphic encryption based on GSW encryption \cite{C:GenSahWat13}. In that scheme, all parties must share the same matrix~$A$ before they can generate their encryption keys, and semantic security relies on $A$ being random.
+The six-round protocol of Garg et al. \cite{EC:GMPP16} therefore spends four rounds on a coin-tossing protocol to generate the matrix~$A$, and then two more rounds running the Mukherjee-Wichs protocol.
+
+We begin by asking whether we can get semantic security of the encryption even when $A$ is not completely random.
+%\anti{in the presense of a malicious adversary or describe how easy it is if the adversary is honest but curious}.
+%%HUH?
+For example, imagine coosing the bits of~$A$ using a defective coin-tossing protocol with a small constant bias. It is plausible that (a) such protocol can take less than four rounds, and (b) such a biased matrix~$A$ is still good enough to serve as the public matrix for LWE. This may give us a less-than-six-round protocol based on LWE.
+Our eventual protocol does not exactly follow this route, but the ``philosophy'' underlying it is the same.
+
+To get a four-round protocol that build on the two-round Mukherjee-Wichs protocol, we must choose the public matrix $A$ within the first two rounds. And although two rounds are not enough for coin tossing, they may still give us a ``sufficiently random'' public matrix $A$ that we can use for LWE. In fact, we show that we can use a \emph{one-round protocol} to get such a matrix~$A$, which is good enough for (a variant of) the two-round Mukherjee-Wichs protocol.
+
+\paragraph{A variant of the Mukherjee-Wichs protocol.}
+The Mukherjee-Wichs protocol uses a multi-key FHE scheme \cite{C:CleMcg15,EC:MukWic16} based on GSW encryption \cite{C:GenSahWat13}: The scheme uses a public random matrix $A\in\ZZ^{(n-1)\times m}$ (with $m\gg n$), each party~$i$ chooses a random vector $s_i\in \ZZ_q^{n-1}$ and a short vector $e_i\in \ZZ_q^{m}$, then setting its public key as $B_i = \left(\begin{array}{c}A\\e_i-s_iA\end{array}\right)$ and its secret key as $t_i=(s_i,1)$ (all modulo some modulus~$q$).
+%To encrypt a bit $\mu$ under this public key, one sets $C = B_i R + \mu G$ where $R\in\bit^{m\times m}$ is a random bit-matrix and $G$ is some fixed ``gadget matrix'' (whose structure is not important for us here).
+
+In our protocol, we simply let each party choose some of the entries in the matrix~$A$. We then want to argue that the resulting encryption scheme remains secure under LWE, even though some of the entries of $A$ are chosen by the adversary. As we explain in \secref{ILWE}, however, this is not quite true for the Mukherjee-Wichs protocol as is. Roughly, the reason is that the vector $e_i-s_iA$ may leak too much information about $s_i$ if $A$ is (partially) adversarial.
+
+Fortunately, this turns out to be easy to fix: All we need to do is ``flip the dimensions'', and use $n\gg m$ rather than $m\gg n$. This way, the secret key $s_i$ is much longer, and we can appeal to the leakage-resilience of LWE-based encryption to argue that the underlying encryption scheme remains secure even given the leakage $s_iA$. Making the scheme works with $n\gg m$ requires tweaking the ciphertext dimensions and the magnitude of noise, as we explain in \secref{ILWE}. But the algebraic expressions from \cite{C:CleMcg15,EC:MukWic16} (and hence the properties of the multi-key FHE scheme) remain essentially unchanged.
+
+\paragraph{A skeleton protocol.}
+We use our one-round protocol for choosing $A$ to replace the expensive preamble coin-flipping protocol of Garg et al., thus obtaining a skeleton protocol \emph{with only three rounds}, as follows:
+\begin{description}
+\item[Round 1: CRS.] Every player~$P_i$ broadcasts a single message $\alpha_i$, and the collection of $\alpha_i$'s defines the public matrix $A$ needed for (our variant of) the multi-key FHE scheme from \cite{C:CleMcg15,EC:MukWic16}.
+
+\item[Round 2: Encryption.] Each party generates a public/secret key-pair for the multi-key FHE, encrypts its input under these keys, and broadcasts the public key and ciphertext.
+
+\item[Round 3: Decryption.] Each party separately evaluates the function on the encrypted inputs, then use its secret key to compute a decryption share of the resulting evaluated ciphertext and finally broadcasts that share to everyone.
+
+\item[Epilogue: Output.] Once all the decryption shares are received, each party can combine them to get the function value, which is the output of the protocol.
+\end{description}
+
+This skeleton protocol can be shows to be secure in the semi-malicious adversary model, but it is clearly \emph{insecure} in the presence of a malicious adversary.
+Although the protocol can tolerate adversarial choice of the first-round messages $\alpha_i$, the adversary can still violate privacy by sending invalid ciphertexts in Round~2 and observing the partial decryption that the honest players send in the next round. It can also violate correctness by sending the wrong decryption shares in the last round.
+
+These two attacks can be countered by having the parties prove that they behaved correctly, namely that the public keys and ciphertexts in Round~2 were generated honestly, and that the decryption shares in Round~3 were obtained by faithful decryption. To be effective we need the proof of honest encryption to complete before the parties send their decryption shares (and of course the proof of honest decryption must be completed before the output phase can be produced). Hence, if we have a $k$-round proof of honest encryption (and a $(k+1)$-round proof of honest decryption) then we get a $(k+1)$-round protocol overall. Much of the technical difficulties in the current work are related to using $3$-round proofs of honest encryptions, resulting in a $4$-round protocol.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{A Tale of Malleability and Extraction}
+To get a provable protocol, we must exhibit a simulator that can somehow extract the inputs of the adversary, so that it can send these inputs to the trusted party in order to get the function output. To that end we make the three-round proof of honest encryption a \emph{Proof of Knowledge} (POK), and let the simulator use the knowledge extractor to get these adversarial inputs.
+
+At the same time, we must ensure that this proof of knowledge is non-malleable, so that the extracted adversarial inputs do not change between the real protocol (in which the honest parties prove knowledge of their true input) and the simulated protocol (in which the simulator generates proofs for the honest players without knowing their true inputs).
+%Here we use a combination of two-round non-malleable commitment (from \cite{C:PanPasVai08}) and a 3-round witness-indistinguishable proof of knowledge.
+%Specifically, starting from the very first round, each party engages in a 2-round non-malleable commitment protocol of its input and encryption randomness and a 3-round POK of these values (proving also that they are consistent with the ciphertext that it sends). It also begins in the first round a 4-round proof of proper decryption, which will complete at the last round.
+A few subtle technicalities are discussed below.
+
+\paragraph{Two-round commitment with straight-line extraction.}
+The main technical tool that we use in our proofs is the two-round $\nmCom$ commitment of Pandey et al. \cite{C:PanPasVai08} (i.e., Naor's scheme \cite{JC:Naor91} with adaptive PRGs), that the parties use to commit to their inputs and randomness. Commitments in this scheme are marked by \emph{tags}, and the scheme has the remarkable property of \emph{adaptive security}: Namely, commitments with one tag are secure \emph{even in the presence of an oracle that breaks commitments for all other tags}. \anti{Add a footnote about its relation with non-malleable commitments}
+Some hybrid games in our proof of security are therefore staged in a mental-experiment game where such a breaking oracle exists, providing us with straight-line (rewinding-free) extraction of the values that the adversary commits to, while keeping the honest-party commitments secret.
+
+However, we also need our other primitives (MFHE, POK, etc.) to remain secure in the presence of a breaking oracle, and we use complexity leveraging for that purpose: We assume that these primitives are sub-exponentially secure, and set their parameters much larger that those of the commitment scheme. This way, all these primitives remain secure even against sub-exponential time adversaries that can break the commitment by brute force. When arguing the indistinguishability of two hybrids, we reduce to the sub-exponential security of these primitives and use brute force to implement the breaking oracle in those hybrids.%
+\footnote{Technically we ``only'' need to assume standard security in a world with such a breaking oracle, which is a weaker assumption than full sub-exponential security.}
+
+\paragraph{Delayed-input proofs.}
+In the three-round proofs for honest encryption and in the four-round proofs for honest decryption, the statement to be proved is not defined until just before the last round of the protocols. We therefore need to use delayed-input proofs that can handle this case.
+
+%\paragraph{Postponed encryption.}
+%In our protocol we postpone sending the FHE encrypted inputs to the third round, after the two-round $\nmCom$ commitment to the inputs and randomness is completed. In one of our hybrid games in the proof we switch from the honest parties encrypting their true input to the simulator encrypting zeros, but since this change only affects 3rd-round messages then it cannot change the $\nmCom$ commitment of the adversary, and therefore also cannot change the values extracted from the POK.
+
+\paragraph{Fake proofs via Feige-Shamir.}
+The simulator needs to fake the four-round proof of honest decryption on behalf of the honest parties, as it derives their decryption shares from the function output that it gets from the trusted party. For this purpose we use a Feige-Shamir-type four-round proof  \cite{STOC:FeiSha90}, which has a trapdoor that we extract and let us fake these proofs.
+%Our proof of security in fact looks inside the Feige-Shamir protocol, using separately the knowledge extractor which is embedded in it and the zero-knowledge simulator that uses that extracted knowledge. In some hybrids we use use the breaking oracle instead of the knowledge extractor (so in out protocol we replace the one-way function in the Feige-Shamir construction by the same adaptive commitment that we use elsewhere).
+\shai{I changed my mind, I don't want to use the commitment inside $\Pi_{\FLS}$, it's better to stick to rewinding there, and it does work.}
+
+
+\paragraph{WI-POK with a trapdoor.}
+%Since we cannot modify commitment $\nmCom$ and encryption at the same
+%time, we need to
+In our proof we much deal with hybrid games in which the commitment
+contains the honest parties' true inputs while the encryption contains
+zeros. In such hybrids, the statement that the values committed to are
+consistent with the encryption is not true, so we need to fake that
+three-round proof as well.
+
+For that purpose we use another Feige-Shamir-type trapdoor: Each party
+chooses a random string $R$, encloses $\hat{R}=f(R)$ with its first-flow
+message, encloses $R$ inside the commitment $\nmCom$ (together with its input
+and randomness) and adds the statement $\hat{R}=f(R)$ to the list of things
+that it proves in the three-round POK protocol.
+
+In addition, the parties execute a second commitment protocol $\Com$
+(which is normally used to commit to zero in the real protocol), and
+we modify the POK statement to say that either the original statement
+is true, or the value committed in that second commitment $\Com$ is a
+pre-image of the $\hat{R}$ value sent by the \emph{verifier} in the
+first round. Letting the POK protocol be witness-indistinguishable
+(WI-POK), we then extract the $R$ value from the adversary (in some
+hybrids), let the challenger commit to that value in the second
+commitment $\nmCom$, and use it as a trapdoor to fake the proof in the
+POK protocol.
+
+We note that the second commitment $\Com$ need not be non-malleable
+or adaptive, but it does need to remain secure in the presence of a
+breaking oracle for the first commitment. Since we already assume a
+2-round adaptive commitment $\nmCom$, then we use the same scheme also
+for this second commitment, and appeal to its adaptive security to
+argue that the second commitment remains secure in the presence of a
+breaking oracle for the first commitment.
+
+
+\paragraph{Public-coin proofs.}
+In the multi-party setting, the adversary may choose to fail the proofs with some honest parties and succeed with others. We thus need to specify what honest parties do in case one of the proofs fail. The easiest solution is to use public-coin proofs with perfect completeness, and have the parties broadcast their proofs and verify them all (not only the ones where they chose the challenge). This way we ensure that if one honest party fails the proof, then all of them do.
+
+We comment that this is not quite needed, and we could  get security even if some honest parties abort while others do not. However, the argument is a little more subtle, and we forgo this direction in the current preliminary report.
+
+
+\subsection{The Resulting Protocol}
+As mentioned above, our protocol apart from using a multi-key homomorphic encryption scheme and a one-round protocol for its setup, it also uses two-round adaptive commitments $\nmcom=(\nm_1,\nm_2)$ and $\Com=(\onm_1,\onm_2)$, a three-round WIPOK protocol $\Pi_\WIPOK=(\WIPOKmsg_1, \WIPOKmsg_2, \WIPOKmsg_3)$ and a four-round ZK argument of knowledge $\Pi_\FLS=(\FLSmsg_1, \FLSmsg_2, \FLSmsg_3,\FLSmsg_4)$. In the following, we provide a sketch of our protocol. 
+\begin{description}
+
+\item[Round 1: CRS, commitment \& proof.]
+Every party~$i$ broadcasts its message $\alpha_i$ for the one-round protocol for choosing the public matrix~$A$. It also broadcasts the first message $\nm_1$ of the adaptive commitment for its randomness and input, the first message $\WIPOKmsg_1$ of a public-coin WI-POK for a proof of the committed values (including honest encryption), and the first message $\FLSmsg_1$ of a public-coin proof of honest decryption.
+%\footnote{The 1st message in the 2-round and 4-round protocols are sent in the role of the verifier/receiver, while the 1st message in the 3-round protocol is sent in the role of the prover.}
+
+\item[Round 2: another commitment.]
+Each party broadcasts messages $(\nm_2,\WIPOKmsg_2,\FLSmsg_2)$. %\footnote{The roles here are of course reversed from the 1st round, each party is the prover/sender in the 2-round and 4-round protocols and the verifier in the 3-round protocol.}\ 
+In addition it broadcasts the first commitment message $\onm_1$ (which will be used to commit to zero).
+%, in the role of the receiver. 
+
+\item[Round 3: Encryption \& proofs.] The parties collects all the first round messages $\alpha_i$ and use them to compute the common matrix~$A$. Then each party runs the key-generation and encryption procedures of the multi-key FHE, and broadcasts its public key and encrypted input.
+In the same round, each party also broadcasts messages $(\onm_2,\WIPOKmsg_3,\FLSmsg_3)$.
+
+\item[Round 4: Verification \& decryption.]
+Each party runs the verifier algorithm for the $\Pi_\WIPOK$ proof of honest encryption, verifying all the instances (not just those where it played the verifier in previous rounds). If all of them passed then it evaluates the function on the encrypted inputs, then use its secret key to compute a decryption share of the resulting evaluated ciphertext, and broadcasts that share to everyone.
+It also broadcasts the message $\FLSmsg_4$ of the proof of honest decryption.
+
+\item[Epilogue: Verification \& Output.] Once all the decryption shares and proofs are received, each party runs the verifier algorithm for the $\Pi_\FLS$ proof of honest decryption, again verifying all the instances. If all of them passed then it combines all the decryption shares to get the function value, which is the output of the protocol.
+\end{description}
+If any of the messages is missing or mal-formed, or if any of the verification algorithms fail, then the parties are instructed to immediately abort with no output.

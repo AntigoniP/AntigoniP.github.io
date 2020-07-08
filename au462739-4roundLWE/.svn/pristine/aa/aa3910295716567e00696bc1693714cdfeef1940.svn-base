@@ -1,0 +1,21 @@
+% !TEX root =./main-optimal.tex
+\begin{abstract}
+%
+We construct a 4-round multi-party computation protocol for any functionality, which is secure against a malicious adversary. Our protocol relies on the sub-exponential hardness of the Learning with Errors (LWE) problem with polynomial noise ratio, and on the existence of adaptively secure commitments.
+Our round complexity matches a lower bound of Garg et al. (EUROCRYPT '16), and outperforms the state of the art of 6-rounds based on similar assumptions to ours, and 5-rounds relying on indistinguishability obfuscation.
+
+To do this, we construct an LWE based multi-key FHE scheme with a non-interactive \emph{distributed setup procedure} (contrary to the trusted setup required in previous constructions from LWE). The setup procedure is extremely simple and only requires each party to sample and output a random string. This allows us to construct a 3-round semi-malicious protocol without setup using the approach of Mukherjee and Wichs (EUROCRYPT '16). Finally, adaptive commitments and zero-knowledge proofs are used to compile the protocol into the fully malicious setting.
+
+%
+%Our construction takes after the multi-key FHE approach of Mukherjee-Wichs (EUROCRYPT '16) who constructed a 2-round semi-malicious protocol from LWE in the common random string (CRS) model. We show how to use a preliminary round of communication to replace the CRS, thus achieving 3-round semi-malicious security without setup. Adaptive commitments and zero-knowledge proofs are then used to compile the protocol into the fully malicious setting.
+%
+
+\iffalse
+In this work we show that any multi-party functionality can be computed securely in optimal four rounds in the plain model with security against a malicious adversary, matching the lower bount of Garg et al. (EUROCRYPT '16).
+ To obtain our four-round protocol, we assume the existence of adaptively secure commitments, introduced by Pandey et al. (CRYPTO '08), and also assume sub-exponential hardness of Learning-with-Errors (LWE). This can be compared to the results of Garg et al., who show six-round protocols based on LWE and adaptive commitments, and five-round protocols based on Indistinguishability Obfuscation and adaptive commitments.
+ 
+Our solution builds on the two-round protocol of Mukherjee-Wichs (EUROCRYPT '16) in the CRS model, by observing that this protocol does not seem to need the full power of the common-random string. Instead, we show that \emph{in a single round} we can get a weaker shared randomness, which is still good enough for (a variant of) this protocol. This yields a three-round protocol which is secure against a semi-malicious adversary. Using strong commitment protocols and zero-knowledge proofs, we can compile it into a four round protocol, secure against a malicious adversary.
+%\anti{we should discuss the title}
+\fi
+
+\end{abstract}

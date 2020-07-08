@@ -1,0 +1,18 @@
+\paragraph{Tag based non-malleable commitments.} A family of tag-based statistically binding commitment schemes for committing strings of length $\kappa$, and supporting tags of length $\kappa$, where $\kappa$ is the security parameter, is denoted by $\{\langle C(1^\kappa,\id,u),\rec(1^\kappa,\id)\rangle\}$ where $C$ and $R$ represent (randomized) committer and receiver algorithms respectively. 
+
+For $\alpha\in\zo^m$, $\tag\in\zo^t$, non-uniform \ppt\ algorithm $M$ with ``advice'' string $z\in\{0,1\}^*$, and the security parameter $n$, define $\mim_{n,\tag,z}(\alpha)$ to be the output of the following experiment: $M$, on input $(1^n,z)$, interacts with $\com_{n,\tag}$ who commits to $\alpha$; simultaneously, $M$ interacts with $\rec_{n,\widetilde{\tag}}$ where $\widetilde{\tag}$ is chosen by $M$ arbitrarily; $M$ controls the scheduling of messages; the output of the experiment is $\widetilde{\alpha}$ which denotes the value $M$ commits to $\rec$ unless $\widetilde{\tag}=\tag$ in which case $\widetilde{\alpha}=\bot$.
+
+\begin{definition}[Tag based non-malleable commitments]\label{def:tag-nmcom} A family $\{\langle \com_{n,\tag},\rec_{n,\tag}\rangle\}_{n\in\bbN,\tag\in\zo^t}$ of tag-based commitment schemes for messages and tags of length $m$ and $t$ respectively, is said to be non-malleable {\em with respect to commitments} if for every non-uniform \ppt\ algorithm $M$, every $\emph{\texttt{tag}}\in\{0,1\}^{t}$, every pair of strings $(\alpha,\alpha')\in\zo^m\times\zo^m$, and every $z\in\{0,1\}^{*}$, distributions $\mim_{n,\tag,z}(\alpha)$ and $\mim_{n,\tag,z}(\alpha')$ are computationally indistinguishable.
+\end{definition}
+
+
+
+A family $\{\langle C(1^\kappa,\id,u),\rec(1^\kappa,\id)\rangle\}_{\kappa\in\mathbb{N},\id\in\bit^t}$ of tag-based commitment schemes for messages and tags of length $\kappa$ and $t$ respectively, is said to be non-malleable {\em with respect to commitments} if for every non-uniform \ppt\ algorithm $M$, every $\emph{\texttt{id}}\in\{0,1\}^{t}$, every pair of strings $(u,\tilde u)\in\bit^\kappa\times\bit^\kappa$, and every $z\in\{0,1\}^{*}$, distributions $\nmCom_{1}(\id,z,u)$ and $\nmCom_{1}(\id,z,\tilde u)$ are computationally indistinguishable.
+\end{definition}
+
+A(z) interacts with C, receiving a commitment
+to the string v, and acting as a receiver; A simultaneously participates in another interaction with
+an honest receiver R, acting as a committer. A?s interaction with C is called the left interaction,
+and its interaction with R is called the right interaction. Let ?v denote the string committed by
+
+

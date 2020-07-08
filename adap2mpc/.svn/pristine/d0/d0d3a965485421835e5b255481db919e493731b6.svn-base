@@ -1,0 +1,145 @@
+% !TEX root =../main.tex
+\section{Preliminaries}
+\label{sec:preliminaries}
+
+
+
+\subsection{Notation}
+Throuhgout the paper $\secpar \in \N$ will denote the security parameter. We say that a function $f : \N \rightarrow \R$ is negligible if $\forall c~ \exists~  n_c$ such that if $n>n_c$ then $f(n)< n^{-c}$. We will use $\negl(\cdot)$ to denote an unspecified negligible function. We often use $[n]$ to denote the set $\{1,...,n\}$. The concatenation of $a$ with $b$ is denoted by $a||b$. Moreover, we use $d \leftarrow \dist$ to denote the process
+of sampling $d$ from the distribution $\dist$ or, if $\dist$ is a set, a uniform choice from it.  If $\dist_1$ and $\dist_2$ are two distributions, then we denote that they are statistically
+close by $\dist_1 \statind \dist_2$; we denote that they are computationally indistinguishable
+by $\dist_1 \compind  \dist_2$; and we denote that they are identical by $ \dist_1 \idind \dist_2$.
+
+
+We recall the notion of polynomial-size circuit classes and families, together with the notion of statistical and computational indistinguishability in \cref{A:preliminaries}.
+
+For the sake of simplicity, we suppose that all circuits in a circuit
+class have the same input and output lengths. This can be achieved
+without loss of generality using appropriate paddings.  We recall that
+for any $\cirsize$-size circuit class $\circlass =
+{\{\circlass_\secpar\}}_{\secpar \in \N}$, there exists a universal
+$\poly(\cirsize)$-size circuit family
+${\{\univcirc_\secpar\}}_{\secpar \in \N}$ such that for any $\secpar
+\in \N$, any circuit $\cir \in \circlass_\secpar$ with input and
+output lengths $\cirinlen, \ciroutlen$, and any input $\cirin \in
+\bits^\cirinlen$, $\univcirc_\secpar(\cir, \cirin) =
+\cir(\cirin)$.
+
+
+\begin{mydefinition}[Equivocal Garbled Circuit]
+  Let $\circlass = {\{\circlass_\secpar\}}_{\secpar \in \N}$ be a
+  $\poly$-size circuit class with input and output lengths $\cirinlen$
+  and $\ciroutlen$.  A \emph{garbled circuit} scheme $\gc$ for
+  $\circlass$ % with
+%   polynomial universal circuits 
+  is a tuple of four
+  polynomial-time algorithms $\gc=(\gcgen,\gcgarble,\gceval,\allowbreak\gcsim)$: 
+  \begin{description}
+  \item[Input Labels Generation:] $\gckey \getsr \gcgen(1^\secpar)$
+%     1^\cirinlen)$
+    generates input labels $\{\gckey^i\}_{i \in
+      [\cirinlen] }$ (with $\gckey^i[b] \in \bits^\kappa$ being
+    the input label corresponding to the value $b$ of the $i$-th input
+    wire) for the security parameter $\secpar$, input length
+    $\cirinlen$, and input label length $\kappa$; % = \cirinlen(\secpar)$;
+  \item[Circuit Garbling:] $\gccir \getsr \gcgarble(\gckey, \cir;\sigma)$
+     garbles the circuit $\cir \in \circlass_\secpar$
+    into $\gccir$;
+  \item[Evaluation:] $\cirout = \gceval(\gccir, \gckey[x])$  evaluates the
+    garbled circuit $\gcgarble$ using input labels
+    ${\gckey[{x_i}]}$ for input some input $x=(x_1,\ldots,x_n)$
+    and returns the output $\cirout \in \bits^\ciroutlen$; %   with
+%      $\ciroutlen = \ciroutlen(\secpar)$
+    
+  \item[Simulation:] $(\gckey, \gcsimcir,\state) \getsr \gcsim(1^\secpar,
+    \cirout)$
+    % 1^\cirsize, 1^\cirinlen, \cirout)$
+     simulates  input labels $\gckey$, a garbled circuit $\gcsimcir$ and state $\state$ for the security parameter
+    $\secpar$ on the output $\cirout \in \bits^\ciroutlen$;
+  \end{description}
+  satisfying the following security properties:
+  \begin{description}
+  
+  
+  
+   \item[Equivocation:] $( \gckey,\sigma) \getsr \gcequiv( 
+    \gccir,\cirin, \state)$ such that $\gccir = \gcgarble(\gckey, \cir;\sigma)$, given
+$\cirin$, the simulator generates (inactive) labels and fake randomness $\sigma$ of the garbling that makes $\gccir,\gckey$ look like a real garbling
+of $\cir, \cirin$.\anti{update the rest according to this syntax}
+   
+  \end{description}
+  satisfying the following security properties:
+  \begin{description}
+  
+  
+  
+  
+  \item[Correctness:] For any security parameter $\secpar \in \N$, for any circuit $\cir \in \circlass_\secpar$, for any input $\cirin \in \bits^{\cirinlen}$, for any $\gckey$ in the image of $\gcgen(1^\secpar)$ and any $\gccir$ in the image of $\gcgarble(\gckey, \cir)$:
+    \[ \gceval(\gccir, {\{\gckey[\cirin_i]\}}_{i \in [\cirinlen]}) = \cir(\cirin)\enspace. \]
+  \item[Simulatability:] The following two distributions are computationally indistinguishable:\anti{add equivocation property}
+    \begin{align*}
+      \bigg\{
+      ({\{\gckey[{\cirin}]\}}, \gccir)
+      \ &: \
+          \begin{array}{l}
+            \gckey \getsr \gcgen(1^\secpar); \\
+            \gccir \getsr \gcgarble(\gckey, \cir)
+          \end{array}
+      {\bigg\}}_{\secpar, \cir \in \circlass_\secpar, \cirin \in \bits^{\cirinlen}} \enspace, \\
+      \big\{
+      (\gckey, \gccir)
+      \ &: \
+          \begin{array}{l}
+            (\gckey,\gccir) \getsr \gcsim(1^\secpar, \cir(\cirin))
+          \end{array}
+          {\big\}}_{\secpar, \cir \in \circlass_\secpar, \cirin \in
+          \bits^{\cirinlen}} \enspace.
+    \end{align*}
+  \end{description}
+\end{mydefinition}
+
+We recall that garbled circuit schemes can be constructed from one-way
+functions.
+
+
+
+\anti{remove this paragraph}
+For the sake of simplicity, if $\cirin \in \bits^\cirinlen$ and $\gckey = {\{\gckey[i, b]\}}_{i \in
+      [\cirinlen], b \in \bits}$, we define
+$\gckey[\cirin] = \smallset{\gckey[i,\cirin_i]}_{i \in
+  [\cirinlen]}$.
+  
+  \remove{
+We extend this notation when the input is a tuple: for example, if $\cirin=(u,v) \in \bits^{\cirinlen_1} \times \bits^{\cirinlen_2}$, we define $\gckey[u] = \smallset{\gckey[i,u_i]}_{i \in [\cirinlen_1]}$ and $\gckey[v] = \smallset{\gckey[\cirinlen_1 + i,v_i]}_{i \in [\cirinlen_2]}$.
+We also abuse notation and define $\gckey[[u]]$ (resp., $\gckey[[v]]$) to be the $2\cirinlen_1$ (resp., $2\cirinlen_2$) input labels corresponding to the input wires for $u$ and $v$: $\gckey[[u]] = \smallset{\gckey[i,b]}_{i \in [\cirinlen_1],b \in \bits}$ and $\gckey[[v]] = \smallset{\gckey[\cirinlen_1 + i,b]}_{i \in [\cirinlen_2], b \in \bits}$.
+This notation is also used for $\gckey' = {\{\gckey[i]\}}_{i \in [\cirinlen]}$: $\gckey'[[u]] = \smallset{\gckey'[i]}_{i \in [\cirinlen_1]}$ and $\gckey'[[v]] = \smallset{\gckey'[\cirinlen_1 + i]}_{i \in [\cirinlen_2]}$.}
+
+
+We make use of garbled circuit schemes.
+A \emph{garbled circuit} scheme $\gc$ for a $\poly$-size circuit class $\circlass = {\{\circlass_\secpar\}}_{\secpar \in
+  \N}$ is defined by four polynomial-time algorithms $\gc=(\gcgen,\gcgarble,\gceval,\allowbreak\gcsim)$:
+\textit{i)} $\gckey \getsr \gcgen(1^\secpar)$
+% 1^\cirinlen)$
+generates input labels $\gckey = {\{\gckey[i, b]\}}_{i \in
+  [\cirinlen], b \in \bits}$;
+\textit{ii)}
+$\gccir \getsr \gcgarble(\gckey, \cir)$
+garbles the circuit $\cir \in \circlass_\secpar$
+into $\gccir$;
+\textit{iii)} $\cirout = \gceval(\gccir, \gckey')$  evaluates the
+garbled circuit $\gcgarble$ using input labels
+$\gckey' = {\{\gckey'[i]\}}_{i \in [n]}$ (where $\gckey'[i] \in \bits^\kappa$)
+and returns the output $\cirout \in \bits^\ciroutlen$;
+\textit{iv)} $(\gckey', \gcsimcir) \getsr \gcsim(1^\secpar,
+    \cirout)$
+     simulates  input labels $\gckey' = {\{\gckey'[i]\}}_{i \in [\cirinlen]}$ and
+    a garbled circuit $\gcsimcir$ corresponding to the output $\cirout \in \bits^\ciroutlen$.
+The formal definition can be found in \appref{}.
+We recall that garbled circuit schemes can be constructed from one-way
+functions.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

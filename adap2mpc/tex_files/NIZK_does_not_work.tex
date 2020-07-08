@@ -1,0 +1,173 @@
+
+\section{Non-Interactive Zero-Knowledge Arguments}
+
+In this section, we show how to construct adaptive UC non-interactive zero-knowledge arguments (UC NIZK).
+We start by recalling the non-interactive zero-knowledge proof in the hidden-bits model from Feige, Lapidot, and Shamir (FLS)~\cite{FOCS:FeiLapSha90,Goldreich01} and showing that it satisfies a stronger property: we call one-time non-erasure witness indistinguishability.
+We then show that how to transform such a proof into a non-interactive (one-time) non-erasure zero-knowledge argument in the classical common reference string model.
+The transform is similar to the one in~\cite{FOCS:FeiLapSha90,Goldreich01,JC:BelYun96,JC:GolRot13,EPRINT:CanLic17}, except that the (certifiably injective doubly-enhanced) trapdoor permutation is replaced by a lossy trapdoor permutation~\cite{EPRINT:PeiWat07}.
+Finally, we compile the resulting NIZK into an adaptive UC NIZK by combining it with a non-interactive adaptive UC commitment: the witness being first committed and then the NIZK proving that the commitment indeed commits to a valid witness.
+
+
+In this whole section, let $\lang$ be an NP language defined by the witness relation $\rel$ ($\lang = \smallset{\word \suchthat \exists \wit,\, \rel(\word,\wit)  1 }$).
+For the sake of simplicity, for any given security parameter $\secpar$, we only consider words $\word$ and witnesses $\wit$ of size at most $\secpar$.
+
+\subsection{Non-Interactive Zero-Knowledge Proof in the Hidden-Bits Model}
+
+\begin{mydefinition}
+  A \emph{non-interactive one-time-non-erasure-witness-indistinguishable proof in the hidden-bits model} for $\rel$ is a tuple of three algorithms $\hbnizk=(\hbnizkProve,\hbnizkVer,\hbnizkEquiv)$:
+  \begin{description}
+  \item[Proof:] $(I,\pi) = \hbnizkProve(1^\secpar,R,\word,\wit)$ (deterministically) generates a proof consisting of a set of integers $I$ (called set of \emph{revealed bits}) and a bitstring $\pi$ (called a \emph{certificate}), for a word $\word \in L$ using witness $\wit$ and the random string $R \in \bits^{\poly(\secpar)}$;
+  \item[Verification:] $\hbnizkVer(R_I,I,\pi,\word)$ (deterministically) outputs $1$ if the proof $(I,\pi)$ for the word $\word$ is valid, where $R_I = \smallset{R_i}_{i \in I}$ and $R$ is the random string used to generate the proof; and outputs $0$ otherwise;
+  \item[Equivocation:] $R' \getsr \hbnizkEquiv(R,I,\pi,\word,\wit')$ equivocates a proof;
+  \end{description}
+  satisfying the following properties:
+  \begin{itemize}
+  \item \textbf{Completeness.} There exists a negligible function $\negl$, such that for any security parameter $\secpar \in \N$, for any word $\word \in \lang$ and valid witness $\wit$ (i.e., $\rel(\word,\wit) = 1$), with $|\word|,|\wit| \le \secpar$:
+    \[
+      \Pr\Big[
+      R \getsr \bits^{\poly(\secpar)}; \ (I,\pi) = \hbnizkProve(1^\secpar,R,\word,\wit) \ : \\
+      \hbnizkVer(R_I,I,\pi,\word) = 1
+      \Big] \ge 1-\negl(\secpar).
+    \]
+  \item \textbf{(Non-adaptive) soundness.} For any security parameter $\secpar \in \N$, for any word $\word \notin \lang$ (with $|\word| = \secpar$), for any function $B$:
+    \[
+      \Pr\Big[
+      R \getsr \bits^{\poly(\secpar)}; \ (I,\pi) = B(R,\word) \ : \\
+      \hbnizkVer(R_I,I,\pi,\word) = 0
+      \Big]
+      \le \negl(\secpar).
+    \]
+  \item \textbf{(Perfect one-time) non-erasure witness indistinguishability.} For any security parameter $\secpar \in \N$, for any word $\word \in \lang$ and valid witnesses $\wit,\wit'$ (i.e., $\rel(\word,\wit) = 1$ and $\rel(\word,\wit') = 1$), with $|\word|,|\wit|,|\wit'| \le \secpar$, the two distributions are identical:
+    \begin{align*}
+      \Big\{(R',R'_I,I) \ &: \ R' \getsr \bits^{\poly(\secpar)}; \  (I,\pi) = \hbnizkProve(1^\secpar,R',\word,\wit') \Big\} \\
+      \Big\{(R',R_I,I)  \ &: \ R \getsr \bits^{\poly(\secpar)}; \  (I,\pi) = \hbnizkProve(1^\secpar,R,\word,\wit); \ R' \getsr \hbnizkEquiv(R,I,\pi,\word,\wit') \Big\}
+    \end{align*}
+  \end{itemize}
+\end{mydefinition}
+
+We remark that the FLS construction~\cite[Construction~4.10.7]{Goldreich01} actually achieves this definition.
+We recall informally the construction.
+We suppose without loss of generality (up to reduction) that the word $\word$ is a $n$-vertex directed graph and that the language is the set of graphs with an Hamiltonian cycle.
+A witness $\wit$ is an Hamiltonian cyclic.
+The random string $R$ is interpreted as a sequence of $n^3 \times n^3$-matrices.
+If a matric contains a $n \times n$ submatrix corresponding to the matrix of a cycle with $n$ vertices, it is called useful.
+The proof for a word $\word$ consists in:
+\begin{itemize}
+\item for the non-useful matrices, reveal all the corresponding bits of $R$ (i.e., add their positions to the set $I$)
+\item for the useful matrices, reveal all the bits outside of the interesting submatrix $M$, output (in the certificate $\pi$) two permutations associating the vertices of the graph $\word$ to the columns and rows of $M$ in such a way that the Hamiltonian cycle represented by $M$ matches $\wit$, and reveal all the non-edges.
+\end{itemize}
+The equivocation algorithm $\hbnizkEquiv(R,I,\pi,\word,\wit')$ outputs $R'$ equal to $R$ on all revealed bit and just change the bits in the submatrices $M$ of the useful matrices to match the new Hamiltonian cycle $\wit'$.
+
+\subsection{Lossy Trapdoor Permutations}
+
+We now define a variant of lossy trapdoor functions~\cite{STOC:PeiWat08}, with the following changes: injective functions are actually permutations, the domain and co-domaines are not necessarily the same for all functions but the co-domain can be obliviously sampled (useful weakening to allow more constructions), even lossy functions can be inverted on valid images, in which case the inversion algorithm outputs a uniform pre-image.
+
+\begin{mydefinition}
+  A $\ell$-\emph{lossy trapdoor permutation} is a family of functions $\smallset{f_\alpha \colon \ltdpdom_\alpha \to \ltdprange_\alpha}_{\alpha \in \bits^*}$ associated with the following polynomial-time algorithms:
+  \begin{description}
+  \item[Injective Index Generation:] $(\alpha,\tau) \getsr \ltdpinjgen(1^\secpar)$ expects as input the unary representation of the security parameter $\secpar$ and outputs an index $\alpha \in \bits^{\poly(\secpar)}$ and an associated trapdoor $\tau$, such that $2^{n(\secpar) -1 } \le |\ltdpdom_\alpha| = |\ltdprange_\alpha| \le 2^{n(\secpar)}$ (for some fixed polynomial $n$ in $\secpar$) and $f_\alpha$ is a bijection.
+  \item[Lossy Index Generation:] $(\alpha,\tau) \getsr \ltdplossygen(1^\secpar)$  expects as input the unary representation of the security parameter $\secpar$ and outputs an index $\alpha \in \bits^{\poly(\secpar)}$ and an associated trapdoor $\tau$, such that $2^{n(\secpar) -1 } \le |\ltdpdom_\alpha| = |\ltdprange_\alpha| \le 2^{n(\secpar)}$ (for some fixed polynomial $n$ in $\secpar$) and the image $f_\alpha(\ltdpdom)$ of $f_\alpha$ is of size at most $ |\ltdpdom_\alpha| / 2^\ell$.
+  \item[Direct Evaluation of $f_\alpha$:] for any $x \in \ltdpdom_\alpha$, $f_\alpha(x)$ can be computed in polynomial time (in $|\alpha|$).
+  \item[Inversion $f^{-1}_\alpha$:] for any $x \in \ltdpdom_\alpha$, $f_{\alpha,\tau}^{-1}(y)$ is the uniform distribution of pre-images of $y$ for $f_\alpha$ (if $f_\alpha$ is injective, there is exactly one) and can be computed in polynomial time (in $|\alpha|$), using $\tau$.
+  \item[Membership:] checking membership to $\ltdpdom_\alpha$ and $\ltdprange_\alpha$ can be done in polynomial time, for any index $\alpha \in \bits^{\poly(\secpar)}$.
+  \item[Sampling from $\ltdpdom_\alpha$:] sampling a uniform element $x$ from the domain $\ltdpdom_\alpha$ can be done in polynomial timee, for any index $\alpha \in \bits^{\poly(\secpar)}$.
+  \item[Oblivious Sampling from $\ltdprange_\alpha$:] $y = \ltdprangesample(\alpha;\rho)$ samples in polynomial time a uniform element from $\ltdprange_\alpha$ using the random tape $\rho \in \bits^{\poly(|\alpha|)}$, while $\rho = \ltdprangesampleinv(\alpha,y)$ computes in polynomial time a random tape $\rho$ such that $y = \ltdprangesample(\alpha;\rho)$
+  \end{description}
+  satisfying the following properties:
+  \begin{itemize}
+  \item \textbf{Index Indistinguishability.} Lossy indexes are computationally indistinguishable from injective ones. Formally:
+    \begin{align*}
+      \bigset{\alpha \ : \ (\alpha,\tau) \getsr \ltdpinjgen(1^\secpar)} \compind
+      \bigset{\alpha \ : \ (\alpha,\tau) \getsr \ltdplossygen(1^\secpar)}
+    \end{align*}
+  \item \textbf{Obliviousness.} For any security parameter $\secpar \in \N$, for any $\alpha \in \bits^{\poly(\secpar)}$:
+    \begin{align*}
+      \bigset{(y,\rho) \ : \ y = \ltdprangesample(\alpha;\rho)} \compind
+      \bigset{(y,\rho) \ : \ y \getsr \ltdprange_\alpha; \ \rho = \ltdprangesampleinv(\alpha,y) }
+    \end{align*}
+  \end{itemize}
+\end{mydefinition}
+
+
+
+\subsection{Non-Interactive Non-Erasure Zero-Knowledge Arguments}
+
+\begin{mydefinition}
+  A \emph{non-interactive non-erasure zero-knowledge argument (NIZK)} for $\rel$ is a tuple of four polynomial-time algorithms $\nizk = (\nizkSetup,\allowbreak \nizkProve,\nizkVer,\nizkSim)$:
+  \begin{description}
+  \item[Setup:] % $\nizkSetup$ can be viewd as a pair of PPT algorithms $(\nizkSetupSound,\nizkSetupEquiv)$, such that the following holds:
+%    \begin{itemize}
+%    \item $\nizkcrs \getsr \nizkSetupSound(1^\secpar)$ expects as input the unary representation of the security arameter $\secpar$ and outputs a public parameter $\nizkcrs$.
+%  \item
+    $(\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar)$ expects as input the unary representation of the security parameter $\secpar$ and outputs a public parameter $\nizkcrs$ together with a trapdoor $\nizktrap$ (used for simulation and equivocation).
+%    \end{itemize}
+  \item[Proof:] $\pi = \nizkProve(\nizkcrs,\word,\wit;\nizkrand)$ outputs a proof $\nizkproof$ for the word $\word$ using the witness $\wit$ (for the sake of simplicity, we assume $|\word|, |\wit| \le \secpar$) and random tape $\nizkrand$;
+  \item[Verification:] $\nizkVer(\nizkcrs,\word,\nizkproof)$ outputs $1$ if $\nizkproof$ is a valid proof for $\word$, and outputs $0$ otherwise;
+  \item[Simulation:] $(\nizkproof,\nizkst) = \nizkSim(\nizkcrs,\nizktrap,\word)$ simulates a proof $\nizkproof$ for $\word$ together with $\nizkst$;
+  \item[Equivocation:] $\nizkrand = \nizkEquiv(\nizkcrs,\nizktrap,\nizkproof,\nizkst,\word,\wit)$ equivocates the proof $\nizkproof$ such that: $\nizkproof = \nizkProve(\nizkcrs,\word,\wit;\nizkrand) = \nizkproof$;
+  \end{description}
+  satisfying the following properties:
+  \begin{itemize}
+  \item \textbf{Completeness.} There exists a negligible function $\negl$, such that for any security parameter $\secpar \in \N$, for any word $\word \in \lang$ and valid witness $\wit$ (i.e., $\rel(\word,\wit) = 1$), with $|\word|,|\wit| \le \secpar$:
+    \begin{multline*}
+      \Pr\Big[ (\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar); \ \nizkproof = \nizkProve(\nizkcrs,\word,\wit;\nizkrand) \ : \\
+      \nizkVer(\nizkcrs,\word,\nizkproof) = 1
+      \Big] \ge 1 - \negl(\secpar).
+    \end{multline*}
+  \item \textbf{Soundness.} For any polynomial-time
+    circuit family $\advA=\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in \N$:
+    \begin{multline*}
+      \Pr\Big[
+      (\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar) ; \ (\word, \nizkproof) \getsr \advA_\secpar(\nizkcrs) \ : \\
+      \word \notin \lang \text{ and } \nizkVer(\nizkcrs,\word,\nizkproof) = 1
+      \Big] \le \negl(\secpar).
+    \end{multline*}
+  \item \textbf{(One-time) non-erasure zero-knowledge.}
+    For any polynomial-time
+    circuit family $\advA=\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in \N$:
+    \begin{multline*}
+      \bigg|
+      \Pr\left[
+        \begin{array}{l}
+          (\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar) ; \\
+          (\state, \word, \nizkproof) \getsr \advA_\secpar(\nizkcrs) ; \\
+          \pi \getsr \nizkProve(\nizkcrs,\word,\wit;\nizkrand)
+        \end{array}
+        : \advA(\state,\pi,\nizkrand) = 1
+      \right] \\
+      -
+      \Pr\left[
+        \begin{array}{l}
+          (\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar) ; \\
+          (\state, \word, \nizkproof) \getsr \advA_\secpar(\nizkcrs) ; \\
+          (\nizkst,\pi) \getsr \nizkSim(\nizkcrs,\nizktrap,\word); \\
+          \nizkrand = \nizkEquiv(\nizkcrs,\nizktrap,\nizkproof,\nizkst,\word,\wit)
+        \end{array}
+        \ : \advA(\state,\pi,\nizkrand) = 1
+      \right]
+      \bigg| \le \eps.      
+    \end{multline*}
+  \end{itemize}
+\end{mydefinition}
+
+Let us now construct such a NIZK.
+The construction is similar to FLS (with the Bellare-Yung certification~\cite{JC:BelYun96}): the hidden-bit model is simulated as follows, the prover chooses a random trapdoor permutation, each bit $R_i$ corresponds to a hard-core bit of an element in the CRS for this trapdoor permutation. The prover can compute all the hidden bits, and reveal bits of its choice by revealing the pre-image.
+For one-time non-erasure zero-knowledge, the CRS is actually computed in such a way that the elements are in the image of a lossy trapdoor permutation (in the lossy mode).
+That way, for this specific lossy trapdoor permutation, it is possible to open each bit in both ways.
+
+More formally, here is the construction:
+\begin{description}
+\item[Setup:] $(\nizkcrs,\nizktrap) \getsr \nizkSetup(1^\secpar)$ samples a hash function $h \getsr \mathcal{H}$ from a family of pairwise independent hash functions, a lossy index $(\alpha,\tau) \getsr \ltdplossygen(1^\secpar)$ and then for $i \in [\poly(\secpar)]$, samples $x_i \getsr \ltdpdom_\alpha$, computes $y_i = f_\alpha(x_i)$ and set:\\
+  $\nizkcrs = (h, \smallset{y_i})$ and $\nizktrap = (\alpha,\tau)$.
+\item[Proof:] $\pi = \nizkProve(\nizkcrs,\word,\wit;\nizkrand)$
+\end{description}
+
+\subsection{Adaptive UC Non-Interactive Zero-Knowledge Arguments}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

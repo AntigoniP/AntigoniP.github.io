@@ -1,0 +1,617 @@
+% !TEX root =../main.tex
+
+
+\section{Instantiations}
+\label{sec:instantiations}
+
+\subsection{Semi-Malicious OT}
+
+In this section we demonstrate the feasibility of two-round adaptively secure semi-malicious UC oblivious transfer from any two-round malicious oblivious transfer with sender and receiver oblivious sampling. 
+
+
+\BD [OT with sender and receiver oblivious sampling] A 2-round oblivious transfer (OT) protocol with sender and receiver oblivious sampling
+is a 2-round
+oblivious OT (see Definition \ref{def:2ot}) with the additional tuple of PPT algorithms $(\ootsendone,\ootsendtwo,\iotsendone,\iotsendtwo)$ satisfying the following additional properties:
+
+\BI
+\item {\bf Indistinguishability of Receiver's oblivious flow.} For any message $\otsel$, consider the experiment $\crs \getsr \OTSetup(1^\secpar)$, $\tilde\mu^1\getsr \ootsendone(\crs;\tilde\otrandone)$, $\otflowone = \otsendone(\crs,\otsel;\otrandone)$, $\tilde{\otrandone}' \getsr\iotsendone(\crs, \mu^1)$ then 
+\[(\crs,\tilde\otrandone,\tilde\mu^1,\otsel)\compind(\crs,\tilde{\otrandone}',\otflowone,\otsel)\]
+
+\item {\bf Indistinguishability of Sender's oblivious flow.} For any message $\otmsg$, consider the experiment $\crs \getsr \OTSetup(1^\secpar)$, $\tilde\mu^2\getsr \ootsendtwo(\crs;\tilde\zeta)$, $\otflowtwo = \otsendtwo(\crs,\otflowone,\otmsg;\zeta)$, $\tilde{\zeta}' \getsr\iotsendtwo(\crs, \mu^2)$
+ then 
+\[(\crs,\tilde{\zeta}',\tilde\mu^2,\otmsg)\compind(\crs,\zeta,\otflowtwo,\otmsg)\]
+\Fnote{I'm not sure this definition is strong enough: I think we need to allow the adversary to choose $\mu^1$. $\mu^1$ might be maliciously generated, as even a semi-malicious adversary may claim it as ``obliviously sampled''. Now, I'm not sure there is any issue with re-usability of the first flow}
+
+\EI
+
+\ED
+
+
+\anti{we need to add the extraction property as well to the OT}
+
+\paragraph{Parallel oblivious transfer.} We consider a strengthening of $\ot$ in which M OT executions can run in parallel. We assume that m is a fixed, possibly a-priori bounded, polynomial
+in the security parameter $\secpar$.\anti{update this}
+\Fnote{Actually, now, I'm not sure this is an issue. See comment above}
+
+%We consider a strengthening of $\ot$ in which a maliciously generated receiver OT flow can be reused in M OT sender flows. We assume that m is a fixed, possibly a-priori bounded, polynomial in the security parameter $\secpar$
+
+\BD[Non-committing encryption] A non-committing (bit)
+encryption scheme consists of a tuple $(\NCGen, \NCEnc, \NCDec, \NCSim)$ where
+$(\NCGen, \NCEnc, \NCDec)$ is an encryption scheme and $\NCSim$ is the simulation satisfying the following property: for $b\in\bits$ 
+ the following distributions are computationally indistinguishable:
+     \begin{align*}
+    \big\{(\pk, c, \sigma_G, \sigma_E) : (\pk, \sk) \getsr \NCGen(1^\secpar; \sigma_G),& c = \NCEnc_\pk(b; \sigma_E)\big\}_{\secpar,b}   \enspace, \\
+       \big\{(\pk, c, \sigma^b_G, \sigma^b_E) :  (\pk, c, \sigma^0_G, \sigma^0_E,  \sigma^1_G,\sigma^1_E)&\getsr\NCSim(1^\secpar) \big\}_{\secpar,b}\enspace.
+    \end{align*}
+ 
+
+ 
+\ED
+\Mnote{modified theorem statement below. }
+\BT\label{thm:comp1}
+
+%Assuming the existence of a two-round extractable malicious oblivious transfer protocol with sender oblivious sampling in the CRS model, there exists a two-round malicious oblivious transfer protocol with sender equivocality in the CRS model. 
+Assume the existence of injective one-way functions and two-round oblivious transfer with the following properties:
+\BI
+\item UC-Security against static corruption of the receiver by an active adversary. 
+\item Oblivious sampleability of sender's algorithm. 
+\EI
+Then there exists a two-round oblivious transfer protocol with the following properties:
+\BI
+\item UC-Security against static corruption of the receiver by an active adversary and adaptive corruption of the sender by a passive adversary. 
+\EI
+Additionally, the compilation preserves oblivious sampleability of the receiver if the original protocol satisfies it. \Mnote{I think we also need to say that if the original OT achieves semi-malicious sender security, then the compiler preserves it.}
+\ET
+
+\noindent\textbf{Intuition:} \Mnote{Write high-level description here:}
+
+
+\Mnote{Instead of $O_2$, use $Obl$, and $O_2^{-1}$ use $InvObl$}
+
+
+{\small\BPR [Malicious $\qot$ protocol with sender equivocality]\label{prot:compiler1}
+Protocol $\qot = (\qotsetup,\qotsendone,\qotsendtwo,\qotoutput,\qotequivS)$ is run between sender S and receiver R and uses a two-round extractable malicious oblivious transfer protocol $\eot = (\eotsetup,\eotsendone,\eotsendtwo,\eotoutput,\eootsendtwo,\iotsendtwo,\eotextr)$ with sender oblivious sampling and a non-interactive equivocal commitment scheme $\qcom=(\qcomsetup,\qqcomsetup,\qcomcom,\qcomopen,\qcomsim,\qcomequiv)$.
+\BI
+  \item \textsc{Inputs:} S holds two strings $\otmsg_0, \otmsg_1 \in \bits^\secpar$ and R holds a bit $\otsel$.
+    
+   \item \textsc{Setup} $\qotsetup(1^\secpar)$:
+  
+  \BI
+  \item[] Run $\crs' \getsr \eotsetup(1^\secpar)$, $\ck \getsr \qcomsetup(1^\secpar)$ and set $\crs=(\crs',\ck)$. 
+  \EI
+  
+  \item\textsc{Setup}  $\qOTsetup(1^\secpar)$:
+  
+  \BI
+    \item Run  $(\crs', \tex) \getsr \eotsetup(1^\secpar)$ and $(\ck, \teq) \getsr \qqcomsetup(1^\secpar)$ and set $\crs=(\crs',\ck)$
+      \EI
+
+    
+   \item \textsc{First Round} $\qotsendone(\crs,\otsel;\otrandone)$: 
+ \BI
+ \item [] Execute $\otflowone = \eotsendone(\crs,\otsel;\otrandone)$ and output $\otflowone$.
+ \EI
+    \item \textsc{Second Round} $\qotsendtwo(\crs,\otflowone,\otmsg_0,\otmsg_1;\{r_b,s_b,\zeta_{b,\delta},\tilde\zeta_{b,\delta}\}_{b,\delta\in\bits})$:
+  \BE
+  \item Generate $\com_0 = \qcomcom(\otmsg_0;r_0), \com_1 = \qcomcom(\otmsg_1;r_1)$;
+  \item Generate $\delta_0 \getsr \bits$. For $\delta \in \bits$, generate $\otflowtwo_{0,\delta}$ as follows: 
+    \[
+      \otflowtwo_{0,\delta} = \begin{cases}
+        \eotsendtwo(\crs,\otflowone,\otmsg_0||r_0,s_0 ;\zeta_{0,\delta}), s_0 \getsr\bits^\secpar & \text{if } \delta=\delta_0 \\
+        \eootsendtwo(\crs,\tilde\zeta_{0,\delta})                                  & \text{otherwise}      %
+      \end{cases}
+    \]
+  \item Generate $\delta_1 \getsr \bits$. For $\delta \in \bits$, generate $\otflowtwo_{1,\delta}$ as follows: 
+    \[
+      \otflowtwo_{1,\delta} = \begin{cases}
+        \eotsendtwo(\crs,\otflowone,s_1,\otmsg_1||r_1 ;\zeta_{1,\delta}), s_1 \getsr\bits^\secpar  & \text{if } \delta=\delta_1 \\
+        \eootsendtwo(\crs,\tilde\zeta_{1,\delta})                                  & \text{otherwise}      %
+      \end{cases}
+    \]
+   
+
+       
+       \item Output the message $(\com_0,\com_1,\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}})$.
+  \EE
+
+ 
+  
+  \item    \textsc{Output} $\qotoutput((\com_0,\com_1,\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}}),\otsel,\otrandone)$: 
+   \BE
+  \item Run $\eotoutput(\star, \otsel,\otrandone)$ for messages $\smallset{\otflowtwo_{\otsel,\delta}}_{\delta\in\bits}$. Let the outputs be $y_1,y_2$. Output $\otmsg$ for which $y_i=\otmsg||r$ for some $i\in\bits$ and $\com_\otsel = \qcomcom(\otmsg;r)$.
+
+
+  \EE
+
+  \item \textsc{Sender Equivocation} $\qotequivS_1({\crs},{\teq},\otflowone,\otsel,\otmsg_\otsel;\{r_b,\rho_b,s_b,s_{b,\delta},\zeta_{b,\delta},\tilde\zeta_{b,\delta},\zeta_{c,b,\delta},\zeta'_{c,b,\delta}\}_{b,c,\delta\in\bits,})$:
+    
+    \BE 
+    
+  \item Generate $\com_\otsel = \qcomcom(\otmsg_\otsel;r_\otsel)$ and $(\com_{1-\otsel},\state^\cc) \getsr \qcomsim(\crs,\teq)$.
+  \item Generate $\delta_0 \getsr \bits$. For $\delta \in \bits$, generate $\otflowtwo_{0,\delta}$ as follows: 
+    \[
+      \otflowtwo_{0,\delta} = \begin{cases}
+        \eotsendtwo(\crs,\otflowone,\otmsg_\otsel||r_0,s_0 ;\zeta_{0,\delta}), s_0 \getsr\bits^\secpar & \text{if } \delta=\delta_0,\ \otsel=0 \\
+        \eootsendtwo(\crs,\tilde\zeta_{0,\delta})                                        & \text{if } \delta \neq \delta_0,\ \otsel=0 \\
+        \eotsendtwo(\crs,\otflowone,0||\rho_0,s_{0,0} ;\zeta_{0,0,\delta}), s_{0,0} \getsr\bits^\secpar     & \text{if } \delta=\delta_0,\ \otsel=1 \\
+        \eotsendtwo(\crs,\otflowone,1||\rho_1,s_{0,1} ;\zeta'_{0,0,\delta}), s_{0,1} \getsr\bits^\secpar     & \text{if } \delta\neq\delta_0,\ \otsel=1 \\
+      \end{cases}
+    \]
+  \item Generate $\delta_1 \getsr \bits$. For $\delta \in \bits$, generate $\otflowtwo_{1,\delta}$ as follows: 
+    \[
+      \otflowtwo_{1,\delta} = \begin{cases}
+        \eotsendtwo(\crs,\otflowone,s_1,\otmsg_\otsel||r_1 ;\zeta_{1,\delta}), s_1 \getsr\bits^\secpar  & \text{if } \delta=\delta_1,\ \otsel=1 \\
+        \eootsendtwo(\crs,\tilde\zeta_{1,\delta})                                        & \text{if } \delta \neq \delta_1,\ \otsel=1 \\
+        \eotsendtwo(\crs,\otflowone,s_{1,0},0||\rho_0 ;\zeta_{1,0,\delta}), s_{1,0} \getsr\bits^\secpar     & \text{if } \delta=\delta_1,\ \otsel=0 \\
+        \eotsendtwo(\crs,\otflowone,s_{1,1},1||\rho_1 ;\zeta'_{1,0,\delta}), s_{1,1} \getsr\bits^\secpar     & \text{if } \delta\neq\delta_1,\ \otsel=0 \\
+      \end{cases}
+    \]
+ 
+
+    
+       \item Output the message $(\com_0,\com_1,\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}})$.
+    
+    \EE
+    
+    
+ 
+  
+
+
+\EI
+
+
+  \EPR
+}
+
+
+\begin{proof}[Proof of \cref{thm:comp1}] Completeness follows directly. %UC-security against static corruption by an active adversary of $\qot$ also follows from the corresponding property of the $\eot$ protocol. \Mnote{Write something about how sender message is simulated and that the same receiver OT flow is used four times.}
+Without loss of generality, the only corruption scenario to consider here is an adversary that actively corrupts the receiver at the beginning of the execution and passively corrupts the sender post-execution.
+\Mnote{Prove UC-security of this scenario. At the end mention, how the compiler preserves oblivious receiver sampleability and semi-malicious sender security.}
+
+\subparagraph{Sender Equivocation:} We need to prove that for any polynomial-time circuit family $\advA =\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in N$ and for any $\otsel \in
+    \bits$:
+    \begin{multline*}
+      \Bigg| \Pr\bigg[
+      \advA_\secpar(\state,\crs,\otflowtwo,\zeta) = 1
+      \ : \
+      \begin{array}{l}
+        \ \crs \getsr \qotsetup(1^\secpar); \\
+        (\state,\otmsg_0,\otmsg_1,\otflowone) \getsr \advA_\secpar(\crs); \ \zeta \getsr \bits^{\poly(\secpar)};\\  \otflowtwo=\qotsendtwo(\crs,\otflowone,\otmsg_0,\otmsg_1;\zeta)
+              \end{array}
+      \bigg] - \\
+      \Pr\bigg[
+      \advA_\secpar(\state,\crs,\otflowtwo,\zeta') = 1
+      \ : \
+      \begin{array}{l}
+       (\crs,\teq) \getsr \qOTsetup(1^\secpar); \\
+        (\state,\otmsg_0,\otmsg_1,\otflowone) \getsr \advA_\secpar(\crs);\ \\
+        \otflowtwo\getsr\qotequivS_1({\crs},{\teq},\otflowone,\otsel,\otmsg)\\
+      \zeta' = \qotequivS_2({\crs},{\teq},\otflowone,\otflowtwo,\otsel,\otmsg_\otsel,\otmsg_{1-\otsel})
+      \end{array}
+      \bigg]
+      \Bigg| \le \negl(\secpar) \enspace.
+    \end{multline*}
+    \anti{update this def using the Extr and have the state}
+
+    
+    
+    
+
+For that, we consider the following hybrid distributions where $\hyb{0}$ consider the real execution: 
+
+\paragraph{$\hyb{1}$:} In the first hybrid, the challenger extracts the input $\otsel$ of the receiver running the extraction algorithm $ (\otsel;\otrandone) \getsr\eotextr(\crs,\otflowone)$. 
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the extractability property of $\eot$. 
+\end{proof}
+
+\paragraph{$\hyb{1}$:} In this hybrid we change the way the public parameters of the OT are generated. In particular, the challenger runs the setup algorithm $(\crs,\teq) \getsr \qOTsetup(1^\secpar)$ and stores trapdoors $(\teq,\tex)$.
+
+\anti{update the numbering of the hybrids}
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follows from the indistinguishability of public parameters of $\eot$. 
+\end{proof}
+
+
+
+\paragraph{$\hyb{2}$:} In this hybrid we change the way the challenger generates the commitments ob behalf of the sender. In particular, the challenger generates:  
+
+\[\com_\otsel = \qcomcom(\otmsg_\otsel;r_\otsel),(\com_{1-\otsel},\state^\cc) \getsr \qcomsim(\crs,\teq)\]. 
+
+
+% = \qcomcom(0;\rho_0)= \qcomcom(1;\rho_1)$.\anti{update this}
+
+
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the computational hiding of the commitment scheme $\com$.
+\end{proof}
+
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to $\hyb{1}$ except that the sender's messages are simulated: 
+
+\[\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}}\getsr\qotequivS_1({\crs},{\teq},\otflowone,\otsel,\otmsg)\]
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the sender privacy of $\eot$.
+ \anti{do them 1 by 1}\end{proof}
+
+
+\paragraph{$\hyb{2}$:}In this hybrid, we change how the internal randomness of the corrupted party is explained to $\cA$ on being adaptively corrupted. Specifically we change the randomness that is used to explain the commitment $\cS$ generates on behalf of parties. In particular,  upon corruption the challenger receives the real input $(\otmsg_0,\otmsg_1)$ and computes $\rho_{1-\otsel}\getsr \qcomequiv ({\ck},{\teq},\com,\state^\cc, \otmsg_{1-\otsel})$ such that $\com_{1-\otsel} = \qcomcom(\otmsg_{1-\otsel};\rho_{1-\otsel})$.
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the equivocation property of the commitment scheme.\end{proof}
+
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to  $\hyb{1}$ except that upon corruption the challenger receives the real input $(\otmsg_0,\otmsg_1)$. In this case the challenger prepares the internal state on behalf of the sender such that it will be consistent with the OT messages $\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}}$ that it had provided to $\cA$ earlier. In particular, the challenger runs 
+$\zeta'_\otsel\getsr\qotequivS_2({\crs},{\teq},\smallset{\otflowtwo_{0,\delta},\otflowtwo_{1,\delta}},\otsel,\otmsg_\otsel,\otmsg_{1-\otsel})$. \anti{Move the rest in Protocol 2}. Set $\zeta'_\otsel=\{u_{0,\delta},u_{1,\delta}\}_{\delta\in\bits}\cup \{\delta_0,\delta_1\}$ where 
+
+
+  \[
+      u_{0,\delta} = \begin{cases}
+      (s_0,\zeta_{0,\delta}) & \text{if } \delta=\delta_0,\ \otsel=0 \\
+       \zeta_{0,\delta}                                    & \text{if } \delta \neq \delta_0,\ \otsel=0 \\
+         \iotsendtwo(\alpha) & \text{if } \delta=\delta_0,\ \otsel=1 \\
+        ( 1||\rho_1,\zeta'_{0,0,\delta})     & \text{if } \delta\neq\delta_0,\ \otsel=1 \\
+
+      \end{cases}
+    \]
+
+\anti{where $\alpha=\eotsendtwo(\crs,\otflowone,0||\rho_0,s_{0,1} ;\zeta'_{0,0,\delta})$}
+    \[
+      u_{1,\delta} = \begin{cases}
+        
+          (s_1,\zeta_{1,\delta}) & \text{if } \delta=\delta_1,\ \otsel=1 \\
+        \tilde\zeta_{1,\delta}                                        & \text{if } \delta \neq \delta_1,\ \otsel=1 \\
+        (0||\rho_0, \zeta_{1,0,\delta}) & \text{if } \delta=\delta_1,\ \otsel=0  \\
+        \iotsendtwo(\beta) & \text{if } \delta\neq\delta_1,\ \otsel=0 \\
+      \end{cases}
+    \]
+    
+    \anti{where $\beta=\eotsendtwo(\crs,\otflowone,s_{1,1},1||\rho_1 ;\zeta'_{1,0,\delta}))$}
+
+
+
+
+
+\begin{lemma}
+$\hyb{2}\compind \hyb{3}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{2}$ from $\hyb{3}$ follow from the sender oblivious sampling property of $\eot$\anti{add details}.
+\end{proof}
+
+
+
+\end{proof}
+
+\Mnote{Write it like prev thm.}\Mnote{Add injective OWFs. Also remove NCE. Just say we assume a private channel from sender to the receiver and remark that this can be easily implemented via NCE where the receiver provides a public-key in the first round. Remark that we dont have a NCE from Receiver to Sender because that will cost another round.}
+\BT\label{comp2}
+
+Assuming the existence of a two-round parallel and extractable malicious oblivious transfer protocol with receiver oblivious sampling and sender equivocality in the CRS model, there exists a two-round semi-malicious adaptive oblivious transfer protocol in the CRS model. 
+\ET
+
+
+
+
+{\small\BPR [ Semi-Malicious $\ot$ protocol with receiver and sender equivocality]\label{prot:compiler2}
+Protocol $\ot = (\OTSetup,\otsendone,\otsendtwo,\otoutput,\ROTequiv,\SOTequiv)$ is run between sender S and receiver R and uses a two-round extractable malicious OT protocol with receiver and sender oblivious sampling and sender equivocality $\qot = (\qotsetup,\qotsendone,\qotsendtwo,\qotoutput,\obothsend,\iobothsend,\qotextr,\qotequivS)$, a non-committing encryption scheme $\NC=(\NCGen, \NCEnc, \NCDec, \NCSim)$, a garbled circuit scheme $\gc=(\gcgen,\gcgarble,\gceval,\gcsim)$ for the class of all
+  $\cirsize$-size circuits with a sufficiently large polynomial bound $\cirsize$ and a non-interactive equivocal commitment scheme $\qcom=(\qcomsetup,\qqcomsetup,\qcomcom,\qcomopen,\qcomsim,\qcomequiv)$.   
+  \BI
+  \item \textsc{Inputs:} S holds two strings $\otmsg_0, \otmsg_1 \in \bits^\secpar$ and R holds a bit $\otsel$.
+    
+     \item \textsc{Setup} $\OTSetup(1^\secpar)$:
+  
+  \BI
+  \item[] Run $\crs' \getsr \qotsetup(1^\secpar)$, $\ck \getsr \qcomsetup(1^\secpar)$ and set $\crs=(\crs',\ck)$. 
+  \EI
+  
+  \item\textsc{Setup}  $\OTSetupq(1^\secpar)$:
+  
+  \BI
+    \item Run $(\crs', \tex) \getsr \qotsetup(1^\secpar)$, $(\crs', \teq)\getsr \qOTsetup(1^\secpar)$ and $(\ck, \cteq) \getsr \qqcomsetup(1^\secpar)$ and set $\crs=(\crs',\ck)$.      \EI
+
+    
+    
+    
+   \item \textsc{First Round} $\otsendone(\crs,\otsel;\{\otrandone_\delta,\tilde\otrandone_\delta\}_{\delta\in\bits},r)$: 
+ \BE
+   \item Generate $\com = \qcomcom(\otsel;r)$;
+ %  \item Choose a random subset $S \subseteq [4\secpar]$ of size $\secpar$.
+   \item For $\delta \in \bits$, generate $\otflowone_{\delta}$ as follows: 
+
+    \[\otflowone_\delta= \begin{cases} \qotsendone(\crs,r;\otrandone_\delta) & \text{if } \delta=\otsel \\
+                      \qootsendone(\crs;\tilde\otrandone_\delta)                                  & \text{otherwise}      %
+        \end{cases}\]
+
+   \Mnote{Expand OTs since $r$ will be a string}
+   \item Generate key pair $(\sk,\pk) \getsr \NCGen(1^\secpar)$. 
+   
+ \item Output $(\pk,\com,\{\otflowone_\delta\}_{\delta\in\bits})$.
+ \EE
+    \item \textsc{Second Round} $\otsendtwo(\crs,\{\otflowone_\delta\}_{\delta\in\bits},\otmsg_0,\otmsg_1;r,r_E,\{\zeta_{\delta,j}\}_{\delta\in\bits,j\in[\cirsize]})$:
+  \BE
+  
+ % \item Choose a random subset $T \subseteq [4\secpar]$ of size $\secpar$.
+  \item For $\delta \in \bits$ generate circuit $\cir_\delta$ as follows: 
+  
+    \[ \cir_\delta(r) = \big\{  \text{output}~ \otmsg_\delta ~~\text{if } \com = \qcomcom(\delta;r) \big\}
+     \]
+    
+ and generate the garble circuit $\giccir_\delta$, $\{\keys^\delta_j\}_{j\in[\cirsize]} \getsr \gcgen(1^\secpar)$: 
+  \[ \giccir_\delta \getsr \gcgarble(\{\keys^\delta_j\}_j, \cir_\delta) \]
+  
+  \item For $\delta \in \bits$, generate $\otflowtwo_{\delta,j}$ for $j\in[\cirsize]$ as follows: 
+  
+      \[\otflowtwo_{\delta,j} =  \qotsendtwo(\crs,\otflowone_\delta,\keys^\delta_j;\zeta_{\delta,j}) 
+           %          \qootsendtwo(\crs;\zeta_{\delta,j})                                & \text{otherwise}    %
+        \]
+
+  
+\item Generate and output $ct=\NCEnc_\pk(\{\giccir_\delta ,\otflowtwo_{\delta,j}\}_{\delta\in\bits,j\in[\cirsize]};r_E)$. 
+       
+  \EE
+
+
+  \item \textsc{Output} $\otoutput(\ct,\otsel,r,\{\rho_i\}_{i\in\bits})$: 
+  
+  \BE
+  \item Decrypt $\{\giccir_i ,\otflowtwo_{i,j}\}_{i\in\bits,j\in[\cirsize]}\}=\NCDec_\sk(ct)$. 
+  \item Receive the garble labels $\{\keys^i_{j}[r]\}_{j\in[\cirsize]}\getsr\qotoutput(\otflowtwo_{i,j}\}_{i\in\bits,j\in[\cirsize]}, \otsel,\rho_i,r)$. 
+  \item Evaluate the garble circuits $x_i = \gceval(\gccir_i, \keys^i_{j}[r])$. 
+  \item If $x_i \neq \perp$ for an $i\in\bits$ then output $x_i$ \Mnote{, otherwise output the default value}. 
+  \EE
+
+   \item \textsc{Receiver Equivocation} $\ROTequiv_1({\crs},{\teq};\{\otrandone_\delta\}_{\delta\in\bits})$
+   \BE
+  \item Generate $\com \getsr \qcomsim(\crs,\teq)$.
+  \item For $\delta \in \bits$, compute $r_\delta \gets \qcomequiv(\crs,\teq,\com,\delta)$.
+ %\item  Choose two random disjoint subsets $S_0,S_1 \subseteq [4\secpar]$ of size $\secpar$.
+    \item  For $\delta \in \bits$, generate $\otflowone_\delta$ as follows: 
+    
+    \[\otflowone_\delta=\qotsendone(\crs,r_\delta;\otrandone_\delta)\]
+\EE
+   \item \textsc{Receiver Equivocation} $\ROTequiv_2({\crs},{\teq},\otsel,r_\otsel)$
+   \BE
+
+    \item For $\delta \in \bits$,  generate $\{\zeta_{\delta}\}_{\delta\in\bits}$ as follows
+
+    \[\zeta_\delta= \begin{cases} r_\otsel;\otrandone_\otsel & \text{if } \delta=\sigma \\
+   \qiotsendone(  \crs,\mu^1_{1-\sigma} )& \text{otherwise} \\
+       %             \tilde\rho_i                             & \text{otherwise}      %
+        \end{cases}\]
+        
+    %    \item Choose $T$ such that $T\cap S_{1-\otsel}=\emptyset$
+\EE
+
+
+\EI
+
+
+   
+   
+   
+    \EPR
+}
+
+
+    \subparagraph{Receiver Equivocation:} We need to prove that for any polynomial-time circuit family $\advA =\smallset{\advA_\secpar}_{\secpar \in \N}$,
+    there exists a negligible function $\negl$, such that for any $\secpar \in N$ and for any $\otsel \in
+    \bits$:
+    \begin{multline*}
+      \Bigg| \Pr\bigg[
+      \advA_\secpar(\state,\crs,\otflowone,\otrandone) = 1
+      \ : \
+      \begin{array}{l}
+        \ \crs \getsr \qotsetup(1^\secpar); \\
+        (\state,\otsel) \getsr \advA_\secpar(\crs); \ \otrandone \getsr \bits^{\poly(\secpar)};\\  \otflowone = \otsendone(\crs,\otsel;\otrandone)
+              \end{array}
+      \bigg] - \\
+      \Pr\bigg[
+      \advA_\secpar(\state,\crs,\otflowone,\otrandone') = 1
+      \ : \
+      \begin{array}{l}
+       (\crs,\teq) \getsr \qOTsetup(1^\secpar); \\
+        (\state,\otsel) \getsr \advA_\secpar(\crs);\ \\
+        \otflowone\getsr\ROTequiv_1({\crs},{\teq})\\
+     \otrandone' \getsr\ROTequiv_2({\crs},{\teq},\otflowone,\otsel)
+      \end{array}
+      \bigg]
+      \Bigg| \le \negl(\secpar) \enspace.
+    \end{multline*}
+    
+    \anti{make them qOT}
+
+For that, we consider the following hybrid distributions where $\hyb{0}$ consider the real execution:
+
+
+ \anti{update the numbering of the hybrids}
+\paragraph{$\hyb{1}$:} In this hybrid we change the way the public parameters of the OT are generated. In particular, the challenger runs:
+$(\crs', \teq)\getsr \qOTsetup(1^\secpar)$ and $(\ck, \cteq) \getsr \qqcomsetup(1^\secpar)$ and stores $(\teq, \cteq)$. 
+
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follows from the indistinguishability of public parameters of $\qot$ and commitment $\qcom$. 
+\end{proof}
+
+
+\paragraph{\bf Receiver is honest at the onset of the protocol.} 
+
+\paragraph{$\hyb{2}$:} In this hybrid we change the way the challenger generates the commitment on behalf of the sender. The challenger generates $\com \getsr \qcomsim(\crs,\teq)$.  
+
+
+
+% = \qcomcom(0;\rho_0)= \qcomcom(1;\rho_1)$.\anti{update this}
+
+
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the computational hiding of the commitment scheme $\com$.
+\end{proof}
+
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to $\hyb{1}$ except that the receiver's messages are simulated as follows:  
+$\{\otflowone_i\}_{i\in[4\secpar]}\getsr\ROTequiv_1({\crs},{\teq})$.
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the receiver privacy of $\qot$.
+ \anti{do them 1 by 1}\end{proof}
+
+\paragraph{\bf Receiver gets corrupted at the end of the protocol:} 
+
+
+
+\paragraph{$\hyb{2}$:}In this hybrid, we change how the internal randomness of the corrupted party is explained to $\cA$ on being adaptively corrupted. Upon corruption the challenger receives the real input $\otsel$ and computes $r'\getsr \qcomequiv ({\ck},{\teq},\com,\state^\cc, \otsel)$ such that $\com \getsr \qcomcom(\otsel)$.
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follow from the equivocation property of the commitment scheme.\end{proof}
+
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to  $\hyb{1}$ except that challenger prepares the internal state on behalf of the receiver such that it will be consistent with $\{\otflowone_i\}_{i\in[4\secpar]}$. That said, the challenger runs $\zeta'_\otsel\getsr\ROTequiv_2({\crs},{\teq},\otsel)$.
+
+
+
+\begin{lemma}
+$\hyb{2}\compind \hyb{3}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{2}$ from $\hyb{3}$ follow from the receiver oblivious sampling property of $\qot$\anti{add details}.
+\end{proof}
+
+\paragraph{\bf Receiver is corrupted and Sender is honest at the onset of the protocol:} 
+
+\paragraph{$\hyb{1}$:} In this hybrid, the challenger extracts the input $\otsel$ of the receiver running the extraction algorithm $ (\otsel||r;\otrandone) \getsr\eotextr(\crs,\otflowone)$. 
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the extractability property of $\eot$. 
+\end{proof}
+
+\paragraph{$\hyb{2}$:} In this hybrid we change the way messages $\otflowtwo_{i,j,b}$ are generated. The challenger uses twice the input labels that correspond to the actual inputs $\mathsf{inp}=\otsel||r$, instead of using both possible input labels: 
+
+\[\otflowtwo_{i,j}=\qotsendtwo(\crs,\otflowone_i,(\keys^i_j[\mathsf{inp}_k],\keys^i_j[\mathsf{inp}_k]);\zeta_{i,j})\]
+
+where $k\in[|\mathsf{inp}|]$.
+
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the sender privacy of $\qot$.  
+\end{proof}
+
+\paragraph{$\hyb{2}$:} This hybrid is identical to the previous hybrid except that the challenger simulates the garble circuits: 
+\[(\keys,\giccir_i)\getsr \gcsim(1^\secpar, x_i)~ \text{where} ~ x_i=\cir_i(\otsel,r) \]
+
+
+
+
+
+
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the fact tha $\gc$ is simulatable.  
+\end{proof}
+
+\paragraph{\bf Sender gets corrupted at the end of the protocol:} 
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to  $\hyb{1}$ except that challenger prepares the internal state on behalf of the sender such that it will be consistent with $\{\otflowtwo_{i,j}\}_{i\in[4\secpar],j\in[\cirsize]}$. That said, the challenger runs: $\zeta'_\otsel\getsr\qotequivS({\crs},{\teq},\otflowone_i,\otsel,\otmsg_\otsel)$. 
+
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the sender equivocation property of $\qot$. 
+\end{proof}
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to $\hyb{1}$ except that the challenger explains randomness for the garble circuits:
+
+\[( \keys^i,\psi_i) \getsr \gcequiv( 
+    \gccir_i,\cirin_i, \state)\]
+    
+\begin{lemma}
+$\hyb{0}\compind \hyb{1}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{0}$ follow from the equivocation property of $\gc$. 
+\end{proof}
+
+
+\anti{rest is not relevant}
+
+\paragraph{$\hyb{2}$:} This hybrid is similar to hybrid $\hyb{1}$, except that the ciphertext $ct$ are simulated: $ct \getsr \NCSim(1^\secpar)$.
+
+
+\begin{lemma}
+$\hyb{1}\compind \hyb{2}$.
+\label{lemma:hyb1}
+\end{lemma}
+\begin{proof}
+The indistinguishability of $\hyb{1}$ from $\hyb{2}$ follows from the semantic security of $\NC$. 
+\end{proof}
+
+
+%\subsection{NIZK}
+
+%\subsection{Commitment}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

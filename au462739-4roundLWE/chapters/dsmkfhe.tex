@@ -1,0 +1,421 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{LWE-Based Multi-Key FHE with Distributed Setup and Our Semi-Malicious Protocol}\label{sec:dualGSW}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In this section we present our new LWE-based multi-key FHE scheme, and show how to apply the \cite{MW16} to obtain 3-round semi-malicious multi-party computation from LWE.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Defining Multi-Key FHE with Distributed Setup}\label{sec:mkeyFHE}
+An encryption scheme is multi-key homomorphic if it can evaluate
+circuits on ciphertexts encrypted under different public keys. To
+decrypt an evaluated ciphertext, the algorithm uses the secret keys of
+all parties whose ciphertexts took part in the computation. In more
+detail, a multi-key homomorphic encryption scheme consists of five
+procedures, $\MFHE = (\Setup, \Keygen,\Encrypt,\Decrypt,\Evall)$:
+\begin{itemize}
+\item {\bf Setup $\params \leftarrow \Setup(1^\kappa)$:}
+  On input the security parameter $\kappa$ %and the circuit depth $d$
+  the setup algorithm outputs the system parameters $\params$. 
+\item {\bf Key Generation $(\pk, \sk) \leftarrow \Keygen(\params)$:}
+  On input $\params$ the key generation algorithm outputs a
+  public/secret key pair $(\pk,\sk)$.
+\item {\bf Encryption $ c \leftarrow \Encrypt(pk,\mu)$:}
+  On input $pk$ and a plaintext message $x\in \bit^*$ output a
+  ``fresh ciphertext'' $c$.
+  (We assume for convenience that the ciphertext includes in
+  it also the respective public key.)
+\item {\bf Evaluation $\hc:= \Evall(\params; \cC; (c_1,\ldots, c_\ell))$:}
+  On input a (description of a) Boolean circuit $\cC$ %of depth $\leq d$
+  and a sequence of $\ell$ fresh ciphertexts $(c_1,\ldots,c_\ell)$,
+  output an ``evaluated ciphertext'' $\hc$.
+  (Here we assume that the evaluated ciphertext includes also all
+  the public keys from the $c_i$'s.)
+\item {\bf Decryption $x := \Decrypt((\sk_1,\ldots, \sk_N), \hc)$:}
+  On input an evaluated ciphertext $c$ (with $N$ public keys) and a
+  the corresponding $N$ secret keys $(\sk_1,\ldots,\sk_N)$, output
+  the message $x\in \bit^*$.
+\end{itemize}
+
+The scheme is correct if for every circuit $\cC$ on $N$ inputs and any
+input sequence $x_1,\ldots,x_N$ for~$\cC$, if we set $\params
+\leftarrow \Setup(1^\kappa)$ and then generate $N$ key-pairs and $N$
+ciphertexts $(\pk_i,\sk_i) \leftarrow \Keygen(\params)$ and $c_i
+\leftarrow \Encrypt(pk_i,x_i)$, then we get
+\[
+\Decrypt\big((\sk_1,\ldots, \sk_N), \Evall(\params; \cC;
+(c_1,\ldots,c_N)) \big) = \cC(x_1,\ldots, x_N)]
+\]
+except with negligible probability (in $\kappa$) taken over the
+randomness of all these algorithms.  We typically consider a slightly
+weaker notion of homomorphism, where the \textbf{Setup} algorithm gets
+also a depth-bound $d$ and correctness is then defined only relative
+to circuits of depth upto~$d$.
+
+\medskip\noindent\textbf{Local decryption.}  A special property of the
+multi-key FHE schemes from \cite{C:CleMcg15,MW16} that we need,
+is that the decryption procedure consists of a ``local''
+partial-decryption procedure $ev_i\gets\PartDec(\hc,\sk_i)$ that only
+takes one of the secret keys and outputs a partial decryption share,
+and a public combination procedure $\mu \leftarrow
+\FinDec(ev_1,\ldots, ev_N, \hc)$ that takes these partial shares and
+outputs the plaintext.
+
+\medskip\noindent\textbf{Simulated decryption shares.}  Another
+property of the schemes from \cite{C:CleMcg15,MW16} that we
+need is the ability to simulate the decryption shares. Specifically,
+there exists a $\ppt$ simulator $\cS^T$, that gets for input:\\ ~--
+the evaluated ciphertext~$\hc$,\\ ~-- the output plaintext $x:=
+\Decrypt((\sk_1,\ldots, \sk_N), \hc)$,\\ ~-- a subset $I \subset [N]$,
+and all secret keys \emph{except the one for~$I$},
+$\{\sk_j\}_{j\in[N]\setminus I}$.\\ The simulator produces as output
+simulated partial evaluation decryption shares:
+$\{\widetilde{ev_i}\}_{i\in I}\leftarrow \cS^{T}(x,
+\hc,I,\{\sk_j\}_{j\in[N]\setminus I}).$ We need the simulated share be
+indistinguishable from the shares produced by the local partial
+decryption procedures using the keys $\{sk_i\}_{i\in I}$ (even to a
+distinguisher that sees all the inputs of $\cS^T$). We say that a
+scheme is \emph{simulatable} if it has local decryption and a
+simulator as described here.
+
+
+\subsubsection{Distributed Setup}
+\label{sec:distsetup}
+
+We present our new variant that does not require the setup procedure to be run by a trusted entity, but rather it is run in a distributed manner by all parties in the protocol. In our definition we allow the setup to depend on the maximum number of users $N$. This restriction does not pose a problem for our application.
+
+\begin{itemize}
+	\item {\bf Distributed Setup $\params_i \leftarrow \DSetup(1^\kappa, 1^N)$:}
+	On input the security parameter $\kappa$ and number of users $N$, %and the circuit depth $d$
+	the setup algorithm outputs the system parameters for the $i$th player $\params_i$. 
+\end{itemize}
+
+The remaining functions have the same functionality as above, where $\params = \{\params_i\}_{i\in[N]}$.
+
+
+%\medskip\noindent\textbf{Security of multikey FHE.}  
+
+\subsubsection{Security}
+Security for multikey FHE is
+defined as the usual notion of semantic security. For the distributed setup variant we require that semantic security for the $i$th party holds even when all $\{\params_j\}_{j \in [N]\setminus\{i\}}$ are generated adversarially and possibly depending on $\params_i$.
+
+%
+%, but for our purposes
+%we need a special variant of this notion, since we will be using a
+%partially adversarial setup, see \secref{ILWE}.
+
+
+%\anti{why did we delete the definition of the LWE assumption? }
+%\shai{We don't need it, but can explain it briefly using words.}
+
+%=====================================================================
+\subsection{A ``Dual'' LWE-Based Multi-Key FHE with Distributed Setup}\label{sec:MFHE}
+\znote{Change notation.}
+For our protocol we use a ``dual'' of the Clear-McGoldrick multi-key
+FHE scheme from \cite{C:CleMcg15,MW16}. Just like the
+``primal'' version, our scheme uses the GSW FHE scheme
+\cite{C:GenSahWat13}, and its security is based on the hardness
+of LWE.
+
+Recall that the LWE problem is parametrized by integers $n,m,q$ (with
+$m>n\log q$) and a a distributions $\chi$ over $\ZZ$ that produces whp
+integers much smaller than~$q$. The LWE assumption says that given a
+random matrix $A\in\ZZ_q^{n\times m}$, the distribution $sA+e$ with
+random $s\in\ZZ_q^n$ and $e\gets\chi^m$ is indistinguishable from
+uniform in $\ZZ_q^m$.
+%For our purposes, we use
+%two instances of the LWE assumptions, one with parameters $n,m,q$ and
+%the other with parameters $m,w,q$ with $w>m\log q$.)
+
+For the ``dual'' GSW scheme below, we use parameters $n<m<w<q$ with
+$m>n\log q$ and $w>m\log q$, and two error distriubtions $\chi,\chi'$
+with $\chi'$ producing much larger errors than $\chi$ (but still much
+smaller than~$q$). Specifically, consider the distribution
+\[
+\chi'' = \{ a,b\gets\chi^{m}, c \gets \chi',
+            ~\mbox{output}~\langle a,b\rangle+c \} .
+\]
+We need the condition that the statistical distance between $\chi'$
+and $\chi''$ is negligible (in the security parameter~$n$). This
+condition holds, for example, if $\chi,\chi'$ as discrete Gaussian
+distributions around zero with parameters $p,p'$, respectively, such
+that $p'/p^2$ is super-polynomial (in~$n$).
+
+\begin{description}
+\item[Key generation.]
+In the ``dual'' GSW scheme that we use, the public key of party~$i$
+is matrix $B_i\in\ZZ_q^{m\times n}$, and the corresponding secret key
+is a \emph{random low-norm vector} $t_i\in\ZZ_q^m$, such that
+$t_iB_i=0\pmod q$. In more detail, for $A \in\ZZ^{(m-1)\times n}$ and
+a low-norm vector $s_i\gets\chi^{m-1}$, we set $b_i=s_iA \bmod{q}$
+and $B_i=\left(\begin{array}{c}A\\\!\!-b_i\!\!\end{array}\right)$.
+Denoting $t_i=(s_i,1)$, we indeed have $t_i B_i=0\pmod{q}$.
+  
+Just like in the multi-key scheme from \cite{C:CleMcg15,MW16},
+to get a multi-key FHE scheme from the ``dual'' GSW acheme above, we
+will need all the parties to share the same $(m-1)$-by-$n$ matrix~$A$
+for key-generation.
+
+\item[Encryption.]
+To encrypt a bit $\mu$ under the public key $B_i$, choose a random
+matrix $R\in\ZZ_q^{n\times w}$ and a low-norm error matrix
+$E\in\ZZ_q^{m\times w}$, and set $C = B_i R + E + \mu G$ where $G$ is
+a fixed $m$-by-$w$ ``gadget matrix'' (whose structure is not important
+for us here).
+
+For our protocol, we use more error for the last row of the error
+matrix~$E$ than for the top $m-1$ rows. Namely, we choose
+$\hat{E}\gets\chi^{(m-1)\times w}$ and $e'\gets{\chi'}^w$ and set
+$E=\left(\begin{array}{c}\hat{E}\\e'\end{array}\right)$.
+
+\item[Decryption.]
+Just like in the GSW scheme, the invariant satisfied by ciphertexts in
+this scheme is that an encryption of a bit $\mu$ relative to secret key
+$t_i$ is a matrix $C$ that satisfies $t C = \mu \cdot t G + e \pmod{q}$
+for a low-norm error matrix~$E$, where $G$ is a fixed $m$-by-$w$
+``gudget matrix'' (cf. \cite{MP12}). This invariant holds for freshly
+encrypted ciphertexts since $t B_i=0\pmod{q}$, and so
+\[
+t_i(B_i R + E + \mu G) = \mu\cdot t_iG + t_iE \pmod{q},
+\]
+where $e=t_iE$ has low norm (as both $t_i$ and $E$ have low norm).
+
+To decrypt, the secret-key holder computes $u=t_i\cdot C \bmod q$,
+outputting 1 if the result is closer to $t_iG$ or 0 is the result is
+closer to~0.
+\end{description}
+Since ciphertexts satisfy the same invariant as in the original GSW
+scheme, then the homomorphic operations in GSW work just as well for
+this ``dual'' variant. Similarly the ciphertext-extension technique
+from \cite{C:CleMcg15,MW16} works also for this variant
+exactly as it does for the ``primal'' scheme (see below). Hence we
+get a multi-key FHE scheme.
+
+\paragraph{The ciphertext-expansion procedure.}
+\shai{I don't think we really need to show this explicitly, but maybe
+it doesn't hurt. Maybe put it in some appendix.}
+For the ciphertext-extension technique, recall that the there exists a
+low-norm vector $u$ such that $Gu=(0,0,\ldots,0,1)$, and therefore for
+every secret key $t=(s|1)$ we have $tGu=1 \pmod q$. It follows that if
+$C$ is an encryption of $\mu$ wrt secret key $t=(s|1)$, then the
+vector $v=Cu$ satisfies
+\[
+\langle t,v\rangle
+  =tCu=(\mu tG+e)u=\mu tGu + \langle e,u\rangle = \mu + \epsilon
+    \pmod{q}
+\]
+where $\epsilon$ is a small integer. In other words, given an
+encryption of $\mu$ wrt~$t$ we can construct a vector $v$ such that
+$\langle t,v\rangle\approx \mu \pmod{q}$.
+
+Next, let $t_1=(s_1|1)$, $t_2=(s_2|1)$ be two secret keys with
+corresponding public keys
+$B_1=\small\left(\begin{array}{c}A\\-s_1A\end{array}\right)$ and
+$B_2=\small\left(\begin{array}{c}A\\-s_2A\end{array}\right)$, then
+given these two public keys we can compute the vector
+$\delta=(s_1-s_2)A\bmod q$.
+
+Let $C=B_1R+E+\mu G$ be fresh encryption of $\mu$ wrt $t_1$, and
+suppose that we also have en encryption under $t_1$ of the matrix
+$R$. Knowing the vector~$\delta$, we can apply homomorphic operations
+to the encryptiion of~$R$ to get an encryption of the entries of
+the vector $\rho=\delta R$, and then using the technique above we
+can compute for every entry $\rho_i$ a vector $x_i$ such that
+$\langle t_1,x_i\rangle\approx \rho_i \pmod{q}$. Concatenating all
+these vectors we get a matrix $X$ such that
+$t_1 X \approx\rho=(s_1-s_2)AR\pmod{q}$.
+
+Finally, consider the matrix $C'=\small\left(\begin{array}{cc}
+C & X\\0 & C\end{array}\right)$, we claim that this is an encryption
+of the same plaintext~$\mu$ under the concatenated secret key
+$t'=(t_1|t_2)$. To see this, notice that
+\[
+t_2 C = (s_2|1)
+\left(\left(\begin{array}{c}A\\-s_1A\end{array}\right)R+E+\mu G\right)
+\approx (s_2-s_1)AR + \mu t_2 G \pmod{q},
+\]
+and therefore 
+\begin{eqnarray*}
+t' C' &=& (t_1 C ~|~ t_1 X + t_2 C)
+\approx (\mu t_1 G ~|~ (s_1-s_2)AR + (s_2-s_1)AR + \mu t_2 G)\\
+&=& \mu (t_1 G ~|~ t_2 G) ~=~
+ \mu (t_1|t_2) \left(\begin{array}{cc}G & \\ & G\end{array}\right),
+\end{eqnarray*}
+as needed. As in the schemes from \cite{C:CleMcg15,MW16}, this
+technique can be generalized to extend the ciphertext $C$ into an
+encryption of the same plaintext $\mu$ under the concatenation of any
+number of keys.
+
+%---------------------------------------------------------------------
+\paragraph{A simulatable scheme.} Exactly as for the ``primal'' case,
+the decryption shares in this ``dual'' scheme are only simulatable
+when all parties but one are corrupted. But the (generic) solution
+of Mukherjee-Wichs \cite[Thm.~6.5]{MW16} can be used to make
+this scheme simulatable for any adversary structure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Our Interactive Setup Procedure and its Security}
+\label{sec:ILWE}
+Below we prove that this ``dual'' GSW scheme provides semantic
+security not only when the matrix $A$ is random, but even when it is
+partially adevrsarial.
+In our setting, the public matrix~$A$ will be constructed in the first
+round of the protocol. Namely, every party broadcasts one message, and
+then everyone locally computes the (same) matrix~$A$ from all these
+broadcast messages. Below we formulate the security property that we
+need in terms of a generic one-round protocol $\Pi_{\sf{GenSetup}}$ for
+choosing~$A$, and then describe a specific protocol that realizes
+this security property under LWE. 
+
+\def\rA{{\sf r}\!{\cal A}}
+
+%---------------------------------------------------------------------
+\paragraph{Interactive LWE.}
+Fix the number of parties~$N$, LWE parameters $n,m,w,q$ and error
+distributions~$\chi,\chi'$.
+Let $\Pi_{\sf{GenSetup}}=(\setupOne,\setupTwo)$ be an $N$-party,
+one-broadcast-round protocol with no inputs. Namely, first each
+party~$i$ computes a message $\alpha_i\gets\setupOne(n,m,w,q,N)$
+(where $\setupOne$ is a randomized procedure), and broadcasts it to
+everyone. Upon receipt of all the boradcast messages $\alpha_i$, each
+party computes a matrix $A\gets \setupTwo(\alpha_1,\ldots,\alpha_N)
+\in \ZZ_q^{(n-1)\times m}$ (where $\setupTwo$ is deterministic). Since
+all the parties see the same $\alpha_i$'s and $\setupTwo$ is
+deterministic, then they all output the same matrix~$A$.
+
+Consider now the experiment of executing the protocol
+$\Pi_{\sf{GenSetup}}$ in the presence of a rushing adversary $\rA$
+that controls all the parties but one, and then using the resulting
+$A$ in the dual GSW scheme. Specifically, consider the following
+experiment:
+
+%\anti{should we say wlog 1 party is honest?}
+%\shai{Here it really is wlog. We can say it I guess
+%      (but it's really obvious so not sure we need to).}
+
+
+%\fbox{text}
+%\framebox[width][pos]{text}
+%\begin{tabular}{ll}
+%  \multicolumn{2}{l}{Bla blah blah}\\
+%  Blah & Blah
+%\end{tabular}
+
+
+\smallskip\noindent
+\underline{\textbf{Experiment
+    $\mathsf{ILWE}(\rA)$:}}
+\vspace{-1ex}
+\begin{itemize}
+\item
+  The adversary chooses one party $i\in [N]$;
+\item
+  Party $P_i$ computes $\alpha_i\gets\setupOne(n,m,w,q,N)$;
+\item
+  The adversary sets all the other messages
+  $\{\alpha_j\}_{j\ne i}\gets \rA(\alpha_i)$;
+\item
+  $P_i$ computes
+  $A\gets\setupTwo(\alpha_1,\ldots,\alpha_N)\in\ZZ_q^{(m-1)\times n}$,
+  then chooses a short secret key $s_i\gets\chi^{m-1}$ and sets
+  $b_i=s_iA \bmod q\in\ZZ_q^n$.
+%  and $B_i=\left(\begin{array}{c}A\\-b_i\end{array}\right)$
+
+  $P_i$ also chooses a random bit $\sigma\in\bit$ and proceeds as
+  follows:
+  \begin{itemize}
+  \item If $\sigma=0$ it chooses a uniform random matrix
+  $U\in\ZZ_q^{(m-1)\times w}$ and a uniform vector $v\in\ZZ_q^w$
+
+  \item If $\sigma=1$ then $P_i$ chooses also encryption randomness
+    $R\in\ZZ_q^{n\times w}$, $\hat{E}\gets\chi^{(m-1)\times w}$ and
+    $e'\gets{\chi'}^w$, and sets $U = A\times R + \hat{E} \bmod{q}$
+    and $v = b_i\times R + e' \bmod{q}$.
+  \end{itemize}
+  In either case, $P_i$ sends to the adversary the tripe $(b_i,U,v)$.
+\item
+  The adversary outputs a guess $\sigma'$ for the value of the
+  bit~$\sigma$.
+\end{itemize}
+We write $(\sigma,\sigma')\gets \mathsf{ILWE}(\rA)$ to denote a run
+of this experiment where $P_i$ chooses $\sigma$ and the adversary
+outputs~$\sigma'$.
+
+\begin{definition}[Interactive-LWE]\label{def:iLWE}
+  A protocol $\Pi$ is said to be ILWE-hard (relative to the parameters
+  $n,m,w,q,\chi,\chi'$ and~$N$) if for any $\ppt$ adversary $\rA$ we have
+  \[
+  \Pr[\sigma=\sigma' : (\sigma,\sigma')\gets
+    \mathsf{ILWE}(\rA)] \le 1/2 + \mbox{negligible}(n).
+  \]
+  $\Pi$ is sub-exponential ILWE-hard if the same holds even for
+  adversaries running in time $2^{n^\epsilon}$, for some constant
+  $\epsilon>0$.
+%The (sub-exponential) ILWE assumption postulates the existence of a
+%one-round protocol $\Pi_{\sf{GenSetup}}=(\setupOne,\setupTwo)$ that
+%offers (sub-exponential) ILWE hardness.
+\end{definition}
+
+%---------------------------------------------------------------------
+\def\piconc{\Pi_{\mathrm concat}}
+\subsubsection{An ILWE-Hard Protocol Under LWE} \label{sec:ILWE-Prot}
+Our ILWE-hard protocol is very simple: Setting $n=N\cdot n'$ for
+security parameter~$n'$, we let each party~$i$ choose its own
+$(m-1)\times n'$ matrix $A_i$, then concatenate all these matrices to
+get $A=(A_1|A_2|\ldots|A_N)\in\ZZ_q^{(m-1)\times n}$. Denote this
+simple protocol $\piconc$, then we have:
+\begin{theorem}\label{thm:ilwe}
+  The protocol $\piconc$ is ILWE hard under the LWE hardness
+  assumption with parameters $n',w,q$ and error~$\chi$. Similarly, it
+  is sub-exponential ILWE-hard under the sub-exponential LWE hardness
+  assumption.
+\end{theorem}
+\begin{proof}(sketch)
+Proving indistinguishability of the cases $\sigma=0,\sigma=1$, goes
+through a few hybrid games:
+\begin{description}
+\item[Game $H_0$.] The first game is the case $\sigma=1$, where we set
+  $b_i=s_iA$, $U = AR + \hat{E}$, and $v = b_iR+e'$ (all modulo~$q$).
+
+\item[Game $H_1$.] In the second game we compute $v=s_iU + e'$ instead
+  of $v = b_iR+e'$.
+
+  By our choise of error distributions $\chi,\chi'$, we have that
+  $s_iU + e'=s_i(AR+\hat{E})+e'$ is statistically close to
+  $b_i R + e' = s_i A R + e'$ (since $s_i\hat{E} + e'$ is statistcally
+  close to $e'$). Hence the adversary's views in the games $H_0,H_1$
+  are statistically close.
+
+\item[Game $H_2$.] Next, observe that no matter what the adversary
+  does with its parts of the matrix $A$, the resulting $U=AR+\hat{E}$
+  is pseudo-random. This is because if we let $R_j$ be the $j$'th
+  block of $n'$ rows in $R$ then
+  \[
+  U = \sum_{j\ne i} A_j R_j + (A_i R_i + \hat{E}).
+  \]
+  and $(A_i R_i + \hat{E})$ is pseudorandom by LWE and independent of
+  $\sum_{j\ne i} A_j R_j$.
+
+  In game $H_2$ we therefore replace the choise $U = AR + \hat{E}$ by
+  a uniformly random $U\in\ZZ_q^{(m-1)\times w}$, and by the above
+  $H_2$ is indistinguishable from $H_1$ under LWE.
+  
+\item[Game $H_3$.] We replace $v=s_iU+e'$ by a uniform $v\in\ZZ_q^w$,
+  thus getting the case $\sigma=0$.
+
+  We note that $s_i$ has a lot of min-entropy left even given
+  $b_i=s_iA$, since $b_i$ leaks at most $n \log q$ bits about $s_i$
+  (and we set $m$ much larger than that). By leakage-resilience
+  of LWE \cite{GKPV10}, the vector $s_i U+ e'$ is pseudorandom when
+  $U$ is random and $s_i$ has sufficient min-entropy.%
+\footnote{Note that the instance $v=s_iU+e'$ is revealed only after
+    the matrix~$A$ (and hence the leakage function on~$s_i$) is set,
+    so we do not need to deal with ``after-the-fact'' leakage.}
+  \end{description}
+\end{proof}
+
+
+\subsection{A 3-Round Semi-Malicious Multiparty Computation Protocol}
+
+\shai{Here we need to put a short section about the 3-round semi-malicious
+protocol}

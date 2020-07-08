@@ -1,0 +1,631 @@
+% !TEX root =../main-optimal.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Preliminaries}\label{sec:prelim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\paragraph{Notation.}
+We denote the security parameter by $\kappa$. A function
+$\mu:\NN\rightarrow\NN$ is {\em negligible} if for every positive
+polynomial $p(\cdot)$ and all sufficiently large $\kappa$'s it holds
+that $\mu(\kappa)<\frac{1}{p(\kappa)}$. We use the abbreviation
+\ppt\ to denote probabilistic polynomial-time.  We often use $[n]$ to
+denote the set $\{1,...,n\}$. $d \leftarrow \dist$ denotes the process
+sampling $d$ from the distribution $\dist$ or, if $\dist$ is a set, a
+uniform choice from it. If $\dist_1$ and $\dist_2$ are two
+distributions, then $\dist_1 \statind \dist_2$ denotes that they are
+statistically close, $\dist_1\compind\dist_2$ denots computationally
+indistinguishability, and $ \dist_1 \idind \dist_2$ denotes identical
+distributions. For a protocol $\Pi$ between two parties $P_i$ and $P_j$ denote by $({\sf{p_1}}^{i,j},\ldots, {\sf{p_t}}^{i,j})$ the view of the messages in all $t$ rounds where the subscripts $({i,j})$ denote that the \emph{first} message of the protocol is sent by $P_i$ to $P_j$. Likewise, subscripts $({j,i})$ denote that the \emph{first} message of the protocol is sent by $P_j$ to $P_i$.
+
+
+\iffalse
+  \paragraph{Two-party computation.}
+  A two-party protocol problem is cast by specifying a random process
+  that maps pairs of inputs to pairs of outputs (one for each party). We
+  refer to such a process as a functionality and denote it $F : \bit^*
+  \times \bit^*\rightarrow\bit^* \times \bit^*$ where $F = (F_1,
+  F_2)$. That is, for every pair of inputs $(x, y)$, the output-pair is
+  a random variable $(F_1(x, y), F_2(x, y))$ ranging over pairs of
+  strings. The first party (with input $x$) wishes to obtain $F_1(x, y)$
+  and the second party (with input $y$) wishes to obtain $F_2(x,
+  y)$. The aim of a secure two-party protocol is to protect an honest
+  party against dishonest behavior by the other party. In this paper, we
+  consider malicious static adversaries who may arbitrarily deviate from
+  the specified protocol. Moreover, the parties in the protocols have
+  access to a secure broadcast channel in which all parties can
+  simultaneously broadcast messages over the channel at the same
+  communication round. Moreover, we assume an asynchronous
+  network%
+  \footnote{The fact that the network is asynchronous means that
+    the messages are not necessarily delivered in the order which they
+    are sent.}
+  where the communication is open (i.e. all the
+  communication between the parties is seen by the adversary) and
+  delivery of messages is not guaranteed. For simplicity, we assume that
+  the delivered messages are authenticated. This can be achieved using
+  standard methods. The above naturally extends to the multi-party
+  computation setting. 
+
+  \paragraph{Security of protocols (informal).}
+  The security of a protocol is analyzed by comparing what an
+  adversary can do in the protocol to what it can do in an ideal
+  scenario that is secure by definition.  This is formalized by
+  considering an ideal computation involving an incorruptible trusted
+  third party to whom the parties send their inputs. The trusted party
+  computes the functionality on the inputs and returns to each party its
+  respective output. Loosely speaking, a protocol is secure if any
+  adversary interacting in the real protocol (where no trusted third
+  party exists) can do no more harm than if it was involved in the
+  above-described ideal computation.
+\fi
+\iffalse %%%May be good for intro
+  For the case of two parties, a simultaneous message exchange channel
+  is equivalent to two point-to-point channels in reverse directions
+  with {\em simultaneous} message delivery. We now present a protocol
+  for two party computation. In fact, we present our protocol as a
+  compiler: given an appropriate non-malleable commitment protocol of
+  $\rnm$ rounds, we obtain a protocol for general two party computation
+  in $r_{\mathsf{2pc}}$ {\em simultaneous message exchange rounds} where
+  $r_\mathsf{2pc}:=\max (4, \rnm+1)$. That is, in each simultaneous
+  message exchange round, both parties will simultaneously send
+  messages, and when their messages have been delivered, the next round
+  shall begin. Recall that, we will consider {\em rushing} adversaries
+  in the proof of security where the adversary, in any given round, can
+  wait for the honest parties' messages before sending his own message.
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multi-Key FHE}\label{sec:mkeyFHE}
+An encryption scheme is multi-key homomorphic if it can evaluate
+circuits on ciphertexts encrypted under different public keys. To
+decrypt an evaluated ciphertext, the algorithm uses the secret keys of
+all parties whose ciphertexts took part in the computation. 
+In more detail, a multi-key homomorphic encryption scheme
+consists of five procedures,
+$\MFHE = (\Setup, \Keygen,\Encrypt,\Decrypt,\Evall)$:
+\begin{itemize}
+\item {\bf Setup $\params \leftarrow \Setup(1^\kappa)$:}
+  On input the security parameter $\kappa$ %and the circuit depth $d$
+  the setup algorithm outputs the system parameters $\params$. 
+\item {\bf Key Generation $(\pk, \sk) \leftarrow \Keygen(\params)$:}
+  On input $\params$ the key generation algorithm outputs a
+  public/secret key pair $(\pk,\sk)$.
+\item {\bf Encryption $ c \leftarrow \Encrypt(pk,\mu)$:}
+  On input $pk$ and a plaintext message $x\in \bit^*$ output a
+  ``fresh ciphertext'' $c$.
+  (We assume for convenience that the ciphertext includes in
+  it also the respective public key.)
+\item {\bf Evaluation $\hc:= \Evall(\params; \cC; (c_1,\ldots, c_\ell))$:}
+  On input a (description of a) Boolean circuit $\cC$ %of depth $\leq d$
+  and a sequence of $\ell$ fresh ciphertexts $(c_1,\ldots,c_\ell)$,
+  output an ``evaluated ciphertext'' $\hc$.
+  (Here we assume that the evaluated ciphertext includes also all
+  the public keys from the $c_i$'s.)
+\item {\bf Decryption $x := \Decrypt((\sk_1,\ldots, \sk_N), \hc)$:}
+  On input an evaluated ciphertext $c$ (with $N$ public keys) and a
+  the corresponding $N$ secret keys $(\sk_1,\ldots,\sk_N)$, output
+  the message $x\in \bit^*$.
+\end{itemize}
+
+The scheme is correct if for every circuit $\cC$ on $N$ inputs and any input sequence $x_1,\ldots,x_N$ for~$\cC$, if we set $\params \leftarrow \Setup(1^\kappa)$ and then generate $N$ key-pairs and $N$ ciphertexts $(\pk_i,\sk_i) \leftarrow \Keygen(\params)$ and $c_i \leftarrow \Encrypt(pk_i,x_i)$, then we get
+\[
+\Decrypt\big((\sk_1,\ldots, \sk_N), \Evall(\params; \cC; (c_1,\ldots,c_N))
+\big)
+= \cC(x_1,\ldots, x_N)]
+\]
+except with negligible probability (in $\kappa$) taken over the randomness of all these algorithms.
+We typically consider a slightly weaker notion of homomorphism, where the \textbf{Setup} algorithm gets also a depth-bound $d$ and correctness is then defined only relative to circuits of depth upto~$d$.
+
+\iffalse
+  \begin{definition}[Homomorphism and Compactness]
+  Let $N = N_\kappa$ be any polynomial number of keys (in the security
+  parameter) and let $\cC = \cC_\kappa$ be a sequence of $N$-input
+  circuits of depth $\le d$. Set params $\Setup(1^\kappa,1^d)$ and
+  consider any sequences of $N$ correctly generated key pairs
+  $\{(\pk_i,\sk_i)\leftarrow \Keygen(\params)\}_{i\in[N]}$. Let
+  $\{c_i\leftarrow\Encrypt(pk_{I_i},\mu_i)\}_{i \in [N]}$, then it
+  holds that: 
+  \begin{equation*}
+  \begin{split}
+  Pr [\Decrypt((\sk_1,\ldots, \sk_N), \Evall(\params; \cC;
+    (c_1,\ldots,c_N)))~&\\~~~~~~~~~~~~~~\neq \cC(\mu_1,\ldots,
+    \mu_N)]= negl(\kappa)
+  \end{split}
+  \end{equation*} 
+
+
+  There exists a polynomial  $p= p(\kappa,d,N)$ such that the output
+  length of $\Evall$ is at most $p$ bits long regardless of the
+  evaluated circuit $\cC$ and $\ell$.
+  \end{definition}
+\fi
+\iffalse
+  \begin{definition}[IND-CPA security]
+    A scheme $\MFHE$ is IND-CPA secure if for any polynomial
+    $d=d(\kappa)$ and any $\ppt$ adversary $\cA$ it holds that:
+  \begin{equation*} %\mathsf{Adv}^{\CPA}_{\MFHE}[\kappa] := 
+  \begin{split}
+  |Pr[\cA(\params, \pk, \Encrypt(\pk,0)) =1]~&\\
+   - Pr[\cA(\params, \pk,\Encrypt(~&\pk,1)) =1]|=negl(\kappa),
+  \end{split}
+  \end{equation*}
+  where $\params \leftarrow \Setup(1^\kappa,1^d)$ and
+  $(\pk,\sk)\leftarrow \Keygen(\params)$.
+  \end{definition}  
+\fi
+
+\medskip\noindent\textbf{Local decryption.}
+A special property of the multi-key FHE schemes from \cite{C:CleMcg15,EC:MukWic16} that we need, is that the decryption procedure consists of a ``local'' partial-decryption procedure $ev_i\gets\PartDec(\hc,\sk_i)$ that only takes one of the secret keys and outputs a partial decryption share, and a public combination procedure $\mu \leftarrow \FinDec(ev_1,\ldots, ev_N, \hc)$ that takes these partial shares and outputs the plaintext.
+
+\medskip\noindent\textbf{Simulated decryption shares.}
+Another property of the schemes from \cite{C:CleMcg15,EC:MukWic16} that we need is the ability to simulate the decryption shares. Specifically, there exists a $\ppt$ simulator $\cS^T$, that gets for input:\\
+~-- the evaluated ciphertext~$\hc$,\\
+~-- the output plaintext $x:= \Decrypt((\sk_1,\ldots, \sk_N), \hc)$,\\
+~-- a subset $I \subset [N]$, and all secret keys \emph{except the one for~$I$}, $\{\sk_j\}_{j\in[N]\setminus I}$.\\
+The simulator produces as output simulated partial evaluation decryption shares:
+$\{\widetilde{ev_i}\}_{i\in I}\leftarrow \cS^{T}(x, \hc,I,\{\sk_j\}_{j\in[N]\setminus I}).$
+We need the simulated share be indistinguishable from the shares produced by the local partial decryption procedures using the keys $\{sk_i\}_{i\in I}$ (even to a distinguisher that sees all the inputs of $\cS^T$). We say that a scheme is \emph{simulatable} if it has local decryption and a simulator as described here.
+
+\medskip\noindent\textbf{Security of multikey FHE.}
+Security is defined as the usual notion of semantic security, but for
+our purposes we need a special variant of this notion, since we will
+be using a partially adversarial setup, see \secref{ILWE}.
+
+\anti{why did we delete the definition of the LWE assumption? }
+\shai{We don't need it, but can explain it briefly using words.}
+\subsubsection{The LWE-Based Multi-Key FHE That We Use}\label{MFHE}
+For our protocol we use the multi-key FHE scheme from \cite{C:CleMcg15,EC:MukWic16}, which has essentially the same key generation and encryption procedures as the GSW FHE scheme \cite{C:GenSahWat13}, and whose security is based on LWE.
+\iffalse
+  The $\LWE$ problem was introduced by Regev \cite{Reg09}, here we
+  recall the definition of the \emph{decisional} version of $\LWE$.
+  \begin{definition}[LWE \cite{Reg09}] Let $\kappa$ be the security
+  parameter, $n = n(\kappa), q = q(\kappa)$ be integers and let
+  $\chi=\chi (\kappa)$, be distributions over $\ZZ$. The
+  $\LWE_{n,q,\chi}$ assumption says that for any polynomial $m = m(\kappa)$,
+  $(A, sA + e) \compind  (A, z), $ where $A \leftarrow  \ZZ^{n\times
+      m}_q$, $ s    \leftarrow \ZZ^n_q, e  \leftarrow \chi^m$ and $z
+    \leftarrow  \ZZ^m_q$.
+  \label{def:LWE}
+  \end{definition}
+\paragraph{The GSW FHE scheme and its multi-key variant.}
+\fi
+Recall that the LWE problem is parametrized by integers $n,m,q$ (with $m>n\log q$) and a a distributions $\chi$ over $\ZZ$ that produces whp integers much smaller than~$q$. The LWE assumption says that given a random matrix $A\in\ZZ_q^{n\times m}$, the distribution $sA+e$ with random $s\in\ZZ_q^n$ and $e\gets\chi^m$ is indistinguishable from uinform in $\ZZ_q^m$.
+
+In the GSW scheme, the public is a matrix $B\in\ZZ_q^{n\times m}$, and the corresponding secret key is a vector $t\in\ZZ_q^n$ with the last entry~1, such that $tB\bmod q$ is a low-norm $m$-vector.
+In more detail, a key pair is generated by selecting a random matrix $A \in\ZZ^{(n-1)\times m}$, a random vector $s \in \ZZ_q^{n-1}$, and a short vector $e\in \ZZ_q^{m}$, then setting $t=(s,1)$ and $B = \left(\begin{array}{c}A\\e-sA\end{array}\right)$, all modulo~$q$.
+The multi-key scheme from \cite{C:CleMcg15,EC:MukWic16} uses the same key-generation and encryption procedures of GSW, except that all users share the same $(n-1)$-by-$m$ random matrix~$A$.
+
+To encrypt a bit $\mu$, set $C = B R + \mu G$ where $R\in\bit^{m\times m}$ is a random bit-matrix and $G$ is some fixed ``gadget matrix'' (whose structure is not important for us here).
+Note that the bottom row in $B$ is ``close'' to the row space of the top $n-1$ rows, a property that is very unlikely to hold in a uniform random $B\in\ZZ_q^{n\times m}$.
+Nonetheless, the GSW public keys are \emph{pseudo-random} under LWE. Moreover the encryption procedure of GSW has the property that if it is used with a truly random ``public key matrix'' $B$, then the resulting ``ciphertext'' $C=BR+\mu G$ is nearly random and independent of the message $\mu$ (due to the leftover hash lemma). Together with the pseudo-randomness of the key, this implies that ciphertexts in these schemes are pseudo-random, and in particular that the scheme is semantically secure.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Our Interactive Setup Procedure and Hardness Assumption}
+\label{sec:ILWE}
+In our setting, the public matrix~$A$ will be constructed as part of the protocol, so the adversary may be able to influence it. We insist on constructing $A$ using a one-round protocol, in which every party broadcasts one message and then everyone locally computes the (same) matrix~$A$ from all these broadcast messages.
+
+Since the matrix $A$ depends also on messages sent by the adversary, we can no longer base the security of the resulting scheme on LWE, but rather must use a special-purpose assumption to argue that the scheme still provide semantic security even with this partially adversarial matrix~$A$.
+
+Our assumption postulates the existence of such a one-round protocol for which the resulting ``GSW scheme'' enjoys semantic security. Specifically, we assume that for a matrix $A$ which is generated by this one-round protocol we have $(A,b, U, v)\indist(A,b, AR,bR)$ (where $U,v$ are uniform, $b=SA+e$ with $s,e$, and $R$ the randomness used in the GSW key-generation and encryption).
+
+Below we first state this assumption for a generic one-round protocol $\Pi_{\sf{GenSetup}}$, and then discuss concrete candidate realizations of $\Pi_{\sf{GenSetup}}$ for which this assumption seems plausible. We call this assumption \emph{Interactive-LWE}.
+
+%---------------------------------------------------------------------
+\paragraph{The Interactive-LWE assumption.}
+Fix the number of parties~$N$ and the LWE integer parameters $n,m,q$ and error distribution~$\chi$ (depending on the security parameter). Let $\Pi_{\sf{GenSetup}}=(\setupOne,\setupTwo)$ be an $N$-party, one-broadcast-round protocol with no inputs. Namely, first each party~$i$ computes a message $\alpha_i\gets\setupOne(n,m,q,N)$ (where $\setupOne$ is a randomized procedure), and broadcasts it to everyone. Upon receipt of all the boradcast messages $\alpha_i$, each party computes a matrix $A\gets \setupTwo(\alpha_1,\ldots,\alpha_N) \in \ZZ_q^{(n-1)\times m}$ (where $\setupTwo$ is deterministic). Since all the parties see the same $\alpha_i$'s and $\setupTwo$ is deterministic, then they all output the same matrix~$A$.
+
+\def\rA{{\sf r}\!{\cal A}}
+Consider now the experiment of executing the protocol~$\Pi_{\sf{GenSetup}}$ in the presence of a rushing adversary $\rA$ that controls all the parties but one, and then using the resulting $A$ in the GSW scheme. Specifically, consider the following experiment:
+\anti{should we say wlog 1 party is honest?}
+\shai{Here it really is wlog. We can say it I guess (but it's really obvious so not sure we need to).}
+
+\smallskip\noindent
+\underline{\textbf{Experiment $\mathsf{ILWE}_{\Pi[n,m,q,N,\chi]}(\rA)$:}}
+\vspace{-1ex}
+\begin{itemize}
+\item
+  The adversary chooses one party $i\in [N]$;
+\item
+  Party $P_i$ computes $\alpha_i\gets\setupOne(n,m,q,N)$;
+\item
+  The adversary sets all the other messages $\{\alpha_j\}_{j\ne i}\gets \rA(\alpha_i)$;
+\item
+  $P_i$ computes $A\gets \setupTwo(\alpha_1,\ldots,\alpha_N)$, then chooses a secret key $s\in \ZZ_q^{n-1}$ and a short vector $e\gets\chi$ and computes $b=sA+e\bmod{q}$.
+
+  $P_i$ also chooses a random bit $\sigma\in\bit$ and proceeds as follows:
+  \begin{itemize}
+  \item If $\sigma=0$ it chooses a uniform random matrix $U\in\ZZ_q^{m\times n}$ and a uniform random vector $v\in\ZZ_q^m$.
+
+  \item If $\sigma=1$ then $P_i$ chooses also encryption randomness $R\in\bit^{m\times m}$, and sets $U = A\times R \bmod{q}$ and $v=b\times R \pmod{q}$.
+  \end{itemize}
+  In either case, $P_i$ sends to the adversary the triple $(b,U,v)$ 
+\item
+  The adversary outputs a guess $\sigma'$ for the value of the bit~$\sigma$.
+\end{itemize}
+We write $(\sigma,\sigma')\gets \mathsf{ILWE}_{\Pi[n,m,q,N]}(\rA)$ to denote a run of this experiment where $P_i$ chooses $\sigma$ and the adversary outputs~$\sigma'$.
+
+\begin{definition}[Interactive-LWE]\label{def:iLWE}
+  A protocol $\Pi$ is said to be ILWE-hard (relative to the parameters $n,m,q,\chi$ and~$N$) if for any $\ppt$ adversary $\rA$ we have
+  \[
+  \Pr[\sigma=\sigma' : (\sigma,\sigma')\gets \mathsf{ILWE}_{\Pi[n,m,q,N]}(\rA)]
+  \le 1/2 + \mu(n)
+  \]
+  $\Pi$ is sub-exponential ILWE-hard if the same holds even for adversaries running in time $2^{n^\epsilon}$, for some constant $\epsilon>0$.
+
+The (sub-exponential) ILWE assumption postulates the existence of a one-round protocol $\Pi_{\sf{GenSetup}}=(\setupOne,\setupTwo)$ that offers (sub-exponential) ILWE hardness.
+\end{definition}
+
+%---------------------------------------------------------------------
+\subsubsection{A Candidate ILWE-Hard Protocol}
+Do ILWE-hard protocols exist? Heuristically, the answer seems to be positive (under standard LWE hardness). For example it is easy to come up with a protocol $\Pi$ which is ILWE-hard in the random-oracle model under standard LWE: the parties send nothing at all in the first round, and the matrix~$A$ is derived using the random oracle.
+
+Without a random oracle, one could hope that letting each party choose a sufficiently high-entropy sub-matrix of~$A$ would result in a good overall $A$, using the leakage-resilience of LWE. This direction seems to fail because the adversary is rushing: Even if for any fixed choice by the adversary the matrix $A$ will indeed be LWE hard whp over the choice of the honest party, in our case we must account for the ability of the adversary to make its choice \emph{after} it already sees the choice of the honest party.
+
+One could also attempt to let each party send a short random string and derive the matrix $A$ from all these strings in a pseudorandom fashion, then try to argue about the limited influence that the adversary has on the resulting matrix~$A$. Unfortunately we were not able to come up with any such construction that would be provably secure (under any assumption).
+
+Instead, below we consider much simpler protocols, where different parties directly choose different parts of the matrix~$A$, and we try to reason about their ILWE-hardness. To build some intuition we begin from a few protocols that do not work and describe attacks against them, and then we move to describe a candidate instantiation for which we do not see any attacks.
+
+%----------------------------------------------------------------
+\paragraph{Failed attempt \#1, parties choose different columns.}
+Consider a protocol in which each party $P_i$ is choosing a random $n\times m'$ matrix $A_i$ and the matrix $A\in \ZZ_q^{n\times m'N}$ is just the column-concatenation of all the $A_i$'s, $A=(A_1|A_2|\ldots|A_N)$.
+
+An easy attack is for the adversary (who controls $P_N$ without loss of generality) to set its matrix as $A_N=G$ where $G$ is the GSW ``gadget matrix''. That gadget matrix has the property that given the vector $sG+e$ for a small error vector $e$, it is easy to find $e$ and $s$. Now, notice that the vector $sA+e$ that $P_N$ sends to $\rA$ has the form $(sA_1+e_1|sA_2+e_2|\ldots|sA_N+e_N)$, so in particular the adversary can set the portion $sA_N+e_N=sG+e_N$ to recover the secret key~$s$.
+
+%----------------------------------------------------------------
+\paragraph{Failed attempt \#2, parties choose different rows.}
+One way to avoid attacks as above is to ensure that for any fixed matrix that the adversary may put in ``its entries'', a random matrix by the honest user will make $sA+e$ pseudorandom.
+
+One way to ensure this is to let each party choose a random $n'\times m$ matrix $A_i$ and set $A\in\ZZ_q^{Nn'\times m}$ as the row-concatenation of the $A_i$'s, i.e., $A^T=(A_1^T|\ldots|A_N^T)$. It is now easy to prove that $sA+e$ is pseudorandom (under LWE), no matter what the adversary does. But this arrangement opens another avenue of attack: The adversary (still controlling $P_N$) set $A_N=A_1$, so the bottom few rows in $A$ are equal to the top few rows. Hence, also the bottom few rows in $AR$ are equal to the top few rows, which lets the adversary distinguish $AR$ from a uniform random~$U$.
+
+At this point one may hope that if we let the parties choose different diagonals then neither of the attacks above would apply, but this is not the case. Here too, an adversary controlling all but one party can force the matrix~$A$ to have many identical rows, which would mean that so does the matrix~$AR$. More generally, it seems that any arrangement where each party chooses a subset of the entries in~$A$ will let the adversary force~$A$ to be low rank (and hence also $AR$ will be of low rank).
+\anti{Does it worth to mention the variant of the attack where the secret $s$ is a matrix (short secret LWE assumption)? }\shai{No, why does it matter? This attack completely ignores $s$.}
+
+%----------------------------------------------------------------
+\paragraph{A simple plausible candidate, parties choose different bits.}
+Letting different parties choose different entries in $A$ does not seem to work, but we can instead let each party choose some \emph{bits} in each entry. For example, with $N$ parties we can set $q=2^{\kappa N}$, then let party~$P_1$ choose bits $0,N,2N,\ldots,N(\kappa-1)$ in each entry of~$A$, party $P_2$ choose bits $1,N+1,2N+1,\ldots,N(\kappa-1)+1$, etc.
+
+As far as we can see, the two lines of attacks from above do not apply to this candidate. On one hand, if the adversary's bits are fixed irrespective of the bits of the honest party, then each column of $A$ would have sufficient entropy to render $sA+e$ pseudorandom. On the other hand, the honest party controls enough bits in every row, so it seems hard for the adversary to cause $A$ have low rank.
+%\anti{do we need to makes the fact for the G more clear, I hope they do not confuse it with  failed attempt 1})
+
+%Another similar construction would put each party $P_i$ ``in charge'' of a prime $q_i$, where the $q_i$'s are different primes more or less of the same size whose product is roughly equal to $q$ (but $q$ itself could again be a power of two). Then each party $P_i$ would choose a random matrix $A_i\in\ZZ_{q_i}^{m\times n}$, and the matrix $A$ would be obtained as the Chinese-remaindering of the $A_i$'s, reduced modulo~$q$. Note that in this case the avdersary can cause the matrix to be congruent to the gadget matrix $G$ modulo all but one $q_i$, but 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Commitment Schemes}\label{sec:com}
+
+Commitment schemes allow a {\em committer} $C$ to commit itself to a value while keeping it (temporarily) secret from the {\em receiver} $R$. Later the commitment can be ``opened'', allowing the receiver to see the committed value and check that it is consistent with the earlier commitment.
+%(this property is called \emph{hiding}). Furthermore, in a later stage when the commitment is opened, it is guaranteed that the ``opening'' can yield only a single value determined in the committing phase (this property is called \emph{binding}).
+In this work, we consider commitment schemes with \emph{statistically binding}. This means that even an unbounded cheating committer cannot create a commitment that can be opened in two different ways. We also use \emph{tag-based} commitment, which means that in addition to the secret committed value there is also a public tag associated with the commitment. The notion of hiding that we use is \emph{adaptive-security} (due to Pandey et al. \cite{C:PanPasVai08}): it roughly means that the committed value relative to some tag is hidden, even in a world that the receiver has access to an oracle that breaks the commitment relative to any other tag.
+
+\BD[Adaptively-secure Commitment\protect\cite{C:PanPasVai08}]\label{def:com}
+A tag-based commitment scheme $(C,R)$ is statistically binding and adaptively hiding if it satisfies the following properties:
+\begin{description}
+\item[Statistical binding:] For any (computationally unbounded) cheating committer $C^*$ and auxiliary input $z$, it holds that the probability after the commitment stage that there exist two executions of the opening stage in which the receiver outputs two different values (other than $\perp$), is negligible.
+
+\item[Adaptive hiding:] For every cheating \ppt\ receiver $R^*$ and every tag value $\tagg$, it holds that the following ensembles are computationally indistinguishable.
+\BI
+\item $\{\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m_1,z)\}_{\kappa \in N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$
+
+\item $\{\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m_2,z)\}_{\kappa \in N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$
+\EI
+where $\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m,z)$ denotes the random variable describing the output of $R^*(\tagg)$ after receiving a commitment to $m$ relative to~$\tagg$ using $\Com$, while interacting with a commitment-breaking oracle $\calB_\tagg$.
+
+The oracle $\calB_\tagg$ gets as input an alleged view $v'$ and tag $\tagg'$. If $\tagg'\ne\tagg$ and $v'$ is a valid transcript of a commitment to some value~$m'$ relative to $\tagg'$, then $\calB_{\tagg}$ returns that value~$m'$. (If there is no such value, or if $\tagg=\tagg'$, then $\calB_\tagg'$ returns~$\perp$. If there is more than one possible value~$m'$ then $\calB_{\tagg'}$ returns an arbitrary one.)
+\end{description}
+\ED
+To set up some notations, for a two-message commitment we let $\com_1=\Com_{\tagg}(r)$ and $\com_2=\Com_{\tagg}(m;\com_1 ;r')$ denote the two messages of the protocol, the first depending only on the randomness of the receiver and the second depending on the message to be committed, the first-round message from the receiver, and the randomness of the sender.
+%The decommitment phase consists of the sender sending the decommitment information $\decom_m = (m, r_m)$ which contains the message $m$ together with the randomness $r_m$. This enables the receiver to verify whether $\decom_m$ is consistent with the transcript $\com_m$. If so, it outputs $m$; otherwise it outputs $\bot$. For simplicity of exposition, in the sequel, we will assume that random coins are an implicit input to the commitment functions, unless specified explicitly.
+
+Pandey et al. \cite{C:PanPasVai08} proved that adaptively secure commitments exist if adaptive PRGs exist. Note that adaptive security implies non-malleability (which is the ``intuitive nontion that we need''), but the other direction is not known. In our proof we rely heavily on adaptive security, we do not know if similar result can be proven based on any (two-round) non-malleable commitment.
+
+\iffalse
+  \paragraph{Non-Malleable Commitments.}\label{nmcomsec}
+  Let $\nmCom=\langle C,R\rangle$  be a $k$-round commitment protocol
+  where $C$ and $R$ represent (randomized) committer and receiver
+  algorithms, respectively.  Denote the messages exchanged by
+  $(\nm_1,\ldots,\nm_{\rnm})$ where $\nm_i$ denotes the view of the
+  message in the $i$-th round.
+
+  For some string $u\in\bit^\kappa$,  tag $\id\in\bit^t$, non-uniform
+  \ppt\ algorithm $M$ with ``advice'' string $z\in\{0,1\}^*$, and
+  security parameter $\kappa$, consider the following experiment: $M$ on
+  input $(1^\kappa,z)$, interacts with $C$ who commits to $u$ with tag
+  $\id$; simultaneously, $M$ interacts with
+  $R({1^\kappa,\,\widetilde{\id}})$ attempting to commit to a related
+  value $\widetilde{u}$, again using identity $\widetilde{\id}$ of its
+  choice ($M$'s interaction with $C$ is called the left interaction, and
+  its interaction with $R$ is called the right interaction); $M$
+  controls the scheduling of messages; the output of the experiment is
+  denoted by a random variable $\nmc^{M}_{\langle C,R\rangle}(u, z)$
+  that describes the view of $M$ in both interactions and the value
+  $\widetilde{u}$ which $M$ commits to $R$ in the right execution unless
+  $\widetilde{\id}=\id$ in which case $\widetilde{u}=\bot$, i.e., a
+  commitment where the adversary copies the identity of the left
+  interaction is considered invalid.
+
+
+
+  \BD[Tag-based non-malleable commitments]\label{def:tag-nmcom} A
+  commitment scheme $\nmCom=\langle C,R\rangle$ is said to be
+  non-malleable {\em with respect to commitments} if for every
+  non-uniform \ppt\ algorithm $M$ (man-in-the-middle), for every pair of
+  strings $(u^0, u^1)\in\bit^\kappa\times\bit^\kappa$, every tag-string
+  $\id \in\{0,1\}^{t}$, every $\kappa\in\NN$, every (advice) string
+  $z\in\{0,1\}^{*}$, the following two distributions are computationally
+  indistinguishable:
+  $$\nmc^{M}_{\langle C,R\rangle}(u^0, z)\indist\nmc^{M}_{\langle
+   C,R\rangle}(u^1, z)$$
+
+  %$$(v_0,\mathsf{view^0})\indist(v_1,\mathsf{view^1}).$$
+  \ED
+
+  \paragraph{Parallel Non-Malleable Commitments.} We consider a
+  strengthening of \nmcom\ in which $M$ can receive commitments to $m$
+  strings on the ``left'', say $(u_1,\ldots,u_m)$, with tags $(\id_1,
+  \ldots,\id_m)$ and makes $m$ commitments on the ``right'' with tags
+  $(\widetilde{\id}_1,\ldots,\widetilde{\id}_m)$. We assume that $m$
+  is a fixed, possibly a-priori bounded, polynomial in the security
+  parameter $\kappa$. In the following let $i\in[m],b\in\bit$:
+
+  We say that a \nmcom\ is an $m$-bounded parallel non-malleable
+  commitment if for every pair of sequences $\{u^b_i\}$ the random
+  variables $\nmc^{M}_{\langle C,R\rangle}(\{u^0_i\}, z)$ and
+  $\nmc^{M}_{\langle C,R\rangle}(\{u^1_i\}, z)$ are computationally
+  indistinguishable where $\nmc^{M}_{\langle C,R\rangle}(\{u_i^b\}, z)$
+  describes the view of $M$ and the values $\{\widetilde{u}_i^b\}$
+  committed by $M$ in the $m$ sessions on the right with tags
+  $\{\widetilde{\id}_i\}$ while receiving parallel commitments to
+  $\{u^b_i\}$ on left with tags $\{\id_i\}$.
+
+  \subsubsection{Adaptive One Way Functions}
+
+  An adaptively secure injective OWF is a family of functions where each
+  function $f_\tagg$ in the family is specified by an index $\tagg$ such
+  that  $f_{\tagg'}$ is hard to invert provided $f_{\tagg'}(x)$ for a
+  random $x$, even  given oracle access to an inverter for $f_{\tagg}$
+  for all $\tagg \neq \tagg'$.  \BD[Adaptive One-to-one One-way
+   Functions \cite{C:PanPasVai08}] A family of injective one-way
+  functions $F = \{f_\tagg: D_\tagg \rightarrow\bit^*
+  \}_{\tagg\in\bit^\kappa}$ is called adaptively secure if
+  \begin{description}
+  \item[Easy to sample and compute:] There is an efficient randomized
+   domain sampler $D$, which on input $\tagg \in \{0, 1\}^\kappa$,
+   outputs a random element in $D_\tagg$. There is a deterministic
+   polynomial algorithm $M$ such that for all $\tagg \in \{0,
+   1\}^\kappa$ and for all $x \in D_\tagg, M(\tagg, x) = f_\tagg(x)$.
+  \item [Adaptive One-wayness:] Let $O(\tagg, \cdot, \cdot)$ denote an
+   oracle that, on input $\tagg'$ and $y$ outputs $f^{-1}_{\tagg'}(y)$
+   if $\tagg' \neq \tagg, |\tagg' | = |\tagg|$ and $\bot$ otherwise.
+   The family $F$ is adaptively secure if, for any probabilistic
+   polynomial-time adversary $\cA$, there exists a negligible function
+   $\mu$ such that for all $\kappa$, and for all tags $\tagg \in \{0,
+   1\}^\kappa$ \end{description}
+  $$Pr[x \leftarrow D_\tagg : \cA^{O(\tagg,\cdot,\cdot)}(\tagg,
+   f_\tagg(x)) = x] \leq\mu(\kappa)$$ where the probability is over the
+  random choice of $x$ and the coin-tosses of $\cA$.
+  \ED
+
+  Candidate constructions of adaptive OWFs can be found in
+  \cite{C:PanPasVai08}.
+
+  \paragraph{Non-Malleable Commitment Robust w.r.t. $k$-round Protocols.}
+  Lin and Pass \cite{LinPass09} introduced the notion
+  of non-malleability w.r.t. arbitrary $k$-round protocols. Traditional
+  definitions of non-malleability consider a setting where a man-in-the
+  middle adversary is participating in two (or more) executions of the
+  \emph{same} protocol. However, non-malleability w.r.t. arbitrary
+  protocols considers a class of adversaries that can participate in a
+  left interaction of any arbitrary protocol. 
+
+
+  Consider a one-many man-in-the-middle adversary $M$ that participates
+  in one left interaction -- communicating with a machine $B$ --and one
+  right interaction-- acting as a committer using the commitment scheme
+  $\langle C,R\rangle$.  As in the standard definition of
+  non-malleability, $M$ can adaptively choose the identity in the right
+  interaction. We denote by $\nmc^{B,M}_{\langle C,R\rangle}(y, z)$ the
+  random variable consisting of the view of $M(z)$ in a
+  man-in-the-middle execution when communicating with $B(y)$ on the left
+  and an honest receiver on the right, combined with the value $M$
+  commits to on the right. Intuitively, we say that $\langle C,R\rangle$
+  is non-malleable w.r.t. $B$ if $\nmc^{B,M}_{\langle C,R\rangle}(y^1,
+  z)$ and $\nmc^{B,M}_{\langle C,R\rangle}(y^2, z)$ are
+  indistinguishable, whenever interactions with $B(y^1)$ and $B(y^2)$
+  cannot be distinguished.
+
+  \BD[Robust non-malleable commitments]\label{def:robust-nmcom} Let $B$
+  a probabilistic polynomial-time machine. A commitment scheme
+  $\nmCom=\langle C,R\rangle$ is said to be \emph{non-malleable
+    w.r.t. $B$}, if for every two sequences $\{y^1_\kappa\}_{\kappa\in
+    \NN}$ and $\{y^2_\kappa\}_{\kappa\in \NN}$ where
+  $y^1_\kappa,y^2_\kappa\in\bit^\kappa$, every $\kappa\in\NN$, every
+  (advice) string $z\in\{0,1\}^{*}$, the following two distributions are
+  computationally indistinguishable for all non-uniform \ppt\ algorithms
+  $\tilde M$:
+
+  $$\mathsf{view}_{\tilde M}[\langle B(y_\kappa^1),{\tilde
+      M}(z)\rangle(1^\kappa)]\indist\mathsf{view}_{\tilde M}[\langle
+    B(y_\kappa^2),{\tilde M}(z)\rangle(1^\kappa)].$$
+
+  where $\mathsf{view}_{\tilde M}[\langle B(y),M(z)\rangle(1^\kappa)]$
+  denotes the view of $\tilde M$ in interaction with $B$ on common input
+  $1^\kappa$, and private inputs $z$ and $y$ respectively, then it also
+  holds that  for every non-uniform \ppt\ man-in-the-middle adversary
+  $M$ the following two distributions are computationally
+  indistinguishable:
+  $$\nmc^{B,M}_{\langle C,R\rangle}(y^1_\kappa,
+  z)\indist\nmc^{B,M}_{\langle C,R\rangle}(y^2_\kappa, z)$$ \ED We say
+  that $\nmCom$ is non-malleable w.r.t. $k$-round protocols if  $\nmCom$
+  is non-malleable w.r.t. any machine $B$ that interacts with the
+  man-in-the-middle adversary in $k$ rounds. Any commitment scheme that
+  is ''extractable'' and has more than k ''rewinding slots'' is directly
+  one-many non-malleable w.r.t. $k$-round protocols \cite{LinPass09}. In
+  this work, we focus on non-malleability w.r.t 3-round protocols and in
+  particular......\anti{continue here with the concrete assumption we
+    need} }
+\fi
+  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\shai{Do we need to define witness relations? it's common knowldge}
+\iffalse
+  \subsection{Witness Relations}
+
+  We recall the definition of a witness relation for an NP language
+  \cite{Goldbook,STOC:LinPas11}.  \BD[Witness relation] A \emph{witness
+  relation} for a language $L \in \NP$ is a binary relation $R_L$ that
+  is polynomially bounded, polynomial time recognizable and
+  characterizes $L$ by $L = \{x: ~\exists~ y ~\text{s.t.} ~(x,y)\in
+  R_L\}$ \ED We say that $y$ is a witness for the membership $x \in L$
+  if  $(x,y)\in R_L$. We will also let $R_L(x)$ denote the set of
+  witnesses for the membership $x\in L$, i.e., $R_L(x)=\{y:(x,y)\in L\}$.
+  In the following, we assume a fixed witness relation $R_L$ for
+  each language $L \in \NP$.
+\fi
+
+\subsection{Interactive Proofs}
+Given a pair of interactive Turing
+machines, $P$ and $V$ , we denote by $\langle P(w), V \rangle(x)$ the random variable representing the (local) output
+of $V$, on common input $x$, when interacting with machine $P$ with private input $w$, when the random
+input to each machine is uniformly and independently chosen.
+
+\BD [Interactive Proof System] A pair of interactive machines $\langle P, V \rangle$ is called an \emph{interactive proof system} for a language $L$ if there is a negligible function $\mu(\cdot)$ such that the following two conditions hold:
+\BI
+\item Completeness: For every $x \in L$, and every $w\in R_L(x)$, $Pr [\langle P(w), V \rangle(x)= 1] = 1$. 
+\item  Soundness: For every $x \notin L$, and every interactive machine $P^*, Pr [\langle P^*, V \rangle(x) = 1] \leq\mu(\kappa)$
+\EI
+In case the soundness condition is required to hold only with respect to a computationally
+bounded prover, the pair $\langle P, V \rangle$ is called an interactive argument system.
+\ED
+
+\subsection{Zero-Knowledge}
+We recall the standard definition of ZK proofs. Loosely speaking, an interactive proof is said to be
+zero-knowledge (ZK) if a verifier $V$ learns nothing beyond the validity of the assertion being proved,
+it could not have generated on its own. As ``feasible''computation in general is defined though
+the notion of probabilistic polynomial-time, this notion is formalized by requiring that the output
+of every (possibly malicious) verifier interacting with the honest prover $P$ can be ``simulated" by
+a probabilistic expected polynomial-time machine $\cS$ (a.k.a. the simulator). The idea behind this
+definition is that whatever $V^*$ might have learned from interacting with $P$, he could have learned
+by himself by running the simulator $\cS$. 
+
+\BD [ZK]. Let $L$ be a language in $\NP$, $R_L$ a witness relation for $L$, $(P,V )$ an interactive
+proof (argument) system for $L$. We say that $(P, V )$ is \emph{statistical/computational ZK}, if for every
+probabilistic polynomial-time interactive machine $V$ there exists a probabilistic algorithm $\cS$ whose
+expected running-time is polynomial in the length of its first input, such that the following ensembles
+are statistically close/computationally indistinguishable over $L$.
+\BI
+\item $\{\langle P(y), V(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, y \in R_L(x), z\in\bit^*}$
+\item $\{\cS (x,z)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, y \in R_L(x), z\in\bit^*}$
+\EI
+
+where $\langle P(y), V(z) \rangle(x)$ denotes the view of $V$ in interaction with $P$ on common input $x$ and private
+inputs $y$ and $z$, respectively.
+
+\ED
+
+\subsection{Witness Indistinguishability}
+An interactive proof (or argument) is said to be witness indistinguishable (WI) if the verifier's
+output is ``computationally'' independent of the witness used by the prover for proving the statement.
+In this context, we focus on languages $L \in \NP$ with a corresponding witness relation $R_L$.
+Namely, we consider interactions in which, on common input $x$, the prover is given a witness in
+$R_L(x)$. By saying that the output is computationally independent of the witness, we mean that
+for any two possible $\NP$-witnesses that could be used by the prover to prove the statement $x \in L$,
+the corresponding outputs are computationally indistinguishable.
+
+\BD [Witness-indistinguishability]. Let $\langle P, V \rangle$ be an interactive proof (or argument) system for a language $L \in \NP$. We say that $\langle P, V \rangle$ is \emph{witness-indistinguishable} for $R_L$, if for every
+probabilistic polynomial-time interactive machine $V^*$ and for every two sequences $\{w^1_{\kappa,x}\}_{\kappa\in \NN,x\in L}$ and $\{w^2_{\kappa,x}\}_{\kappa\in \NN,x\in L}$, such that $w^1_{\kappa,x}, w^2_{\kappa,x}\in R_L(x)$ for every $x \in L\cap \bit^\kappa$, the following probability
+ensembles are computationally indistinguishable over $\kappa\in \NN$.
+\ED
+
+\BI
+\item $\{\langle P(w^1_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$
+\item $\{\langle P(w^2_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$
+\EI
+\subsection{Proofs (Arguments) of Knowledge}
+Loosely speaking, an interactive proof is a proof of knowledge if the prover convinces the verifier
+that it possesses, or can feasibly compute, a witness for the statement proved. The notion of a
+proof of knowledge is essentially formalized as follows: an interactive proof of $x \in L$ is a proof of
+knowledge if there exists a probabilistic expected polynomial-time extractor machine $E$, such that
+for any prover $P$, $E$ on input the description of $P$ and any statement $x \in L$ readily outputs a valid
+witness for $x \in L$ if $P$ succeeds in convincing the Verifier that $x \in L$. Formally,
+
+\BD[Proof of knowledge] Let $(P, V )$ be an interactive proof system for the language
+$L$. We say that $(P, V )$ is a proof of knowledge for the witness relation $R_L$ for the language $L$ it there
+exists an probabilistic expected polynomial-time machine $E$, called the extractor, and a negligible
+function $\mu(\cdot)$ such that for every machine $P^*$, every statement $x \in \bit^\kappa$, every random tape
+$x \in \bit^*$, and every auxiliary input $z \in \bit^*$,
+$$Pr [ \langle P^*_r(z), V \rangle(x) = 1]\leq Pr[E^{P^*_r(x,z)}(x) \in R_L(x)] + \mu(\kappa)$$
+\ED
+
+An interactive argument system $\langle P, V \rangle$ is an
+argument of knowledge if the above condition holds w.r.t.
+probabilistic polynomial-time provers.
+
+\iffalse
+  \paragraph{Special-sound WI proofs.} A $4$-round public-coin
+  interactive proof for the language $L \in \NP$ with witness relation
+  $R_L$ is special-sound with respect to $R_L$, if for any two
+  transcripts $(\delta,\alpha,\beta, \gamma)$ and
+  $(\delta',\alpha',\beta', \gamma')$ such that the initial two
+  messages, $(\delta,\delta')$ and $(\alpha,\alpha')$ are the same
+  but the challenges $(\beta,\beta')$ are different, there is a
+  deterministic procedure to extract the witness from the two
+  transcripts and runs in polynomial time.
+  %Special-sound WI proofs for languages in $\NP$ can be based on
+  %the existence of $2$-round commitment schemes, which in turn
+  %can be based on one-way functions. [GMW91, FS90, HILL99, Nao91].
+\fi
+
+\paragraph{Delayed-Input Witness Indistinguishability.}
+The notion of delayed-input Witness Indistinguishability formalizes security of the prover with respect to an adversarial
+verifier that adaptively chooses the input statement to the proof system in the last round. Once we
+consider such adaptive instance selection, we also need to specify where the
+witnesses come from; to make the definition as general as
+possible, we consider an arbitrary (potentially unbounded) \emph{witness selecting
+machine} that receives as input the views of all parties and outputs a witness $w$ for any statement
+$x$ requested by the adversary. In particular, this machine is a (randomized) Turing
+machine that runs in exponential time, and on input a
+statement $x$ and the current
+view of all parties, picks
+a witness $w \in R_L(x)$ as the private input of the prover.
+
+Let  $\langle P, V \rangle$ be a 3-round Witness Indistinguishable proof system for a language $L \in \NP$ with witness relation
+$R_L$.  Denote the messages exchanged by $(\WIPOKmsg_1, \WIPOKmsg_{2}, \WIPOKmsg_{3})$ where $\WIPOKmsg_i$ denotes the message in the $i$-th round.
+For a delayed-input $3$-round Witness Indistinguishable proof system, we
+consider the game ${\sf ExpAWI}$ between a challenger $\cC$ and an adversary $\cA$ in which the instance $x$ is chosen by $\cA$ after seeing the first message of the protocol played
+by the challenger. Then, the challenger receives as local input two witnesses $w_0$ and $w_1$ for $x$ chosen adaptively by
+a witness-selecting machine. The challenger then continues the game by randomly selecting one of the two
+witnesses and by computing the third message by running the prover's algorithm on input the
+instance $x$, the selected witness $w_b$ and the challenge received from the adversary in the second round. The adversary
+wins the game if he can guess which of the two witnesses was used by the challenger.
+
+
+\BD[Delayed-Input Witness Indistinguishability] \label{dWI}\label{def:dWI}
+Let ${\sf ExpAWI}_{\langle P, V \rangle}^\cA$ be a delayed-input WI experiment parameterized by a $\ppt$
+adversary $\cA$ and an delayed-input $3$-round Witness Indistinguishable proof system $\langle P, V \rangle$ for a language $L \in \NP$ with witness relation
+$R_L$. The experiment has as input the security parameter $\kappa$ and auxiliary information $aux$ for $\cA$. 
+The experiment ${\sf ExpAWI}$ proceeds as follows: 
+\BE
+\item[]${\sf ExpAWI}_{\langle P, V \rangle}^\cA(\kappa, aux)$:
+\BE
+\item[] {\bf Round-1:} The challenger $\cC$ randomly selects coin tosses $r$ and runs P on input $(1^\kappa; r)$ to obtain the first message $\WIPOKmsg_1$;
+\item[] {\bf Round-2:}  $\cA$ on input $\WIPOKmsg_1$ and $aux$ chooses an instance $x$ and a challenge $\WIPOKmsg_2$. The witness-selecting machine on inputs the statement $x$ and the current
+view of all parties outputs witnesses $w_0$ and $w_1$ such that
+$(x,w_0), (x,w_1) \in R_L$. $\cA$ outputs $x, w_0, w_1, \WIPOKmsg_2$ and internal state $\sf state$;
+\item[] {\bf Round-3:} $\cC$ randomly selects $b\leftarrow \bit$ and runs $P$ on input $(x,w_b, \WIPOKmsg_2)$ to obtain $\WIPOKmsg_3$;
+\item[] $b'  \leftarrow \cA((\WIPOKmsg_1, \WIPOKmsg_2, \WIPOKmsg_3), aux, \sf state)$; 
+\item[] If $b = b'$ then output $1$ else output $0$.
+\EE
+\EE
+ A $3$-round Witness Indistinguishable proof system for a language $L \in \NP$ with witness relation
+$R_L$ is \emph{delayed-input} if for any $\ppt$ adversary $\cA$ there exists a negligible function $\mu(\cdot)$ such that for any $aux \in\bit^*$ it holds that 
+ $$|Pr[{\sf ExpAWI}_{\langle P, V \rangle}^\cA(\kappa, aux)=1]-1/2|\leq \mu(\kappa) $$
+\ED
+
+The most recent $3$-round delayed-input WI proof system appeared in the work of \cite{C:COSV16}.
+
+\subsection{Feige-Shamir ZK Proof Systems}\label{fls} For our construction we use the $3$-round, public-coin, input-delayed witness-indistinguishable proof-of-knowledge $\Pi_\WIPOK$ based on the work of Feige, Lapidot, Shamir \cite{FLS99}, and the $4$-round zero-knowledge argument-of-knowledge protocol of Feige and Shamir $\Pi_\FLS$ \cite{STOC:FeiSha90}.
+%%[[NO, WE DON'T]]%%Somewhat similarly to Garg et al. \cite{EC:GMPP16}, we modify the Feige-Shamir protocol by replacing the one-way function used there by a non-malleable commitment protocol (and the value committed there is the ``trapdoor'' that is used by the zero-knowledge simulator).
+
+Recall that the Feige-Shamir protocol consists of two executions of a WIPOK protocol in reverse directions. The first execution has the verifier prove something about a secret that it chooses, and the second execution has the prover proving that either the input statement is true or the prover knows the verifier's secret. The zero-knowledge simulator then uses the knowledge extraction to extract the secret of the verifier, making it possible to complete the proof.
+%Importantly for us, the zero-knowledge simulator only rewinds the verifier's second message (which is the third message in the protocol).
+
+%%[[NO, WE DON'T]]%%In our setting, we have the verifier use the Pandey et al. \cite{C:PanPasVai08} commitment to commit to its secret, and in some of the hybrids we replace the use of the knowledge extractor by straight-line extraction from the commitment. This allows us to avoid rewinding in those hybrids.

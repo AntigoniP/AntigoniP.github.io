@@ -1,0 +1,10 @@
+% !TEX root =./main-optimal.tex
+\begin{abstract}
+
+In this work we show that any multi-party functionality can be computed securely in optimal four rounds in the plain model with security against a malicious adversary, matching the lower bount of Garg et al. (EUROCRYPT '16).
+ To obtain our four-round protocol, we assume the existence of adaptively secure commitments, introduced by Pandey et al. (CRYPTO '08), and also assume sub-exponential hardness of Learning-with-Errors (LWE). This can be compared to the results of Garg et al., who show six-round protocols based on LWE and adaptive commitments, and five-round protocols based on Indistinguishability Obfuscation and adaptive commitments.
+ 
+Our solution builds on the two-round protocol of Mukherjee-Wichs (EUROCRYPT '16) in the CRS model, by observing that this protocol does not seem to need the full power of the common-random string. Instead, we show that \emph{in a single round} we can get a weaker shared randomness, which is still good enough for a variant of the Mukherjee-Wichs protocol. This yields a three-round protocol which is secure against a semi-malicious adversary. Using strong commitment protocols and zero-knowledge proofs, we can compile it into a four round protocol, secure against a malicious adversary.
+%\anti{we should discuss the title}
+
+\end{abstract}

@@ -1,0 +1,284 @@
+% !TEX root =../main-optimal.tex
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Preliminiaries}\label{sec:prelim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Notation.}
+We denote the security parameter by $\kappa$. A function
+$\mu:\NN\rightarrow\NN$ is {\em negligible} if for every positive
+polynomial $p(\cdot)$ and all sufficiently large $\kappa$'s it holds
+that $\mu(\kappa)<\frac{1}{p(\kappa)}$. We use the abbreviation
+\ppt\ to denote probabilistic polynomial-time.  We often use $[n]$ to
+denote the set $\{1,...,n\}$. $d \leftarrow \dist$ denotes the process
+sampling $d$ from the distribution $\dist$ or, if $\dist$ is a set, a
+uniform choice from it. If $\dist_1$ and $\dist_2$ are two
+distributions, then $\dist_1 \statind \dist_2$ denotes that they are
+statistically close, $\dist_1\compind\dist_2$ denots computationally
+indistinguishability, and $ \dist_1 \idind \dist_2$ denotes identical
+distributions. For a protocol $\Pi$ between two parties $P_i$ and
+$P_j$ denote by $({\sf{p_1}}^{i,j},\ldots, {\sf{p_t}}^{i,j})$ the view
+of the messages in all $t$ rounds where the subscripts $({i,j})$
+denote that the \emph{first} message of the protocol is sent by $P_i$
+to $P_j$. Likewise, subscripts $({j,i})$ denote that the \emph{first}
+message of the protocol is sent by $P_j$ to $P_i$.
+
+
+\subsection{Commitment Schemes}\label{sec:com}
+Commitment schemes allow a {\em committer} $C$ to commit itself to a
+value while keeping it (temporarily) secret from the {\em receiver}
+$R$. Later the commitment can be ``opened'', allowing the receiver to
+see the committed value and check that it is consistent with the
+earlier commitment.
+%(this property is called \emph{hiding}). Furthermore, in a later stage when the commitment is opened, it is guaranteed that the ``opening'' can yield only a single value determined in the committing phase (this property is called \emph{binding}).
+In this work, we consider commitment schemes with \emph{statistically
+  binding}. This means that even an unbounded cheating committer
+cannot create a commitment that can be opened in two different
+ways. We also use \emph{tag-based} commitment, which means that in
+addition to the secret committed value there is also a public tag
+associated with the commitment. The notion of hiding that we use is
+\emph{adaptive-security} (due to Pandey et al. \cite{C:PanPasVai08}):
+it roughly means that the committed value relative to some tag is
+hidden, even in a world that the receiver has access to an oracle that
+breaks the commitment relative to any other tag.
+
+\BD[Adaptively-secure
+  Commitment\protect\cite{C:PanPasVai08}]\label{def:com} A tag-based
+commitment scheme $(C,R)$ is statistically binding and adaptively
+hiding if it satisfies the following properties:
+\begin{description}
+\item[Statistical binding:] For any (computationally unbounded)
+  cheating committer $C^*$ and auxiliary input $z$, it holds that the
+  probability after the commitment stage that there exist two
+  executions of the opening stage in which the receiver outputs two
+  different values (other than $\perp$), is negligible.
+
+\item[Adaptive hiding:] For every cheating \ppt\ receiver $R^*$ and
+  every tag value $\tagg$, it holds that the following ensembles are
+  computationally indistinguishable.  \BI
+\item $\{\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m_1,z)\}_{\kappa \in
+  N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$
+
+\item $\{\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m_2,z)\}_{\kappa \in
+  N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$ \EI where
+  $\view_{\Com}^{R^*(\tagg),\calB_\tagg}(m,z)$ denotes the random
+  variable describing the output of $R^*(\tagg)$ after receiving a
+  commitment to $m$ relative to~$\tagg$ using $\Com$, while
+  interacting with a commitment-breaking oracle $\calB_\tagg$.
+
+The oracle $\calB_\tagg$ gets as input an alleged view $v'$ and tag
+$\tagg'$. If $\tagg'\ne\tagg$ and $v'$ is a valid transcript of a
+commitment to some value~$m'$ relative to $\tagg'$, then
+$\calB_{\tagg}$ returns that value~$m'$. (If there is no such value,
+or if $\tagg=\tagg'$, then $\calB_\tagg'$ returns~$\perp$. If there is
+more than one possible value~$m'$ then $\calB_{\tagg'}$ returns an
+arbitrary one.)
+\end{description}
+\ED To set up some notations, for a two-message commitment we let
+$\com_1=\Com_{\tagg}(r)$ and $\com_2=\Com_{\tagg}(m;\com_1 ;r')$
+denote the two messages of the protocol, the first depending only on
+the randomness of the receiver and the second depending on the message
+to be committed, the first-round message from the receiver, and the
+randomness of the sender.
+%The decommitment phase consists of the sender sending the decommitment information $\decom_m = (m, r_m)$ which contains the message $m$ together with the randomness $r_m$. This enables the receiver to verify whether $\decom_m$ is consistent with the transcript $\com_m$. If so, it outputs $m$; otherwise it outputs $\bot$. For simplicity of exposition, in the sequel, we will assume that random coins are an implicit input to the commitment functions, unless specified explicitly.
+
+Pandey et al. \cite{C:PanPasVai08} proved that adaptively secure
+commitments exist if adaptive PRGs exist. Note that adaptive security
+implies non-malleability (which is the ``intuitive nontion that we
+need''), but the other direction is not known. In our proof we rely
+heavily on adaptive security, we do not know if similar result can be
+proven based on any (two-round) non-malleable commitment.
+
+
+\subsection{Interactive Proofs}
+Given a pair of interactive Turing machines, $P$ and $V$ , we denote
+by $\langle P(w), V \rangle(x)$ the random variable representing the
+(local) output of $V$, on common input $x$, when interacting with
+machine $P$ with private input $w$, when the random input to each
+machine is uniformly and independently chosen.
+
+\BD [Interactive Proof System] A pair of interactive machines $\langle
+P, V \rangle$ is called an \emph{interactive proof system} for a
+language $L$ if there is a negligible function $\mu(\cdot)$ such that
+the following two conditions hold: \BI
+\item Completeness: For every $x \in L$, and every $w\in R_L(x)$, $Pr
+  [\langle P(w), V \rangle(x)= 1] = 1$. 
+\item  Soundness: For every $x \notin L$, and every interactive
+  machine $P^*, Pr [\langle P^*, V \rangle(x) = 1] \leq\mu(\kappa)$
+  \EI In case the soundness condition is required to hold only with
+  respect to a computationally bounded prover, the pair $\langle P, V
+  \rangle$ is called an interactive argument system.  \ED
+
+\subsection{Zero-Knowledge}
+We recall the standard definition of ZK proofs. Loosely speaking, an
+interactive proof is said to be zero-knowledge (ZK) if a verifier $V$
+learns nothing beyond the validity of the assertion being proved, it
+could not have generated on its own. As ``feasible''computation in
+general is defined though the notion of probabilistic polynomial-time,
+this notion is formalized by requiring that the output of every
+(possibly malicious) verifier interacting with the honest prover $P$
+can be ``simulated" by a probabilistic expected polynomial-time
+machine $\cS$ (a.k.a. the simulator). The idea behind this definition
+is that whatever $V^*$ might have learned from interacting with $P$,
+he could have learned by himself by running the simulator $\cS$. 
+
+\BD [ZK]. Let $L$ be a language in $\NP$, $R_L$ a witness relation for
+$L$, $(P,V )$ an interactive proof (argument) system for $L$. We say
+that $(P, V )$ is \emph{statistical/computational ZK}, if for every
+probabilistic polynomial-time interactive machine $V$ there exists a
+probabilistic algorithm $\cS$ whose expected running-time is
+polynomial in the length of its first input, such that the following
+ensembles are statistically close/computationally indistinguishable
+over $L$.  \BI
+\item $\{\langle P(y), V(z) \rangle(x)\}_{\kappa\in \NN\,x\in
+  \bit^\kappa\cap L, y \in R_L(x), z\in\bit^*}$
+\item $\{\cS (x,z)\}_{\kappa\in \NN\,x\in \bit^\kappa\cap L, y \in
+  R_L(x), z\in\bit^*}$ \EI
+
+where $\langle P(y), V(z) \rangle(x)$ denotes the view of $V$ in
+interaction with $P$ on common input $x$ and private inputs $y$ and
+$z$, respectively.
+
+\ED
+
+\subsection{Witness Indistinguishability}
+An interactive proof (or argument) is said to be witness
+indistinguishable (WI) if the verifier's output is ``computationally''
+independent of the witness used by the prover for proving the
+statement.  In this context, we focus on languages $L \in \NP$ with a
+corresponding witness relation $R_L$.  Namely, we consider
+interactions in which, on common input $x$, the prover is given a
+witness in $R_L(x)$. By saying that the output is computationally
+independent of the witness, we mean that for any two possible
+$\NP$-witnesses that could be used by the prover to prove the
+statement $x \in L$, the corresponding outputs are computationally
+indistinguishable.
+
+\BD [Witness-indistinguishability]. Let $\langle P, V \rangle$ be an
+interactive proof (or argument) system for a language $L \in \NP$. We
+say that $\langle P, V \rangle$ is \emph{witness-indistinguishable}
+for $R_L$, if for every probabilistic polynomial-time interactive
+machine $V^*$ and for every two sequences
+$\{w^1_{\kappa,x}\}_{\kappa\in \NN,x\in L}$ and
+$\{w^2_{\kappa,x}\}_{\kappa\in \NN,x\in L}$, such that
+$w^1_{\kappa,x}, w^2_{\kappa,x}\in R_L(x)$ for every $x \in L\cap
+\bit^\kappa$, the following probability ensembles are computationally
+indistinguishable over $\kappa\in \NN$.  \ED
+
+\BI
+\item $\{\langle P(w^1_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in
+  \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$
+\item $\{\langle P(w^2_{\kappa,x}), V^*(z) \rangle(x)\}_{\kappa\in
+  \NN\,x\in \bit^\kappa\cap L, z\in\bit^*}$ \EI
+\subsection{Proofs (Arguments) of Knowledge}
+Loosely speaking, an interactive proof is a proof of knowledge if the
+prover convinces the verifier that it possesses, or can feasibly
+compute, a witness for the statement proved. The notion of a proof of
+knowledge is essentially formalized as follows: an interactive proof
+of $x \in L$ is a proof of knowledge if there exists a probabilistic
+expected polynomial-time extractor machine $E$, such that for any
+prover $P$, $E$ on input the description of $P$ and any statement $x
+\in L$ readily outputs a valid witness for $x \in L$ if $P$ succeeds
+in convincing the Verifier that $x \in L$. Formally,
+
+\BD[Proof of knowledge] Let $(P, V )$ be an interactive proof system
+for the language $L$. We say that $(P, V )$ is a proof of knowledge
+for the witness relation $R_L$ for the language $L$ it there exists an
+probabilistic expected polynomial-time machine $E$, called the
+extractor, and a negligible function $\mu(\cdot)$ such that for every
+machine $P^*$, every statement $x \in \bit^\kappa$, every random tape
+$x \in \bit^*$, and every auxiliary input $z \in \bit^*$,
+$$Pr [ \langle P^*_r(z), V \rangle(x) = 1]\leq Pr[E^{P^*_r(x,z)}(x)
+  \in R_L(x)] + \mu(\kappa)$$ \ED
+
+An interactive argument system $\langle P, V \rangle$ is an argument
+of knowledge if the above condition holds w.r.t.  probabilistic
+polynomial-time provers.
+
+
+\paragraph{Delayed-Input Witness Indistinguishability.}
+The notion of delayed-input Witness Indistinguishability formalizes
+security of the prover with respect to an adversarial verifier that
+adaptively chooses the input statement to the proof system in the last
+round. Once we consider such adaptive instance selection, we also need
+to specify where the witnesses come from; to make the definition as
+general as possible, we consider an arbitrary (potentially unbounded)
+\emph{witness selecting machine} that receives as input the views of
+all parties and outputs a witness $w$ for any statement $x$ requested
+by the adversary. In particular, this machine is a (randomized) Turing
+machine that runs in exponential time, and on input a statement $x$
+and the current view of all parties, picks a witness $w \in R_L(x)$ as
+the private input of the prover.
+
+Let  $\langle P, V \rangle$ be a 3-round Witness Indistinguishable
+proof system for a language $L \in \NP$ with witness relation $R_L$.
+Denote the messages exchanged by $(\WIPOKmsg_1, \WIPOKmsg_{2},
+\WIPOKmsg_{3})$ where $\WIPOKmsg_i$ denotes the message in the $i$-th
+round.  For a delayed-input $3$-round Witness Indistinguishable proof
+system, we consider the game ${\sf ExpAWI}$ between a challenger $\cC$
+and an adversary $\cA$ in which the instance $x$ is chosen by $\cA$
+after seeing the first message of the protocol played by the
+challenger. Then, the challenger receives as local input two witnesses
+$w_0$ and $w_1$ for $x$ chosen adaptively by a witness-selecting
+machine. The challenger then continues the game by randomly selecting
+one of the two witnesses and by computing the third message by running
+the prover's algorithm on input the instance $x$, the selected witness
+$w_b$ and the challenge received from the adversary in the second
+round. The adversary wins the game if he can guess which of the two
+witnesses was used by the challenger.
+
+
+\BD[Delayed-Input Witness
+  Indistinguishability] \label{dWI}\label{def:dWI} Let ${\sf
+  ExpAWI}_{\langle P, V \rangle}^\cA$ be a delayed-input WI experiment
+parameterized by a $\ppt$ adversary $\cA$ and an delayed-input
+$3$-round Witness Indistinguishable proof system $\langle P, V
+\rangle$ for a language $L \in \NP$ with witness relation $R_L$. The
+experiment has as input the security parameter $\kappa$ and auxiliary
+information $aux$ for $\cA$.  The experiment ${\sf ExpAWI}$ proceeds
+as follows:  \BE
+\item[]${\sf ExpAWI}_{\langle P, V \rangle}^\cA(\kappa, aux)$: \BE
+\item[] {\bf Round-1:} The challenger $\cC$ randomly selects coin
+  tosses $r$ and runs P on input $(1^\kappa; r)$ to obtain the first
+  message $\WIPOKmsg_1$;
+\item[] {\bf Round-2:}  $\cA$ on input $\WIPOKmsg_1$ and $aux$ chooses
+  an instance $x$ and a challenge $\WIPOKmsg_2$. The witness-selecting
+  machine on inputs the statement $x$ and the current view of all
+  parties outputs witnesses $w_0$ and $w_1$ such that $(x,w_0),
+  (x,w_1) \in R_L$. $\cA$ outputs $x, w_0, w_1, \WIPOKmsg_2$ and
+  internal state $\sf state$;
+\item[] {\bf Round-3:} $\cC$ randomly selects $b\leftarrow \bit$ and
+  runs $P$ on input $(x,w_b, \WIPOKmsg_2)$ to obtain $\WIPOKmsg_3$;
+\item[] $b'  \leftarrow \cA((\WIPOKmsg_1, \WIPOKmsg_2, \WIPOKmsg_3),
+  aux, \sf state)$; 
+\item[] If $b = b'$ then output $1$ else output $0$.  \EE \EE A
+  $3$-round Witness Indistinguishable proof system for a language $L
+  \in \NP$ with witness relation $R_L$ is \emph{delayed-input} if for
+  any $\ppt$ adversary $\cA$ there exists a negligible function
+  $\mu(\cdot)$ such that for any $aux \in\bit^*$ it holds that 
+ $$|Pr[{\sf ExpAWI}_{\langle P, V \rangle}^\cA(\kappa,
+    aux)=1]-1/2|\leq \mu(\kappa) $$ \ED
+
+The most recent $3$-round delayed-input WI proof system appeared in
+the work of \cite{C:COSV16}.
+
+\subsection{Feige-Shamir ZK Proof Systems}\label{fls}
+For our construction we use the $3$-round, public-coin, input-delayed
+witness-indistinguishable proof-of-knowledge $\Pi_\WIPOK$ based on the
+work of Feige, Lapidot, Shamir \cite{FLS99}, and the $4$-round
+zero-knowledge argument-of-knowledge protocol of Feige and Shamir
+$\Pi_\FLS$ \cite{STOC:FeiSha90}.
+%%[[NO, WE DON'T]]%%Somewhat similarly to Garg et al. \cite{EC:GMPP16}, we modify the Feige-Shamir protocol by replacing the one-way function used there by a non-malleable commitment protocol (and the value committed there is the ``trapdoor'' that is used by the zero-knowledge simulator).
+
+Recall that the Feige-Shamir protocol consists of two executions of
+a WIPOK protocol in reverse directions. The first execution has the
+verifier prove something about a secret that it chooses, and the
+second execution has the prover proving that either the input
+statement is true or the prover knows the verifier's secret. The
+zero-knowledge simulator then uses the knowledge extraction to extract
+the secret of the verifier, making it possible to complete the proof.
+%Importantly for us, the zero-knowledge simulator only rewinds the verifier's second message (which is the third message in the protocol).
+
+%%[[NO, WE DON'T]]%%In our setting, we have the verifier use the Pandey et al. \cite{C:PanPasVai08} commitment to commit to its secret, and in some of the hybrids we replace the use of the knowledge extractor by straight-line extraction from the commitment. This allows us to avoid rewinding in those hybrids.

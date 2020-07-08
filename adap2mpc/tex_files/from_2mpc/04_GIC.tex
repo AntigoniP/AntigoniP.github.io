@@ -1,0 +1,236 @@
+\section{Definition of Garbled Interactive Circuit
+  Schemes}\label{sec:def-GIC}
+In this section, we define Garbled Interactive Circuit (GIC)
+schemes. An overview is provided in Section \cref{sec:intro-22}. %  They generalize standard garbled circuit schemes for plain
+% circuits to interactive circuits. Roughly speaking, an interactive
+% circuits $\iC$ can interact with a non-deterministic oracle $\nda$,
+% which on input a query $\ndax$ from $\iC$, and some witness~$\ndaw$,
+% returns an answer $\nday$ to $\iC$. A GIC scheme must ensure: 1) {\em
+%   correctness}, the garbled interactive circuit $\giccir$ can still be
+% evaluated with $\nda$ and an arbitrary list of witnesses $\vec \ndaw$,
+% and produce the same outputs as $\iC$ does when evaluated with~$\nda$
+% and~$\vec \ndaw$; importantly, different from standard garbling schemes, the
+% witnesses do not need to be encoded for evaluation; 2) {\em simulation
+%   security}, the garbled circuit $\giccir$ can be simulated using only
+% the outputs, together with all queries and answers it sends to and
+% receives from $\nda$, provided that there is a {\em computationally
+%   unique transcript} of outputs, queries, and answers.
+
+\subsection{Interactive Circuits}
+We start by defining non-deterministic oracles and interactive
+circuits.
+\begin{mydefinition}[Non-Deterministic Oracles]
+  A non-deterministic oracle $\nda$ is a circuit that takes as input a
+  pair of bitstrings $(\ndax,\ndaw) \in \bits^{\ndaxlen} \times
+  \bits^{\ndawlen}$, called \emph{query} and \emph{witness}
+  respectively, and the output is a $\ndaylen$-bit string or a special
+  element $\perp$, called \emph{answer}: $\nda(\ndax,\ndaw) \in
+  \bits^{\ndaylen} \cup \{\perp\}$. A \emph{$\poly$-size
+    non-deterministic oracle family} is an ensemble of
+  \emph{$\poly$-size} non-deterministic oracles $\nda =
+  \smallset{\nda_\secpar}_{\secpar \in N}$.
+\end{mydefinition}
+
+\begin{mydefinition}
+  Let $\nda$ be a non-deterministic oracle. An $L$-round interactive
+  circuit $\iC = \smallset{\icnext^\round}_{\round \in [L]}$ with
+  oracle $\nda$ consists of a list of $L$ next-step circuits.
+\end{mydefinition}
+
+\subparagraph{Execution of $\iC$ with $\nda$ on Witnesses $\vec w$:}
+An execution of $\iC$ with $\nda$ and a list of witnesses $\vec w =
+\smallset{\vec {w}^{\round}}_{\round \in [L]}$ proceeds in $L$
+iterations as follows: In round $\round \in [L]$, the next-step
+circuit $\icnext^\round$ on input the state $\st^{\round-1}$ (output
+in the previous round) and answers $\vec a^{\round-1} =
+\smallset{a^{\round-1}_k}_k$ (to queries $\vec q^{\round-1} =
+\smallset{q^{\round-1}_k}_k$ produced in the previous round), outputs
+a new state $\st^{\round}$, queries $\vec q^\round =
+\smallset{q^{\round}_k}_k$, and a (round) output $\icout^\round$,
+  \begin{align*}
+     (\st^\round, \vec q^\round, \icout^\round) =
+    \begin{cases}
+      \icnext^\round(\st^{\round-1}, \vec a^{\round-1}) & \text{if } \forall
+      k,\  a^{\round-1}_k = \nda(q^{\round-1}_k, w^{\round-1}_k) \ne \bot \\
+      (\bot,\bot,\bot) & \text {otherwise}
+    \end{cases}~.
+  \end{align*}
+  The execution terminates after $L$ rounds, or whenever $\bot$ is
+  output. By convention, $\st^0$ and $\vec{q}^0$ are empty strings.
+
+
+  We say that an execution is {\em valid} if it terminates after $L$
+  rounds without outputting~$\bot$. We call the list of witnesses
+  $\vec w$ the {\em witnesses} of the execution.  The {\em output} of
+  the execution is the list of round outputs, denoted as $\out(\iC,
+  \nda,\vec w) = \vec \icout = \smallset{\icout^\round}_{\round \in
+    [L]}$.  The {\em transcript} of the execution is
+  the list of queries, answers, and outputs, denoted as $\trans(\iC,
+  \nda, \vec w) = \smallset{\vec q^\round, \vec a^\round,
+    \icout^\round}_{\round \in [L]}$.  (If the execution
+  outputs~$\bot$ in round $\round$, $\vec
+  q^{\round'} = \vec a^{\round'} =\icout^{\round'} = \bot$ for all $\round' \ge
+  \round$.)  Finally, we say that $\iC$ has size $S$ if the total size
+  of all circuits are bounded by $S$. In the rest of the paper, when
+  the oracle $\nda$ is clear from the context, we often omit it in the
+  notations and  write $\out(\iC,\vec w)$ and
+  $\trans(\iC,\vec w)$.
+
+  \subsection{Garbling Interactive Circuits} As mentioned above, an
+  important difference between GIC schemes and classical garbled
+  circuit schemes is that to evaluate a garbled (plain) circuit, one
+  must obtain encoded inputs, whereas a garble interactive circuit can
+  be evaluated with its oracle $\nda$ on input an arbitrary list of
+  witnesses, without encoding. This provides a more powerful
+  functionality, but poses an issue on security: There may exist
+  different lists of witnesses $\vec w, \vec w'$ that lead to
+  executions with completely different transcripts. In this case, it
+  is unclear how simulation can be done. To circumvent this, we only
+  require the security of the garbling scheme to hold for 
+  distributions $\icdistr$ of interactive circuits $\iC$ and witnesses
+  $\vec w$ (with potentially some auxiliary information $\aux$) that
+  have {\em computationally unique transcripts} $\trans(\iC,\nda, \vec
+  w)$, in the sense that (given $\aux$) it is hard to find another
+  list of witnesses $\vec w'$ that leads to an {\em inconsistent}
+  transcript $\trans(\iC, \nda,\vec w)$, where inconsistency means:
+
+\begin{mydefinition}[Consistent Transcripts]
+  We say that two transcripts $\{\vec q^\round, \vec
+    a^\round,\allowbreak{\icout^\round\}}_{\round \in [L]}$ and ${\{{\vec
+      q}'^\round, {\vec a}'^\round,\allowbreak \icout'^\round\}}_{\round \in [L]}$
+  are {\em consistent} if for every $\round \in [L]$,
+  $(\vec q^\round, \vec a^\round, \icout^\round) = (\vec q'^\round,
+  \vec a'^\round, \icout'^\round)$, or one of them is $(\bot, \bot,
+  \bot)$. Otherwise, we say that the two transcripts are {\em
+    inconsistent}.
+\end{mydefinition}
+Note that one can always produce a list of invalid witnesses that
+lead to an invalid execution. Therefore, difference due to outputting
+$\bot$ does not count as inconsistency. Next, we formally define these
+distributions that produce unique transcripts. 
+
+\begin{mydefinition}[Unique-Transcript Distribution]
+  Let $\nda = \smallset{\nda_\secpar}_{\secpar \in \N}$ be a
+  non-deterministic oracle family.  Let $\icdistr =
+  \smallset{\icdistr_{\secpar,\icind}}_{\secpar \in \N, \icind}$ be an
+  ensemble of efficiently samplable distributions over tuples
+  $(\iC, \vec w, \aux)$.  We say that $\icdistr$ is a {\em
+    (computationally) unique-transcript} distribution for $\nda$, if
+  \begin{description}
+  \item[Valid Execution:] For any $\secpar \in \N$, any index $\icind
+    \in \bits^{\poly(\secpar)}$, and any $(\iC, \vec w,\allowbreak \aux)$ in the
+    support of $\icdistr_{\secpar,\icind}$, the execution of $\iC$ with $\nda_\secpar$
+    and $\vec w$ is valid.
+  \item[Computationally Unique Transcript:] For any $\poly$-size
+    circuit family $\advA=\smallset{\advA_\secpar}_{\secpar}$, any sequence of 
+    indices $\smallset{\icind_\secpar}_{\secpar}$, there is a
+    negligible function $\negl$, such that for any $\secpar$:
+    \begin{multline*} 
+      \Pr\Big[
+      \trans(\iC, \nda_\secpar,\vec
+      w') \text{ and }\trans(\iC,\nda_\secpar, \vec w)\text{ are inconsistent}
+      \ : \\
+      (\iC, \vec w,\aux) \getsr \icdistr_{\secpar, \icind_\secpar}; \ 
+      \vec w' \getsr \advA_\secpar(\iC, \vec w,\aux)
+      \Big] \le \negl(\secpar)\enspace.
+  \end{multline*}
+  \end{description}
+  It is a \emph{statistically unique-transcript distribution} if the
+  second property holds for any arbitrary-size circuit family
+  $\advA = \smallset{\advA_\secpar}_\secpar$.
+\end{mydefinition}
+
+
+Now, we are ready to define GIC schemes. % which
+% is very similar to garbled circuit schemes, except that, i) garbling
+% is done independent of the witnesses later evaluated on, and ii)
+% security holds only for distributions of interactive circuits and
+% witnesses that lead to unique transcripts, in particular, a garbled
+% interactive circuit reveals no information other than this unique
+% transcript.
+
+\begin{mydefinition}[Garbled Interactive Circuit Schemes]
+  Let $\nda = \smallset{\nda_\secpar}_{\secpar \in \N}$ be a non-deterministic
+  oracle family, and $\icdistr =
+  \smallset{\icdistr_{\secpar,\icind}}_{\secpar \in \N, \icind}$ be a
+  unique-transcript distribution for $\nda$.  A \emph{garbled
+    interactive circuit} scheme for $(\nda,\icdistr)$ is a tuple of
+  three polynomial-time algorithms $\gic =
+  (\gicgarble,\giceval,\allowbreak\gicsim)$:
+  \begin{description}
+  \item[Garbling:] $\giccir \getsr \gicgarble(1^\secpar,\iC)$
+     garbles an interactive circuit $\iC$ into a
+    garbled interactive circuit $\giccir$;
+  \item[Evaluation:] $\icout^\round = \giceval(\giccir, \vec w^{<
+      \round})$  evaluates a garbled interactive
+    circuit $\giccir$ with a partial list of witness $\vec w^{<\round}$,
+    and outputs the $\round$-th round output $\icout^\round$;
+  \item[Simulation:] $\gicsimcir \getsr \gicsim(1^\secpar, T)$
+     simulates a garbled circuit $\gicsimcir$ from a
+    transcript $T$ of an execution;
+  \end{description}
+  satisfying the following properties:
+  \begin{description}
+  \item[Correctness:] For any $\secpar \in \N$, any index $\icind \in
+    \bits^{\poly(\secpar)}$, any $(\iC, \vec w, \aux)$ in the support
+    of $\icdistr_{\secpar, \icind}$, it holds that
+    \begin{multline*}
+      \Pr\Big[
+      \smallset{\giceval(\giccir, \vec w^{<\round})}_{\round \in [L]}
+      = \out(\iC, \nda_\secpar, \vec w)
+      \ : \
+      \iftoggle{llncs}{\\}{}
+      \giccir \getsr \gicgarble(1^\secpar, \iC)
+      \Big] = 1 \enspace;
+    \end{multline*}
+  \item[Simulatability:] The following two distributions are computationally indistinguishable:
+    \begin{align*}
+      \bigg\{
+      (\iC, \vec w, \aux, \giccir)
+      \ &: \
+          \begin{array}{l}
+            (\iC, \vec w, \aux) \getsr \icdistr_{\secpar, \icind}; \\          
+            \giccir \getsr \gicgarble(1^\secpar, \iC)
+          \end{array}
+      {\bigg\}}_{\secpar, \icind}\enspace, \\
+      \bigg\{
+      (\iC, \vec w, \aux, \gicsimcir)
+      \ &: \
+          \begin{array}{l}
+            (\iC, \vec w, \aux) \getsr \icdistr_{\secpar, \icind}; \\
+            \gicsimcir \getsr \gicsim(1^\secpar, \trans(\iC, \nda_\secpar, \vec w))
+          \end{array}
+      {\bigg\}}_{\secpar, \icind} \enspace.
+    \end{align*}
+  \end{description}
+\end{mydefinition}
+
+\begin{remark}
+  In this paper, we always consider perfect correctness for all
+  primitives for the sake of simplicity.  We could relax this notion
+  to correctness up to a negligible error probability if, in addition,
+  we ask that no non-uniform poly-time adversary can generate inputs
+  and randomness which would not satisfy the correctness property,
+  with non-negligible probability. In other words, in the case of GIC
+  schemes, semi-maliciously generated GIC should satisfy the
+  correctness property (except with negligible probability). This
+  additional property is not needed for our semi-honest constructions.
+\end{remark}
+
+\iftoggle{full}{
+  \begin{remark}Note that the above notion of garbled
+  interactive circuit scheme is defined for a non-deterministic oracle
+  family and an associated unique-transcript distribution. We can also
+  consider a uniform version, where the oracle is defined to be a
+  single non-deterministic uniform {\em algorithm}. The uniform
+  version would suffice for our application of constructing 2-round
+  MPC protocols. We however choose to define the non-uniform version
+  since it is stronger, and fits better with the garbling.
+\end{remark}
+}{}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

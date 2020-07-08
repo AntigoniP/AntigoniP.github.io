@@ -1,0 +1,90 @@
+% !TEX root =./main-optimal.tex
+\section{Proof Systems}
+\label{sec:proofsystems}
+
+We provide a detailed description of the proof systems used in this work.
+
+\subsection{Protocol $\Pi_\WIPOK$} 
+This is essentially the Feige-Lapidot-Shamir protocol, slightly reworded in \cite{KatzO04}, mostly for notational convenience.  We recall this protocol here. We denote the messages of this protocol by $(\WIPOKmsg_1, \WIPOKmsg_2,\WIPOKmsg_3)$.
+
+We will be working with the NP-complete language $\it HC$ of graph Hamiltonicity,
+and thus assume statements to be proven take the form of graphs,
+while witnesses correspond to Hamilton cycles. If $\thmm$ is a graph, we abuse notation
+and also let $\thmm$ denote the statement ``$\thmm \in {\it HC}$''. We show how the
+proof system can be used to prove the following statement: $\thmm \land \thmm'$, where
+$\thmm$ will be included as part of the first message, while $\thmm'$
+is only decided in the last round. The
+proof system $\Pi_\WIPOK$ runs $\kappa$ parallel executions of the following $3$-round protocol:
+
+\BE
+
+\item The prover commits to two adjacency matrices for two randomly-chosen cycle
+graphs $G,G'$. The commitment is done bit-by-bit using a perfectly-binding
+commitment scheme.
+\item The verifier responds with a single bit $b$, chosen at random.
+\item If $b = 0$, the prover opens all commitments. If $b = 1$, the prover sends two
+permutations mapping the cycle in $\thmm$ (resp., $\thmm'$) to $G$ (resp., $G'$). For
+each non-edge in $\thmm$ (resp., $\thmm'$), the prover opens the commitment at the
+corresponding position in $G$ (resp., $G'$).
+\item[] The verifier checks that all commitments were opened correctly. If $b = 0$, the
+verifier additionally checks whether both decommitted graphs are indeed
+cycle graphs. If $b = 1$, the verifier checks whether each non-edge in $\thmm$
+(resp., $\thmm'$) corresponds to a non-edge in $G$ (resp., $G'$).
+\EE
+
+Note that the prover does not need to know either $\thmm$ or $\thmm'$ (or the corresponding
+witnesses) until the beginning of the third round. In the above proof system, we assume that 
+$\thmm$ is fixed as part of the first-round message enabling us to
+claim stronger properties about the proof system. In particular, $\Pi_\WIPOK$ proof system is complete and sound. More specifically, the probability that an all-powerful
+prover can cause a verifier to accept when either $\thmm$ or $\thmm'$
+are not true
+is at most $2^{-\kappa}$. We stress that this holds even if the prover can adaptively
+choose  $\thmm'$ after viewing the second-round message of the verifier. Moreover, $\Pi_\WIPOK$ is witness indistinguishable and it is a proof of knowledge for $\thmm$. (More formally, we can achieve a notion
+similar to that of ``witness-extended emulation'' \cite{C:Lindell01} for $\thmm$.) Note also that the first round of the above proof system (as well as the
+internal state of the prover immediately following this round) is independent of
+$\thmm$ or the associated witness.
+
+
+\subsection{Protocol $\Pi_\FLS$}\label{sec:fs}
+
+As noted in Section \ref{sec:prelim}, this is essentially the four round zero-knowledge protocol of Feige-Shamir, except that we use {\em non-malleable commitments} in the first three round of the protocol. Following the discussion in Section \ref{sec:prelim}, we let \nmcom\ be a non-malleable commitment scheme, and make the simplifying assumption that \nmcom\ has just three rounds and the first round is committing. Again, these are purely for notational convenience and can easily be removed (as discussed earlier).
+
+We now simply list all the steps of this protocol following \cite{KatzO04}, but using \nmcom. The messages of this protocol are denoted by 
+$(\FLSmsg_1, \FLSmsg_2,\FLSmsg_3, \FLSmsg_4)$. It allows the prover to prove $\thmm \land \thmm'$ where  $\thmm$ is sent as part of the second round yet $\thmm'$ is only sent as part of the last round. (Intuitively, statements $\thmm,\thmm'$ will correspond to statements $\st_1,\st_2$ of $\Pi_\WIPOK$ described above.)
+
+The proof system $\Pi_\FLS$ proceeds as follows: 
+
+
+
+\BE
+
+\item The first round is as in the original Feige-Shamir protocol but augmented with an $\nmCom$ scheme.  Explicitly, the verifier $V$ selects randomly and independently two values $\sigma_1$ and $\sigma_2$ and computes the first message of two independent executions of $\nmCom$ for $\sigma_1$ and $\sigma_2$, with randomness $\rho_1,\rho_2$ respectively. Let $\nm_1^{\sigma_1}$ and $\nm_2^{\sigma_2}$ be these messages, which $V$ sends to $P$. %corresponding to $\sigma_1$ and $\sigma_2$ respectively. %The transcripts of these executions up to the $\rnm-2$ round are denoted by $\nmCom(\sigma_{1})$ and $\nmCom(\sigma_{2})$, respectively. 
+
+Moreover, $V$ sends the first message $\WIPOKmsg_{1}$ of a WIPOK proof system.
+
+\item The prover $P$ chooses a random challenge $R \in \bit^{2\kappa}$ and computes ${\sf C_R}=\qCom(R;\zeta)$. Let $\ok$ denote the statement that $\qCom$ was formed correctly.
+
+
+\item[] Let $\tthm$ denote the statement: $(\thmm\land \ok)\lor(\nm_1^{\sigma_1}=\nmCom_1(\sigma_{1};\rho_1))\lor(\nm_1^{\sigma_2}=\nmCom_1(\sigma_{2};\rho_2))$ (this statement is reduced to a single graph \tthm). Then, $P$ sends ${\sf C_R}$ and also
+the first message $\tilde\WIPOKmsg_1$ of a separate WIPOK proof system and message $\WIPOKmsg_2$ of $V$'s proof.
+
+\item $V$ sends the last message $\WIPOKmsg_3$ of his WIPOK proof system and completes the proof for the knowledge of the values in $\nmCom$ (which is also completed along with the first and second rounds \footnote{If $\rnm>3$ then $V$ completes its WIPOK after the completion of $\nmCom$.}). $V$ additionally sends a random $R' \in \bit^{2\kappa}$ and message $\tilde\WIPOKmsg_2$ of $P$'s proof
+\item $P$ decommits to $R$. Let $\prg$ be the statement that
+$r = R \oplus R'$ is pseudorandom (i.e., $\exists s ~{\text s.t.} ~{\sf PRG}(s) = r$, where $\sf PRG$ is a pseudorandom function). Let $\tthm'$
+be the statement $\thmm' \lor \prg$ (reduced to a single graph $\tthm'$). The prover send the last message $\tilde\WIPOKmsg_3$ of the $\Pi_\WIPOK$ proof system and completes the proof for the statement $\tthm \land \tthm'$.
+\item[] $V$ checks the decommitment of $R$, and verifies the proof.
+\EE
+
+As claimed in \cite{KatzO04} $\Pi_\FLS$  proof system satisfies the following properties. It is complete and sound (for a poly-time prover) for $\thmm$ and $\thmm'$. Rounds $2-4$ constitute a proof of knowledge for $\tthm$. If a poly-time prover
+can cause a verifier to accept with ``high'' probability, then a witness for
+$\thmm\land\ok$ can be extracted with essentially the same probability. If $\ok$ is true,
+then with all but negligible probability $\prg$ will not be true. Soundness of
+the proof of knowledge sub-protocol then implies that $\tthm'$ is true. But this
+means that $\thmm'$ is true.
+$\Pi_\FLS$ is also zero-knowledge (in addition, to simulating for $\tthm$, the simulator
+also uses the equivocal commitment property to decommit to an $R$
+such that $\prg$ is true.). Furthermore, $\Pi_\FLS$  is an argument of knowledge for $\thmm$.
+  
+Note that although we are using \nmcom\ we are not making any claim here that uses non-malleability. All claims above simply rely on the hiding of \nmcom. The non-malleability is used by the two-party protocol which uses $\Pi_\FLS$.
+
+Also note that in order to handle a general \nmcom\ of $k$ rounds, simply execute the first $k-3$ rounds before the protocol above begins. The statements are then modified to work with the transcript, rather than the first message of the protocol.

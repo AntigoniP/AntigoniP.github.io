@@ -1,0 +1,380 @@
+@inproceedings{GKPV10,
+  author    = {Shafi Goldwasser and
+               Yael Tauman Kalai and
+               Chris Peikert and
+               Vinod Vaikuntanathan},
+  title     = {Robustness of the Learning with Errors Assumption},
+  booktitle = {{ICS}},
+  pages     = {230--240},
+  publisher = {Tsinghua University Press},
+  year      = {2010}
+}
+
+@inproceedings{KMO14,
+  author    = {Susumu Kiyoshima and
+               Yoshifumi Manabe and
+               Tatsuaki Okamoto},
+  title     = {Constant-Round Black-Box Construction of
+               Composable Multi-Party Computation Protocol},
+  booktitle = {{TCC}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {8349},
+  pages     = {343--367},
+  publisher = {Springer},
+  year      = {2014}
+}
+
+
+@inproceedings{PandeyPV08,
+  author    = {Omkant Pandey and
+               Rafael Pass and
+               Vinod Vaikuntanathan},
+  editor    = {David Wagner},
+  title     = {Adaptive One-Way Functions and Applications},
+  booktitle = {Advances in Cryptology - {CRYPTO} 2008, 28th Annual International
+               Cryptology Conference, Santa Barbara, CA, USA, August 17-21, 2008.
+               Proceedings},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {5157},
+  pages     = {57--74},
+  publisher = {Springer},
+  year      = {2008},
+  url       = {http://dx.doi.org/10.1007/978-3-540-85174-5_4},
+  doi       = {10.1007/978-3-540-85174-5_4},
+  timestamp = {Tue, 26 Aug 2008 13:07:09 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/crypto/PandeyPV08},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+@inproceedings{Ciampi16,
+  author    = {Michele Ciampi and
+               Giuseppe Persiano and
+               Alessandra Scafuro and
+               Luisa Siniscalchi and
+               Ivan Visconti},
+  title     = {Online/Offline {OR} Composition of Sigma Protocols},
+  booktitle = {Advances in Cryptology - {EUROCRYPT} 2016 - 35th Annual International
+               Conference on the Theory and Applications of Cryptographic Techniques,
+               Vienna, Austria, May 8-12, 2016, Proceedings, Part {II}},
+  pages     = {63--92},
+  year      = {2016},
+  crossref  = {DBLP:conf/eurocrypt/2016-2},
+  url       = {http://dx.doi.org/10.1007/978-3-662-49896-5_3},
+  doi       = {10.1007/978-3-662-49896-5_3},
+  timestamp = {Fri, 29 Apr 2016 15:23:20 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/eurocrypt/CiampiPSSV16},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@article{GK96,
+  author    = {Oded Goldreich and
+               Ariel Kahan},
+  title     = {How to Construct Constant-Round Zero-Knowledge Proof Systems for {NP}},
+  journal   = {J. Cryptology},
+  volume    = {9},
+  number    = {3},
+  pages     = {167--190},
+  year      = {1996},
+  timestamp = {Mon, 01 Dec 2003 13:13:55 +0100},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/joc/GoldreichK96},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+
+@inproceedings{CM15,
+  author    = {Michael Clear and Ciaran McGoldrick},
+  editor    = {Rosario Gennaro and Matthew Robshaw},
+  title     = {Multi-identity and Multi-key Leveled {FHE} from Learning with Errors},
+  booktitle = {Advances in Cryptology - {CRYPTO} 2015 - 35th Annual Cryptology Conference,
+               Santa Barbara, CA, USA, August 16-20, 2015, Proceedings, Part {II}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9216},
+  pages     = {630--656},
+  publisher = {Springer},
+  year      = {2015},
+  url       = {http://dx.doi.org/10.1007/978-3-662-48000-7_31},
+  doi       = {10.1007/978-3-662-48000-7_31},
+  timestamp = {Mon, 03 Aug 2015 13:32:48 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/crypto/ClearM15},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{MW16,
+  author    = {Pratyay Mukherjee and
+               Daniel Wichs},
+  title     = {Two Round Multiparty Computation via Multi-key {FHE}},
+  booktitle = {{EUROCRYPT} {(2)}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9666},
+  pages     = {735--763},
+  publisher = {Springer},
+  year      = {2016}
+}
+
+@inproceedings{MP12,
+  author    = {Daniele Micciancio and
+               Chris Peikert},
+  title     = {Trapdoors for Lattices: Simpler, Tighter, Faster, Smaller},
+  booktitle = {{EUROCRYPT}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {7237},
+  pages     = {700--718},
+  publisher = {Springer},
+  year      = {2012},
+  note      = {Full version at \url{http://ia.cr/2011/501}}
+}
+
+@misc{PS16,
+    author = {Chris Peikert and Sina Shiehian},
+    title = {Multi-Key FHE from LWE, Revisited},
+    howpublished = {Cryptology ePrint Archive, Report 2016/196},
+    year = {2016},
+    note = {\url{http://eprint.iacr.org/}},
+}
+
+@inproceedings{GargMPP16,
+  author    = {Sanjam Garg and
+               Pratyay Mukherjee and
+               Omkant Pandey and
+               Antigoni Polychroniadou},
+  editor    = {Marc Fischlin and
+               Jean{-}S{\'{e}}bastien Coron},
+  title     = {The Exact Round Complexity of Secure Computation},
+  booktitle = {Advances in Cryptology - {EUROCRYPT} 2016 - 35th Annual International
+               Conference on the Theory and Applications of Cryptographic Techniques,
+               Vienna, Austria, May 8-12, 2016, Proceedings, Part {II}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9666},
+  pages     = {448--476},
+  publisher = {Springer},
+  year      = {2016},
+  url       = {http://dx.doi.org/10.1007/978-3-662-49896-5_16},
+  doi       = {10.1007/978-3-662-49896-5_16},
+  timestamp = {Fri, 29 Apr 2016 15:23:20 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/eurocrypt/GargMPP16},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@article{Reg09,
+  author    = {Oded Regev},
+  title     = {On lattices, learning with errors, random linear codes, and cryptography},
+  journal   = {J. {ACM}},
+  year      = {2009},
+  volume    = {56},
+  number    = {6},
+  doi       = {10.1145/1568318.1568324}
+}
+
+@article{FLS99,
+	author    = {Uriel Feige and
+	Dror Lapidot and
+	Adi Shamir},
+	title     = {Multiple NonInteractive Zero Knowledge Proofs Under General Assumptions},
+	journal   = {{SIAM} J. Comput.},
+	volume    = {29},
+	number    = {1},
+	pages     = {1--28},
+	year      = {1999},
+	url       = {http://dx.doi.org/10.1137/S0097539792230010},
+	doi       = {10.1137/S0097539792230010},
+	timestamp = {Mon, 12 Sep 2011 16:10:10 +0200},
+	biburl    = {http://dblp.uni-trier.de/rec/bib/journals/siamcomp/FeigeLS99},
+	bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+@inproceedings{Yao82,
+  author    = {Andrew Chi-Chih Yao},
+  title     = {Protocols for Secure Computations (Extended Abstract)},
+  booktitle = {FOCS},
+  year      = {1982},
+  pages     = {160-164},
+}
+
+@phdthesis{FeigeThesis,
+	author    = {Uriel Feige},
+	title     = {Alternative Models for Zero Knowledge Interactive Proofs},
+	howpublished = {PhD Thesis},
+	year     = {1990},
+	month    = {},
+}
+
+@misc{GPR15,
+	author    = {Vipul Goyal and Omkant Pandey and Silas Richelson},
+	title     = {Textbook Non-malleable Commitments},
+	howpublished = {Manuscript},
+	year     = {2015},
+	month    = {November},
+}
+@book{Goldbook,
+  author    = {Oded Goldreich},
+  title     = {The Foundations of Cryptography - Volume 1, Basic Techniques},
+  publisher = {Cambridge University Press},
+  year      = {2001},
+  isbn      = {0-521-79172-3},
+  timestamp = {Sat, 26 Nov 2011 13:21:21 +0100},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/books/cu/Goldreich2001},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+@inproceedings{ORS15,
+	author    = {Rafail Ostrovsky and
+	Silas Richelson and
+	Alessandra Scafuro},
+	title     = {Round-Optimal Black-Box Two-Party Computation},
+	booktitle = {Advances in Cryptology - {CRYPTO} 2015 - 35th Annual Cryptology Conference,
+	Santa Barbara, CA, USA, August 16-20, 2015, Proceedings, Part {II}},
+	pages     = {339--358},
+	year      = {2015},
+	url       = {http://dx.doi.org/10.1007/978-3-662-48000-7_17},
+	doi       = {10.1007/978-3-662-48000-7_17},
+	timestamp = {Mon, 03 Aug 2015 13:32:48 +0200},
+	biburl    = {http://dblp.uni-trier.de/rec/bib/conf/crypto/OstrovskyRS15},
+	bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+@inproceedings{GGHR14,
+	author    = {Sanjam Garg and
+	Craig Gentry and
+	Shai Halevi and
+	Mariana Raykova},
+	title     = {Two-Round Secure {MPC} from Indistinguishability Obfuscation},
+	booktitle = {Theory of Cryptography - 11th Theory of Cryptography Conference, {TCC}
+	2014, San Diego, CA, USA, February 24-26, 2014. Proceedings},
+	pages     = {74--94},
+	year      = {2014},
+	crossref  = {DBLP:conf/tcc/2014},
+	url       = {http://dx.doi.org/10.1007/978-3-642-54242-8_4},
+	doi       = {10.1007/978-3-642-54242-8_4},
+	timestamp = {Mon, 03 Feb 2014 13:53:08 +0100},
+	biburl    = {http://dblp.uni-trier.de/rec/bib/conf/tcc/GargGH014},
+	bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{Yao86,
+	author    = {Andrew Chi-Chih Yao},
+	title     = {How to Generate and Exchange Secrets (Extended Abstract)},
+	booktitle = {FOCS},
+	year      = {1986},
+	pages     = {162-167},
+}
+
+@inproceedings{BMR90,
+  author    = {Donald Beaver and
+               Silvio Micali and
+               Phillip Rogaway},
+  title     = {The Round Complexity of Secure Protocols (Extended Abstract)},
+  booktitle = {Proceedings of the 22nd Annual {ACM} Symposium on Theory of Computing,
+               May 13-17, 1990, Baltimore, Maryland, {USA}},
+  pages     = {503--513},
+  year      = {1990},
+  crossref  = {DBLP:conf/stoc/STOC22},
+  url       = {http://doi.acm.org/10.1145/100216.100287},
+  doi       = {10.1145/100216.100287},
+  timestamp = {Mon, 17 Oct 2011 17:25:06 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/stoc/BeaverMR90},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{GMW87,
+	author    = {Oded Goldreich and
+	Silvio Micali and
+	Avi Wigderson},
+	title     = {How to Play any Mental Game or A Completeness Theorem for
+	Protocols with Honest Majority},
+	booktitle = {STOC},
+	year      = {1987},
+	pages     = {218-229},
+}
+
+
+
+
+
+@InProceedings{Ben,
+  author =       "Michael  Or Ben and
+                  Shafi Goldwasser and
+                  Avi Wigderson",
+  title =        "Completeness Theorems for Non-Cryptographic Fault-Tolerant Distributed Computation (Extended Abstract)",
+  pages =        "1--10",
+  editor =       stoc88ed,
+  booktitle =    stoc88name,
+  address =      stoc88addr,
+  month =        stoc88month,
+  publisher =    stocpub,
+  year =         1988,
+}
+
+
+@article{BL04,
+  author    = {Boaz Barak and
+               Yehuda Lindell},
+  title     = {Strict Polynomial-Time in Simulation and Extraction},
+  journal   = {{SIAM} J. Comput.},
+  volume    = {33},
+  number    = {4},
+  pages     = {738--818},
+  year      = {2004},
+  url       = {http://dx.doi.org/10.1137/S0097539703427975},
+  doi       = {10.1137/S0097539703427975},
+  timestamp = {Tue, 17 Aug 2004 14:45:22 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/journals/siamcomp/BarakL04},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+
+
+@inproceedings{KatzOS03,
+	author    = {Jonathan Katz and
+	Rafail Ostrovsky and
+	Adam Smith},
+	title     = {Round Efficiency of Multi-party Computation with a Dishonest Majority},
+	booktitle = {Advances in Cryptology - {EUROCRYPT} 2003, International Conference
+	on the Theory and Applications of Cryptographic Techniques, Warsaw,
+	Poland, May 4-8, 2003, Proceedings},
+	pages     = {578--595},
+	year      = {2003},
+	url       = {http://dx.doi.org/10.1007/3-540-39200-9_36},
+	doi       = {10.1007/3-540-39200-9_36},
+	timestamp = {Tue, 05 Jul 2011 11:04:38 +0200},
+	biburl    = {http://dblp.uni-trier.de/rec/bib/conf/eurocrypt/KatzOS03},
+	bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+@inproceedings{KatzO04,
+  author    = {Jonathan Katz and
+               Rafail Ostrovsky},
+  title     = {Round-Optimal Secure Two-Party Computation},
+  booktitle = {Advances in Cryptology - {CRYPTO} 2004, 24th Annual International
+               CryptologyConference, Santa Barbara, California, USA, August 15-19,
+               2004, Proceedings},
+  pages     = {335--354},
+  year      = {2004},
+  url       = {http://dx.doi.org/10.1007/978-3-540-28628-8_21},
+  doi       = {10.1007/978-3-540-28628-8_21},
+  timestamp = {Thu, 07 Jul 2011 15:50:00 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/crypto/KatzO04},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@inproceedings{COSV16,
+  author    = {Michele Ciampi and
+               Rafail Ostrovsky and
+               Luisa Siniscalchi and
+               Ivan Visconti},
+  editor    = {Matthew Robshaw and
+               Jonathan Katz},
+  title     = {Concurrent Non-Malleable Commitments (and More) in 3 Rounds},
+  booktitle = {Advances in Cryptology - {CRYPTO} 2016 - 36th Annual International
+               Cryptology Conference, Santa Barbara, CA, USA, August 14-18, 2016,
+               Proceedings, Part {III}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {9816},
+  pages     = {270--299},
+  publisher = {Springer},
+  year      = {2016},
+  url       = {http://dx.doi.org/10.1007/978-3-662-53015-3_10},
+  doi       = {10.1007/978-3-662-53015-3_10},
+  timestamp = {Wed, 27 Jul 2016 12:46:33 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/conf/crypto/CiampiOSV16},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}

@@ -1,0 +1,942 @@
+% !TEX root =../main.tex
+
+%
+% Packages
+%
+
+% Standard packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{mathrsfs}
+
+\usepackage{booktabs}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}m{#1}}
+\usepackage{threeparttable}
+\usepackage{blkarray}
+\usepackage{multirow}
+
+\usepackage[noadjust]{cite}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{xspace}
+\usepackage{needspace}
+\usepackage[inline]{enumitem}
+
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\usepackage{soul}
+
+\usepackage{tikz}
+
+  % float has to be loaded before hyperref and algorithm after hyperref
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{caption,subcaption}
+\usepackage{framed}
+\usepackage{mdframed}
+\mdfsetup{skipabove=0pt,skipbelow=0pt}
+
+\iftoggle{allowtodo}{
+  \iftoggle{showtodo}{
+    \usepackage[textsize=small]{todonotes}
+  }{
+    \usepackage[disable]{todonotes}
+  }
+  % add xspace to todo command (http://tex.stackexchange.com/a/68741)
+  \makeatletter
+  \expandafter\apptocmd\csname\string\todo\endcsname{\xspace}{}{}
+  \makeatother
+}{
+}
+
+% Personal packages
+\usepackage{games}
+
+% Hyperref
+\usepackage[pdfpagelabels=true,\iftoggle{llncs}{}{pagebackref}]{hyperref}
+%\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+
+\hypersetup{
+  linktoc = page,
+  pdfpagemode = UseNone,
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!50!black},
+  urlcolor={blue!80!black}
+}
+
+\iftoggle{llncs}{}{
+  \renewcommand*{\backref}[1]{}
+  \renewcommand*{\backrefalt}[4]{
+    \ifcase #1
+    (Not cited.)
+    \or
+    (Page~#2.)
+    \else
+    (Pages~#2.)
+    \fi
+  }
+  \renewcommand*{\backrefsep}{, }
+  \renewcommand*{\backreftwosep}{ and~}
+  \renewcommand*{\backreflastsep}{, and~}
+}
+
+
+% Packages to be loaded AFTER hyperref
+
+\usepackage[capitalize]{cleveref}
+% https://tex.stackexchange.com/a/161340/34384
+\newcommand{\creflastconjunction}{, and\nobreakspace}
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+  % decrease algorithm indent http://tex.stackexchange.com/a/40289/34384
+\expandafter\patchcmd\csname\string\algorithmic\endcsname%
+  {\labelwidth 0.5em}{\labelwidth0pt\labelsep0pt}{}{} 
+  % fix bugs with labels on lines of algorithmicx http://tex.stackexchange.com/a/177033/34384
+\makeatletter
+\newcounter{algorithmicH}% New algorithmic-like hyperref counter
+\let\oldalgorithmic\algorithmic
+\renewcommand{\algorithmic}{%
+  \stepcounter{algorithmicH}% Step counter
+  \oldalgorithmic}% Do what was always done with algorithmic environment
+\renewcommand{\theHALG@line}{ALG@line.\thealgorithmicH.\arabic{ALG@line}}
+\makeatother
+
+\usepackage{soul}
+
+% Fix a bug when llncs is used with both envcountsame and envcountsect
+% https://tex.stackexchange.com/a/372108/34384
+
+\def\theHcase{\theHtheorem}
+\def\theHconjecture{\theHtheorem}
+\def\theHcorollary{\theHtheorem}
+\def\theHdefinition{\theHtheorem}
+\def\theHexample{\theHtheorem}
+\def\theHexercise{\theHtheorem}
+\def\theHlemma{\theHtheorem}
+\def\theHnote{\theHtheorem}
+\def\theHproblem{\theHtheorem}
+\def\theHproperty{\theHtheorem}
+\def\theHproposition{\theHtheorem}
+\def\theHquestion{\theHtheorem}
+\def\theHsolution{\theHtheorem}
+\def\theHremark{\theHtheorem}
+
+%
+% Misc
+%
+
+\iftoggle{llncs}{
+  %% change proof to accept the optional argument as article
+  \let\llncsproof\proof
+  \renewcommand{\proof}[1][]{%
+    \ifx!#1!\else\renewcommand{\proofname}{#1}\fi
+    \llncsproof
+  }
+  % add automatically qed to proof
+  \AtEndEnvironment
+  {proof}
+  {\qed}
+}{}
+
+\setcounter{tocdepth}{2}
+
+\newsavebox{\fboxenvbox}
+\newenvironment{fboxenv}
+    {\begin{lrbox}{\fboxenvbox}}
+    {\end{lrbox}\fbox{\usebox{\fboxenvbox}}}
+
+\iftoggle{showoverflow}{
+  \overfullrule=10pt
+}{}
+
+\newcommand{\textwidthfbox}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax} % text width inside a fbox/fboxenv
+
+%
+% References
+%
+
+\iftoggle{full}{
+  \newcommand*{\appref}[1]{Appendix~\ref{#1}}
+}{
+  \newcommand*{\appref}[1]{the full version}
+}
+
+%
+% General and Math commands
+%
+
+% Abbreviations
+\newcommand{\etal}{et al.\xspace}
+
+% Math sets and groups
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\G}{\mathbb{G}}
+\newcommand{\Gt}{\mathbb{G}_T}
+
+% Probability
+\newcommand*{\prob}[1]{{\Pr}\left[\,{#1}\,\right]}
+\newcommand*{\probb}[2]{{\Pr}_{#1}\left[\,{#2}\,\right]}
+
+% Math misc
+% \makeatletter
+% \newcommand\suchthat{%
+%  \@ifstar
+%   {\mathrel{}\middle|\mathrel{}}
+%   {\mid}%
+% }
+% \makeatother
+\newcommand\suchthat{:}
+
+\newcommand{\defeq}{\coloneqq}
+\newcommand{\eqdef}{\eqqcolon}
+\newcommand{\eeq}{\overset{{}_{?}}{=}}
+
+\newcommand{\nexts}{\:;\:}
+
+\newcommand{\xor}{\mathbin{\mathsf{xor}}}
+
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+
+%
+% General Crypto commands
+%
+
+% Algorithms
+% \newcommand{\getsr}{\stackrel{{}_R}{\leftarrow}}
+\newcommand{\getsr}{\gets}
+
+% Parameters
+\newcommand{\secpar}{\lambda}
+
+% Experiments / Game
+\newcommand{\advA}{A}
+\newcommand{\state}{\mathsf{st}}
+
+\newcommand{\Exp}{\mathsf{Exp}}
+\newcommand{\Succ}{\mathsf{Succ}}  % success
+\newcommand{\Adv}{\mathsf{Adv}}    % advantage
+
+\newcommand{\secu}{\web{sec}}
+\newcommand{\SECU}{\web{SEC}}
+
+\algdef{SnE}[Oracle]{Oracle}{EndOracle}
+  [1]{\ul{#1}}
+  {}
+
+\algdef{SnE}[AlgoExp]{AlgoExp}{EndAlgoExp}
+  [1]{#1}
+  {}
+
+% Protocol flows
+\newcommand*{\Rflow}[2][5em]{\ensuremath{\xrightarrow{\smash{\makebox[#1][c]{$#2$}}}}}
+\newcommand*{\Lflow}[2][5em]{\ensuremath{\xleftarrow{\smash{\makebox[#1][c]{$#2$}}}}}
+\newcommand*{\LRflow}[3][5em]{\ensuremath{\xleftrightarrow[\smash{\makebox{$#2$}}]{\smash{\makebox[#1][c]{$#3$}}}}}
+
+% Crypto misc
+\newcommand{\ve}{\varepsilon}
+\newcommand{\eps}{\ve}
+
+\DeclareMathOperator{\negl}{negl}
+% \DeclareMathOperator{\poly}{poly}
+\newcommand{\poly}{\text{poly}}
+\DeclareMathOperator{\lcm}{lcm}
+
+% Hard problems (uppercase) and associated experiment names (lowercase)
+\newcommand{\hardprobfont}[1]{\texorpdfstring{\ensuremath{\mathsf{#1}}}{#1}}
+
+\newcommand{\DL}{\hardprobfont{DL}\xspace}
+\newcommand{\dl}{\hardprobfont{dl}\xspace}
+\newcommand{\DHtup}{\hardprobfont{DH}\xspace}    % DH tuple
+
+\newcommand{\DDH}{\hardprobfont{DDH}\xspace}
+\newcommand{\ddh}{\hardprobfont{ddh}\xspace}
+
+\newcommand{\MDDH}{\hardprobfont{MDDH}\xspace}
+\newcommand{\mddh}{\hardprobfont{mddh}\xspace}
+
+\newcommand{\DLin}{\hardprobfont{DLin}\xspace}
+\newcommand{\dlin}{\hardprobfont{dlin}\xspace}
+
+\newcommand{\XDH}{\hardprobfont{XDH}\xspace}
+\newcommand{\xdh}{\hardprobfont{xdh}\xspace}
+
+\newcommand{\CDH}{\hardprobfont{CDH}\xspace}
+\newcommand{\cdh}{\hardprobfont{cdh}\xspace}
+
+\newcommand{\SXDH}{\hardprobfont{SXDH}\xspace}
+\newcommand{\sxdh}{\hardprobfont{sxdh}\xspace}
+
+\newcommand{\BDDH}{\hardprobfont{BDDH}\xspace}
+\newcommand{\bddh}{\hardprobfont{bddh}\xspace}
+
+\newcommand{\BDDHI}{\hardprobfont{BDDHI}\xspace}
+\newcommand{\bddhi}{\hardprobfont{bddhi}\xspace}
+
+\newcommand{\klin}{\texorpdfstring{\kappa}{k}}
+\newcommand*{\Lin}[1]{\texorpdfstring{\ensuremath{{#1\text{-}\mathsf{Lin}}}}{#1-Lin}\xspace}
+\newcommand*{\lin}[1]{\texorpdfstring{\ensuremath{{#1\text{-}\mathsf{lin}}}}{#1-lin}\xspace}
+
+%
+% Commands specific to the paper 
+%
+
+% Wide bar https://tex.stackexchange.com/a/60253/34384
+
+\makeatletter
+\let\save@mathaccent\mathaccent
+\newcommand*\if@single[3]{%
+  \setbox0\hbox{${\mathaccent"0362{#1}}^H$}%
+  \setbox2\hbox{${\mathaccent"0362{\kern0pt#1}}^H$}%
+  \ifdim\ht0=\ht2 #3\else #2\fi
+  }
+%The bar will be moved to the right by a half of \macc@kerna, which is computed by amsmath:
+\newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
+%If there's a superscript following the bar, then no negative kern may follow the bar;
+%an additional {} makes sure that the superscript is high enough in this case:
+\newcommand*\widebar[1]{\@ifnextchar^{{\wide@bar{#1}{0}}}{\wide@bar{#1}{1}}}
+%Use a separate algorithm for single symbols:
+\newcommand*\wide@bar[2]{\if@single{#1}{\wide@bar@{#1}{#2}{1}}{\wide@bar@{#1}{#2}{2}}}
+\newcommand*\wide@bar@[3]{%
+  \begingroup
+  \def\mathaccent##1##2{%
+%Enable nesting of accents:
+    \let\mathaccent\save@mathaccent
+%If there's more than a single symbol, use the first character instead (see below):
+    \if#32 \let\macc@nucleus\first@char \fi
+%Determine the italic correction:
+    \setbox\z@\hbox{$\macc@style{\macc@nucleus}_{}$}%
+    \setbox\tw@\hbox{$\macc@style{\macc@nucleus}{}_{}$}%
+    \dimen@\wd\tw@
+    \advance\dimen@-\wd\z@
+%Now \dimen@ is the italic correction of the symbol.
+    \divide\dimen@ 3
+    \@tempdima\wd\tw@
+    \advance\@tempdima-\scriptspace
+%Now \@tempdima is the width of the symbol.
+    \divide\@tempdima 10
+    \advance\dimen@-\@tempdima
+%Now \dimen@ = (italic correction / 3) - (Breite / 10)
+    \ifdim\dimen@>\z@ \dimen@0pt\fi
+%The bar will be shortened in the case \dimen@<0 !
+    \rel@kern{0.6}\kern-\dimen@
+    \if#31
+      \overline{\rel@kern{-0.6}\kern\dimen@\macc@nucleus\rel@kern{0.4}\kern\dimen@}%
+      \advance\dimen@0.4\dimexpr\macc@kerna
+%Place the combined final kern (-\dimen@) if it is >0 or if a superscript follows:
+      \let\final@kern#2%
+      \ifdim\dimen@<\z@ \let\final@kern1\fi
+      \if\final@kern1 \kern-\dimen@\fi
+    \else
+      \overline{\rel@kern{-0.6}\kern\dimen@#1}%
+    \fi
+  }%
+  \macc@depth\@ne
+  \let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
+  \mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
+  \macc@set@skewchar\relax
+  \let\mathaccentV\macc@nested@a
+%The following initialises \macc@kerna and calls \mathaccent:
+  \if#31
+    \macc@nested@a\relax111{#1}%
+  \else
+%If the argument consists of more than one symbol, and if the first token is
+%a letter, use that letter for the computations:
+    \def\gobble@till@marker##1\endmarker{}%
+    \futurelet\first@char\gobble@till@marker#1\endmarker
+    \ifcat\noexpand\first@char A\else
+      \def\first@char{}%
+    \fi
+    \macc@nested@a\relax111{\first@char}%
+  \fi
+  \endgroup
+}
+\makeatother
+
+
+\newcommand{\bits}{{\{0,1\}}}
+
+% distinguisher
+
+\newcommand{\dist}{{\cal D}}	
+
+% circuit classes
+
+\newcommand{\circlass}{\mathcal{C}}
+\newcommand{\univcirc}{U}
+\newcommand{\univcir}{\univcirc}
+\newcommand{\cirin}{x}
+\newcommand{\cirinlen}{n}
+\newcommand{\ciroutlen}{l}
+\newcommand{\cir}{C}
+\newcommand{\cirout}{y}
+\newcommand{\cirsize}{S}
+
+% com
+
+\newcommand{\com}{\mathsf{com}}
+\newcommand{\Com}{\mathsf{Com}}
+\newcommand{\comcom}{\mathsf{COM.Com}}
+\newcommand{\comver}{\mathsf{COM.Ver}}
+\newcommand{\comc}{c}
+\newcommand{\comr}{\rho}
+\newcommand{\comrlen}{\tau}
+\newcommand{\commsg}{x}
+
+% hom com
+
+\newcommand{\hc}{\mathsf{FC}}
+\newcommand{\hccom}{\mathsf{FC.Com}}
+\newcommand{\hcopen}{\mathsf{FC.FOpen}}
+\newcommand{\hcver}{\mathsf{FC.FVer}}
+\newcommand{\hcsim}{\mathsf{FC.SimC}}
+\newcommand{\csim}{\mathsf{FC.Sim}}
+\newcommand{\encsim}{\mathsf{FC.SimE}}
+%\newcommand{\hcsetup{\mathsf{FC.Setup^{bind}}}
+%\newcommand{\ehcsetup{\mathsf{FC.Setup^{equiv}}}
+
+\newcommand{\ehcsetup}{\mathsf{FC.Setup_{equiv}}}
+\newcommand{\setup}{\mathsf{FC.Setup}}
+\newcommand{\hcsetup}{\mathsf{FC.Setup_{bind}}}
+
+\newcommand{\tex}{\mathsf{trap_e}}
+\newcommand{\teq}{\mathsf{trap_q}}
+\newcommand{\cteq}{\mathsf{ctrap_q}}
+
+\newcommand{\cc}{\mathsf{c}}
+\newcommand{\ee}{\mathsf{e}}
+\newcommand{\ff}{\mathsf{f}}
+
+
+
+\newcommand{\hcc}{c}
+\newcommand{\hcd}{d}
+\newcommand{\hcr}{\rho}
+\newcommand{\renc}{\zeta}
+\newcommand{\hcrlen}{\tau}
+\newcommand{\hcmsg}{v}
+\newcommand{\hcout}{y}
+\newcommand{\hcsize}{S}
+
+\newcommand{\hccirclass}{\mathcal{G}}
+\newcommand{\hccirinlen}{n}
+\newcommand{\hcciroutlen}{l}
+\newcommand{\hccir}{G}
+\newcommand{\hccirout}{y}
+
+\newcommand{\ehc}{\mathsf{eFC}}
+\newcommand{\ehccom}{\mathsf{eFC.Com}}
+\newcommand{\ehcopen}{\mathsf{eFC.FOpen}}
+\newcommand{\ehcver}{\mathsf{eFC.FVer}}
+\newcommand{\ehcsimc}{\mathsf{eFC.SimC}}
+\newcommand{\Equiv}{\mathsf{FC.Equiv}}
+\newcommand{\ehcsimd}{\mathsf{FC.EquivC}}
+\newcommand{\encequiv}{\mathsf{FC.EquivE}}
+\newcommand{\fequiv}{\mathsf{FC.EquivF}}
+\newcommand{\ehctrap}{\mathsf{trap_q}}
+\newcommand{\eehctrap}{\mathsf{trap_e}}
+
+\newcommand{\ihc}{\mathsf{iFC}}
+\newcommand{\ihcS}{\mathsf{iFC.S}}
+\newcommand{\ihcR}{\mathsf{iFC.R}}
+\newcommand{\ihcopen}{\mathsf{iFC.FOpen}}
+\newcommand{\ihcver}{\mathsf{iFC.FVer}}
+\newcommand{\ihcsim}{\mathsf{iFC.Sim}}
+\newcommand{\ihcRr}{{\rho'}}
+\newcommand{\ihcRrlen}{{\tau'}}
+
+\newcommand{\eihc}{\mathsf{eiFC}}
+\newcommand{\eihcS}{\mathsf{eiFC.S}}
+\newcommand{\eihcR}{\mathsf{eiFC.R}}
+\newcommand{\eihcopen}{\mathsf{eiFC.FOpen}}
+\newcommand{\eihcver}{\mathsf{eiFC.FVer}}
+\newcommand{\eihcsimc}{\mathsf{eiFC.SimC}}
+\newcommand{\eihcsimd}{\mathsf{eiFC.SimD}}
+\newcommand{\eihcRr}{{\rho'}}
+\newcommand{\eihcRrlen}{{\tau'}}
+
+\newcommand{\interaction}[2]{\langle {#1},\allowbreak {#2} \rangle}
+
+% WE
+
+\newcommand{\we}{\mathsf{WE}}
+\newcommand{\weenc}{\mathsf{WE.Enc}}
+\newcommand{\wedec}{\mathsf{WE.Dec}}
+\newcommand{\welang}{\mathcal{L}}
+\newcommand{\wewitr}{\mathcal{R}}
+\newcommand{\wewit}{\mathsf{w}}
+\newcommand{\weword}{\mathsf{x}}
+\newcommand{\wect}{\mathsf{ct}}
+\newcommand{\wemsg}{\mathsf{M}}
+
+% nondetalg
+
+\newcommand{\nda}{{\mathcal{O}}}
+\newcommand{\ndax}{q}
+\newcommand{\ndaxlen}{n}
+\newcommand{\ndaw}{w}
+\newcommand{\ndawlen}{m}
+\newcommand{\nday}{a}
+\newcommand{\ndaylen}{l}
+\newcommand{\ndadistr}{\mathrm{w}\mathcal{D}}
+\newcommand{\ndaaux}{\mathsf{aux}}
+\newcommand{\ndadistrind}{\mathsf{id}}
+
+% WS
+
+\newcommand{\ws}{\mathsf{WS}}
+\newcommand{\wsenc}{\mathsf{\hc.Enc}}
+\newcommand{\wsdec}{\mathsf{\hc.Dec}}
+\newcommand{\wsct}{\mathsf{ct}}
+\newcommand{\wsmsg}{\mathsf{X}}
+\newcommand{\wsdistr}{\ndadistr}%\mathrm{w}\mathcal{D}}
+
+\newcommand{\denc}{\mathsf{denc}}
+\newcommand{\vecdenc}{\widebar{\denc}}
+
+% GC
+\newcommand{\ckey}{\mathsf{cKeys}}
+\newcommand{\vkey}{\mathsf{vKeys}}
+\newcommand{\fkey}{\mathsf{fKeys}}
+
+
+
+
+\newcommand{\gc}{\mathsf{GC}}
+\newcommand{\gckey}{\mathsf{dataKeys}}
+\newcommand{\Gckey}{\mathsf{stateKeys}}
+\newcommand{\gcgen}{\mathsf{GC.Gen}}
+\newcommand{\gcequiv}{\mathsf{GC.Equiv}}
+\newcommand{\gcgarble}{\mathsf{GC.Garble}}
+\newcommand{\gceval}{\mathsf{GC.Eval}}
+\newcommand{\gcsim}{\mathsf{GC.Sim}}
+\newcommand{\gccir}{\widehat{C}}
+\newcommand{\gcsimcir}{\widetilde{C}}
+\newcommand{\gcinlen}{\alpha}
+
+\newcommand{\tgc}{{\mathsf{oGC}}}
+\newcommand{\tgckey}{{\mathsf{okey}}}
+\newcommand{\tgcgen}{{\mathsf{oGC.Gen}}}
+\newcommand{\tgcgarble}{{\mathsf{oGC.Garble}}}
+\newcommand{\tgceval}{{\mathsf{oGC.Eval}}}
+\newcommand{\tgcsim}{{\mathsf{oGC.Sim}}}
+\newcommand{\tgccir}{\widehat{\mathsf{o}C}} 
+\newcommand{\tgcsimcir}{\widetilde{\mathsf{o}C}}
+
+\newcommand{\tcir}{\mathsf{o}C}
+\newcommand{\tcirsize}{{\mathsf{o}S}}
+
+% MPC / functionality
+\newcommand{\mpcfunc}{f}
+\newcommand{\mpcin}{x}
+\newcommand{\mpcvecin}{\bar{x}}
+\newcommand{\mpcout}{y}
+\newcommand{\mpcinlen}{\kappa}
+\newcommand{\mpcnext}{\mathsf{Nextmsg}}
+\newcommand{\mpcoutput}{\mathsf{Output}}
+\newcommand{\round}{\ell}
+\newcommand{\nbrounds}{L}
+\newcommand{\mpcrand}{r}
+\newcommand{\mpcvecrand}{\bar{\mpcrand}}
+\newcommand{\mpcrandlen}{R}
+\newcommand{\msg}{m}
+\newcommand{\Msg}{M}
+\newcommand{\vecmsg}{\vec m}
+\newcommand{\mpc}{\pi}
+\newcommand{\MPC}{\Pi_\mathsf{MPC}}
+\newcommand{\sMPC}{\Pi_\mathsf{sMPC}}
+\newcommand{\impc}{\Phi}
+\newcommand{\mpcview}{\mathsf{View}}
+\newcommand{\mpcsim}{\mathsf{\cS}}
+
+\newcommand{\mpcideal}{\mathsf{Ideal}}
+\newcommand{\mpcreal}{\mathsf{Real}}
+\newcommand{\mpcrealsm}{\mathsf{Real}^{\mathsf{sm}}}
+\newcommand{\mpcrealdef}{\mathsf{Real}^{\mathsf{def}}}
+
+% Tools for constructing malicious MPC
+\newcommand{\NMZK}{\mathsf{NMZK}}
+\newcommand{\WI}{\mathsf{WI}^{\mathrm{or}}}
+\newcommand{\WIo}{\mathsf{WI}^{\mathrm{or,1}}}
+\newcommand{\WIt}{\mathsf{WI}^{\mathrm{or,2}}}
+\newcommand{\OTz}{\mathsf{OT}^{\mathrm{0}}}
+\newcommand{\OTo}{\mathsf{OT}^{\mathrm{1}}}
+
+
+\newcommand{\qOTsetup}{\mathsf{qOT.Setup_{equiv}}}
+
+
+\newcommand{\OTsetup}{\mathsf{OT.Setup_{bind}}}
+\newcommand{\OTSetup}{\mathsf{OT.Setup}}
+\newcommand{\OTSetupq}{\mathsf{OT.Setup_{equiv}}}
+\newcommand{\ROTequiv}{\mathsf{OT.EquivR}}
+\newcommand{\SOTequiv}{\mathsf{OT.EquivS}}
+
+
+\newcommand{\OT}{\mathsf{OT}}
+\newcommand{\ijl}{{\itoj,\ell}}
+\newcommand{\Trap}{\mathsf{Trap}}
+\newcommand{\NMCom}{\mathsf{NMCom}}
+\newcommand{\wimim}{\mathsf{wiMIM}}
+\newcommand{\err}{\mathsf{err}}
+\newcommand{\bad}{\mathsf{bad}}
+\newcommand{\overtime}{\mathsf{overtime}}
+\newcommand{\vk}{\mathrm{vk}}
+\newcommand{\sk}{\mathrm{sk}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\pk}{\mathrm{pk}}
+\newcommand{\ck}{\mathrm{ck}}
+\newcommand{\crs}{\mathrm{crs}}
+\newcommand{\mpk}{\mathrm{mpk}}
+\newcommand{\ct}{\mathrm{ct}}
+\newcommand{\td}{\mathrm{td}}
+\newcommand{\NP}{\mathrm{NP}}
+\newcommand{\CR}{{\langle C,R \rangle}}
+\newcommand{\view}{{\mathrm{view}}}
+\newcommand{\itoj}{{i \rightarrow j}}
+\newcommand{\jtoi}{{j \rightarrow i}}
+\newcommand{\jtoistar}{{j \rightarrow i^\star}}
+\newcommand{\lang}{{\mathcal{L}}}
+\newcommand{\rel}{{\mathcal{R}}}
+\newcommand{\Time}{{\mathcal{T}}}
+\newcommand*{\expt}[1]{{\mathrm E}\left[\,{#1}\,\right]}
+\newcommand{\set}[1]{\{#1\}}
+
+
+
+% IC
+
+\newcommand{\iC}{{\mathrm C}}
+\newcommand{\iF}{{\mathrm F}}
+\newcommand{\iV}{{\mathrm V}}
+\newcommand{\gval}{g}
+\newcommand{\aval}{\mathsf{\alpha}}
+\newcommand{\icnext}{{\mathrm C}}
+\newcommand{\ifnext}{{\mathrm F}}
+%\newcommand{\icnext}{{\mathrm{i}C.\mathsf{Next}}}
+\newcommand{\ic}{\mathit{IC}}
+\newcommand{\icclass}{\mathcal{C}}
+\newcommand{\icc}{C}
+\newcommand{\icout}{o}
+\newcommand{\icl}{\ell}
+\newcommand{\iclen}{L}
+\newcommand{\icq}{\mathsf{q}}
+\newcommand{\ica}{\mathsf{a}}
+\newcommand{\icst}{\mathsf{st}}
+%\newcommand{\icdistr}{\mathit{IC}\mathcal{D}}
+\newcommand{\icdistr}{\mathrm{i}\mathcal{D}}
+\newcommand{\icind}{\mathrm{id}}
+\newcommand{\icaux}{\mathsf{aux}}
+\newcommand{\iceval}{\mathsf{IC.Eval}}
+\newcommand{\qwa}{\mathit{QWA}}
+\newcommand{\trans}{\mathsf{trans}}
+
+% GIC
+
+\newcommand{\gic}{\mathsf{GiC}}
+\newcommand{\gicgarble}{\mathsf{GiC.Garble}}
+\newcommand{\giceval}{\mathsf{GiC.Eval}}
+\newcommand{\gicsim}{\mathsf{GiC.Sim}}
+\newcommand{\giccir}{\widehat{\iC}}
+
+\newcommand{\gifcir}{\widehat{\iF}}
+\newcommand{\givcir}{\widehat{\iV}}
+
+\newcommand{\gicsimcir}{\widetilde{\iC}}
+\newcommand{\gicst}{\hat{\icst}}
+
+\newcommand{\icaugnext}{{\mathrm{i}C.\mathsf{AugNext}}}
+\newcommand{\gcicaugnext}{\widehat{\mathrm{i}C.\mathsf{AugNext}}{}}
+
+
+% OT
+
+
+
+\newcommand{\eotsetup}{\mathsf{eOT.Setup}}
+\newcommand{\eotsendone}{\mathsf{eOT.Msg}_1}
+\newcommand{\eotsendtwo}{\mathsf{eOT.Msg}_2}
+
+\newcommand{\eootsendone}{\mathsf{eOT.MsgO}_1}
+\newcommand{\eootsendtwo}{\mathsf{eOT.MsgO}_2}
+\newcommand{\obothsend}{\mathsf{qOT.MsgO}}
+\newcommand{\iobothsend}{\mathsf{qOT.MsgO^{-1}}}
+
+
+\newcommand{\qootsendtwo}{\mathsf{qOT.MsgO}_2}
+\newcommand{\qot}{\mathsf{qOT}}
+\newcommand{\eot}{\mathsf{eOT}}
+\newcommand{\eotsetupb}{\mathsf{eOT.Setup_{extr}}}
+
+\newcommand{\qotsetup}{\mathsf{qOT.Setup}}
+\newcommand{\qotsetupb}{\mathsf{qOT.Setup_{ext}}}
+\newcommand{\qotsetupe}{\mathsf{qOT.Setup_{equiv}}}
+\newcommand{\qotsendone}{\mathsf{qOT.Msg}_1}
+\newcommand{\qotsendtwo}{\mathsf{qOT.Msg}_2}
+\newcommand{\qotequivS}{\mathsf{qOT.EquivS}}
+\newcommand{\qootsendone}{\mathsf{qOT.MsgO}_1}
+\newcommand{\qiotsendone}{\mathsf{qOT.MsgO}_1^{-1}}
+\newcommand{\qotextr}{\mathsf{qOT.Extr}}
+
+
+
+
+\newcommand{\eotextr}{\mathsf{eOT.Extr}}
+\newcommand{\qcom}{\mathsf{C}}
+\newcommand{\qcomcom}{\mathsf{C.Com}}
+\newcommand{\qcomopen}{\mathsf{C.Open}}
+\newcommand{\qcomequiv}{\mathsf{C.Equiv}}
+\newcommand{\qcomsetup}{\mathsf{C.Setup}}
+\newcommand{\qcomsim}{\mathsf{C.Sim}}
+\newcommand{\qqcomsetup}{\mathsf{C.Setup_{equiv}}}
+
+\newcommand{\ot}{\mathsf{OT}}
+\newcommand{\otsendone}{\mathsf{OT.Rec}}
+\newcommand{\otsendtwo}{\mathsf{OT.Send}}
+\newcommand{\ootsendone}{\mathsf{OT.MsgO}_1}
+\newcommand{\ootsendtwo}{\mathsf{OT.MsgO}_2}
+\newcommand{\iotsendone}{\mathsf{OT.MsgO}_1^{-1}}
+\newcommand{\iotsendtwo}{\mathsf{OT.MsgO}_2^{-1}}
+\newcommand{\otextr}{\mathsf{OT.Extr}}
+\newcommand{\otoutput}{\mathsf{OT.Output}}
+\newcommand{\qotoutput}{\mathsf{qOT.Output}}
+\newcommand{\len}{\lambda}
+\newcommand{\eotoutput}{\mathsf{eOT.Output}}
+\newcommand{\otflowone}{\mu^1}
+\newcommand{\otflowtwo}{\mu^2}
+
+\newcommand{\otflowonet}{\mu}
+\newcommand{\otflowtwot}{\nu}
+
+
+
+
+\newcommand{\otmsg}{x}
+\newcommand{\otmsglen}{k}
+\newcommand{\otrandone}{\rho}
+\newcommand{\otrandonelen}{\tau}
+\newcommand{\otsel}{\sigma}
+
+\newcommand{\NC}{\mathsf{NC}}
+\newcommand{\NCEnc}{\mathsf{NC.Enc}}
+\newcommand{\NCDec}{\mathsf{NC.Dec}}
+\newcommand{\NCSim}{\mathsf{NC.Sim}}
+\newcommand{\NCGen}{\mathsf{NC.Gen}}
+
+
+\newcommand{\keys}{\mathsf{keys}}
+
+% interactive
+
+\newcommand{\otsender}{\mathsf{OT.S}}
+\newcommand{\otreceiver}{\mathsf{OT.R}}
+
+% hybrids
+\newcommand{\distr}{\mathcal{D}}
+\newcommand{\hybrid}{\mathcal{H}}
+\newcommand{\hyb}[1]{\mathcal{H}_{#1}}
+
+%%%% Rachel's and Fabrice's note %%%%%
+\iftoggle{showtodo}{
+  \definecolor{darkgreen}{rgb}{0, 0.5, 0.0}
+\newcommand{\Rnote}[1]{{\color{blue}[\textbf{Rachel's Note}: #1]}}
+\newcommand{\Fnote}[1]{{\color{red}[\textbf{Fabrice's Note}: #1]}}
+\newcommand{\anti}[1]{{\color{magenta}[\textbf{Antigoni's Note}: #1]}}
+\newcommand{\Mnote}[1]{{\color{darkgreen}[\textbf{Muthu's Note}: #1]}}
+}{
+\newcommand{\Rnote}[1]{}
+\newcommand{\Fnote}[1]{}
+\newcommand{\Anote}[1]{}
+\newcommand{\Mnote}[1]{}
+}
+
+\newcommand{\smallset}[1]{{\{#1\}}}
+\newcommand{\bigset}[1]{{\left\{#1\right\}}}
+\newcommand{\iO}{{\mathrm{i}O}}
+\renewcommand{\subparagraph}[1]{\smallskip\noindent\ul{\textsc{#1}}}
+
+\newcommand{\pprotocol}[5]{
+%  \vspace{-.2cm}
+  {\begin{figure}[#4]
+      \centering
+        \fbox{ \hbox{
+            \begin{minipage}{.92\linewidth}
+              \begin{center}
+                \textbf{#1}
+              \end{center}
+              #5
+            \end{minipage}
+          } }
+        \caption{\label{#3} #2}
+      \vspace{-3ex}
+    \end{figure}
+  }  
+%  \vspace{-.2cm}
+ }
+
+
+\newcommand{\tmpcnext}{{\widetilde{\mathsf{Next}}}}
+\newcommand{\augnext}{{{\mathsf{AugNext}}}}
+\newcommand{\aux}{{{\mathsf{aux}}}}
+\newcommand{\out}{{{\mathsf{out}}}}
+\newcommand{\CRS}{{{\mathsf{CRS}}}}
+\renewcommand{\st}{{{{st}}}}
+\newcommand{\haugnext}{{\widehat{\mathsf{AugNext}}}}
+\newcommand{\haugnextsup}[1]{{\widehat{\mathsf{AugNext}}}{}^{#1}}
+\newcommand{\tmpcview}{{\widetilde{\mathsf{View}}}}
+\newcommand{\tmpcoutput}{{\widetilde{\mathsf{Output}}}}
+\newcommand{\tmpcrand}{{\tilde r}}
+\newcommand{\tmsg}{\widetilde{m}}
+\newcommand{\tmpc}{{\widetilde\Pi}}
+\newcommand{\tvecmsg}{\widetilde{\vec m}}
+\newcommand{\tmpcvecrand}{\widetilde{\vec r}}
+
+\newcommand{\istar}{{i^{\star}}}
+\newcommand{\iii}{i} % replace \istar almost everywhere as the star is not really useful
+\newcommand{\msgsize}{{\gamma}}
+\renewcommand{\vec}[1]{{\bar{#1}}}
+\newcommand{\nC}{{\text{n}C}}
+\newcommand{\UnderlineText}[2][red]{\setulcolor{#1}\ul{#2}}
+\newcommand{\cul}[1]{\UnderlineText[red]{#1}}
+\newcommand{\hP}{\widehat{P}{}}
+\newcommand{\hU}{\widehat{U}{}}
+\newcommand{\hV}{\widehat{V}{}}
+\newcommand{\bc}{c'}
+\newcommand{\pot}{\mathrm{ot}}
+\newcommand{\pOT}{\mathrm{p}\mathsf{OT}}
+\newcommand{\decom}{\mathrm{decom}}
+% \newcommand{\bkey}{\mathsf{label}}
+\newcommand{\bkey}{\tgckey}
+
+
+
+% Add some space around enumerate nested inside description (default: almost no spacing)
+\setlist[enumerate]{topsep=.5\baselineskip}
+
+\newcommand{\roundstar}{{\round^{\star}}}
+\newcommand{\jstar}{{j^{\star}}}
+\newcommand{\kstar}{{k^{\star}}}
+
+
+
+\newtheorem{thm}{Theorem}[section]      % A counter for Theorems etc
+\newcommand{\BT}{\begin{thm}}   \newcommand{\ET}{\end{thm}}
+\newtheorem{dfn}[thm]{Definition}      %
+\newcommand{\BD}{\begin{dfn}}   \newcommand{\ED}{\end{dfn}}
+\newtheorem{corr}[thm]{Corollary}      %
+\newcommand{\BCR}{\begin{corr}} \newcommand{\ECR}{\end{corr}}
+%---
+\newtheorem{Ithm}{Theorem}[section]     % A counter for Theorems in Intro
+\newcommand{\BIT}{\begin{Ithm}}   \newcommand{\EIT}{\end{Ithm}}
+%---
+\newtheorem{lem}{Lemma}[section]  % A counter for Lemmas etc
+\newcommand{\BL}{\begin{lem}}   \newcommand{\EL}{\end{lem}}
+\newtheorem{prop}[lem]{Proposition}
+\newcommand{\BP}{\begin{prop}}   \newcommand{\EP}{\end{prop}}
+\newtheorem{clm}[lem]{Claim}            %
+\newcommand{\BCM}{\begin{clm}}   \newcommand{\ECM}{\end{clm}}
+\newtheorem{fact}[lem]{Fact}            %
+\newcommand{\BF}{\begin{fact}}   \newcommand{\EF}{\end{fact}}
+\newtheorem{prot}{Protocol}      % A counter for Protocols
+\newcommand{\BPR}{\begin{prot}}   \newcommand{\EPR}{\end{prot}}
+\newenvironment{cproof}{\noindent{\bf Proof:~~}}{\hfill $\Box$}
+\newcommand{\BCPF}{\begin{cproof}} \newcommand {\ECPF}{\end{cproof}}
+\newcommand{\Qed}{\hfill $\Box$}
+
+%\newtheorem{remark}[lem]{Remark}            %
+\newcommand{\BR}{\begin{remark}}   \newcommand{\ER}{\end{remark}}
+
+\newcommand{\BDE}{\begin{description}}
+\newcommand{\EDE}{\end{description}}
+\newcommand{\BE}{\begin{enumerate}}
+\newcommand{\EE}{\end{enumerate}}
+\newcommand{\BI}{\begin{itemize}}
+\newcommand{\EI}{\end{itemize}}
+\newcommand{\BEQ}{\begin{eqnarray*}}
+\newcommand{\EEQ}{\end{eqnarray*}}
+\def\blackslug
+{\hbox{\hskip 1pt\vrule width 8pt height 8pt depth 1.5pt\hskip 1pt}}
+\def\qed{\quad\blackslug\lower 8.5pt\null\par}
+\def\qqed{$\Box$}
+
+\newcommand{\ccP}{{\cal P}}
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cS}{{\cal S}}
+\newcommand{\func}{\mathcal{F}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\idind}{\equiv}
+\newcommand{\compind}{\approx_{\mathrm{c}}}
+\newcommand{\statind}{\approx_{\mathrm{s}}}
+
+\newcommand{\nizk}{\ensuremath{\mathsf{NIZK}}}
+\newcommand{\nizkSetup}{\mathsf{NIZK.Setup}}
+% \newcommand{\nizkSetupSound}{\mathsf{NIZK.Setup_{sound}}}
+% \newcommand{\nizkSetupEquiv}{\mathsf{NIZK.Setup_{equiv}}}
+\newcommand{\nizkProve}{\mathsf{NIZK.Prove}}
+\newcommand{\nizkVer}{\mathsf{NIZK.Ver}}
+\newcommand{\nizkSim}{\mathsf{NIZK.Sim}}
+\newcommand{\nizkEquiv}{\mathsf{NIZK.Equiv}}
+\newcommand{\nizkcrs}{\mathrm{crs}}
+\newcommand{\nizktrap}{\mathrm{trap}}
+\newcommand{\nizkst}{\st^{\mathsf{e}}}
+\newcommand{\nizkproof}{\pi}
+\newcommand{\nizkrand}{\rho}
+
+\newcommand{\word}{\mathsf{x}}
+\newcommand{\wit}{\mathsf{w}}
+
+\newcommand{\hbnizk}{\ensuremath{\mathsf{HB}}}
+\newcommand{\hbnizkProve}{\mathsf{HB.Prove}}
+\newcommand{\hbnizkVer}{\mathsf{HB.Ver}}
+\newcommand{\hbnizkEquiv}{\mathsf{HB.Equiv}}
+\newcommand{\hbnizkst}{\st^{\mathsf{e}}}
+
+\newcommand{\ltdpdom}{\mathcal{D}}
+\newcommand{\ltdprange}{\mathcal{R}}
+\newcommand{\ltdpinjgen}{\mathsf{LTDP.InjGen}}
+\newcommand{\ltdplossygen}{\mathsf{LTDP.LossyGen}}
+\newcommand{\ltdprangesample}{\mathsf{LTDP.S}_{\ltdprange}}
+\newcommand{\ltdprangesampleinv}{\mathsf{LTDP.S}_{\ltdprange}^{-1}}
+
+
+\newcommand{\keygen}{\mathsf{KG}}
+\newcommand{\enc}{\mathsf{Enc}}
+\newcommand{\enco}{\mathsf{EncO}}
+\newcommand{\encoinv}{\mathsf{EncO}^{-1}}
+\newcommand{\dec}{\mathsf{Dec}}
+
+\newcommand{\hk}{\mathsf{hk}}
+\newcommand{\hp}{\mathsf{hp}}
+
+
+\newcommand{\HashKG}{\mathsf{HashKG}}
+\newcommand{\ProjKGO}{\mathsf{ProjKGO}}
+\newcommand{\ProjKGOinv}{\mathsf{ProjKGO}^{-1}}
+\newcommand{\Hash}{\mathsf{Hash}}
+\newcommand{\ProjHash}{\mathsf{ProjHash}}
+
+\newcommand{\HH}{\mathsf{H}}
+\newcommand{\projH}{\mathsf{pH}}
+
+\newcommand{\Jacob}{\mathbb{J}}
+\newcommand{\QR}{\mathbb{QR}}
+\newcommand{\SQR}{\mathbb{SQR}}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End: 

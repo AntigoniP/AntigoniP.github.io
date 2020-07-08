@@ -1,0 +1,82 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Need for Dual GSW}\label{sec:whyDual}
+For the interested reader, we explain below why we need to use the
+``dual'' GSW scheme rather than the ``primal'' GSW as in
+\cite{C:CleMcg15,MW16}. As we explained, the main differece
+between the primal and dual schemes is that that the matrix~$A$ in
+``primal'' GSW is $(n-1)$-by-$m$, while in our ``dual'' scheme it
+is $(m-1)$-by-$n$ (in both cases we have $m<n\log q$). While it is
+certailny possible that a one-round ILWE-hard protocol exists also
+for the ``primal'' scheme, we were not able to find one that we can
+prove secure under any standard assumption. Below we detail some
+specific failed attempts.
+
+%----------------------------------------------------------------
+\paragraph{Failed attempt \#1, parties choose different columns.}
+Consider a protocol simlar to the one in \secref{ILWE-Prot}, in which
+each party $P_i$ is choosing a random $n\times m'$ matrix $A_i$ and
+the matrix $A\in \ZZ_q^{n\times m'N}$ is just the column-concatenation
+of all the $A_i$'s, $A=(A_1|A_2|\ldots|A_N)$.
+
+An adversary (who controls $P_N$ without loss of generality), can just
+set its matrix as $A_N=G$ where $G$ is the GSW ``gadget matrix''.
+That gadget matrix has the property that given the vector $sG+e$ for
+a small error vector $e$, it is easy to find $e$ and $s$. Now, notice
+that the vector $sA+e$ that $P_N$ sends to $\rA$ has the form
+$(sA_1+e_1|sA_2+e_2|\ldots|sA_N+e_N)$, so in particular the adversary
+can set the portion $sA_N+e_N=sG+e_N$ to recover the secret key~$s$.
+(This is exactly where the ``dual'' scheme helps: the adversary still
+sees some ``leakage'' $sA_N+e_N$, but it cannot recover $s$ since $s$
+still has a lot of min-entropy even given that leakage.)
+
+%----------------------------------------------------------------
+\paragraph{Failed attempt \#2, parties choose different rows.}
+One way to avoid attacks as above is to ensure that for any fixed
+matrix that the adversary may put in ``its entries'', a random matrix
+by the honest user will make $sA+e$ pseudorandom.
+
+One way to ensure this is to let each party choose a random $n'\times
+m$ matrix $A_i$ and set $A\in\ZZ_q^{Nn'\times m}$ as the
+row-concatenation of the $A_i$'s, i.e., $A^T=(A_1^T|\ldots|A_N^T)$. It
+is now easy to prove that $sA+e$ is pseudorandom (under LWE), no
+matter what the adversary does. But this arrangement opens another
+avenue of attack: The adversary (still controlling $P_N$) set
+$A_N=A_1$, so the bottom few rows in $A$ are equal to the top few
+rows. Hence, also the bottom few rows in $AR$ are equal to the top few
+rows, which lets the adversary distinguish $AR$ from a uniform
+random~$U$.
+
+%----------------------------------------------------------------
+\paragraph{Some other failed attempts.}
+At this point one may hope that if we let the parties choose different
+diagonals then neither of the attacks above would apply, but this is
+not the case. Here too, an adversary controlling all but one party can
+force the matrix~$A$ to have many identical rows, which would mean
+that so does the matrix~$AR$. More generally, it seems that any
+arrangement where each party chooses a subset of the entries in~$A$
+will let the adversary force~$A$ to be low rank, and hence also $AR$
+will be of low rank. (Here too the ``dual'' scheme works better, since
+the attacker sees $AR+E$ rather than $AR$ itself.)
+
+%\anti{Does it worth to mention the variant of the attack where the
+%secret $s$ is a matrix (short secret LWE assumption)?}
+%\shai{No, why does it matter? This attack completely ignores $s$.}
+
+\iffalse
+ %----------------------------------------------------------------
+ \paragraph{A simple plausible candidate, parties choose different bits.}
+ Letting different parties choose different entries in $A$ does not
+ seem to work, but we can instead let each party choose some
+ \emph{bits} in each entry. For example, with $N$ parties we can set
+ $q=2^{\kappa N}$, then let party~$P_1$ choose bits
+ $0,N,2N,\ldots,N(\kappa-1)$ in each entry of~$A$, party $P_2$ choose
+ bits $1,N+1,2N+1,\ldots,N(\kappa-1)+1$, etc.
+ 
+ As far as we can see, the two lines of attacks from above do not apply
+ to this candidate. On one hand, if the adversary's bits are fixed
+ irrespective of the bits of the honest party, then each column of $A$
+ would have sufficient entropy to render $sA+e$ pseudorandom. On the
+ other hand, the honest party controls enough bits in every row, so it
+ seems hard for the adversary to cause $A$ have low rank.
+\fi

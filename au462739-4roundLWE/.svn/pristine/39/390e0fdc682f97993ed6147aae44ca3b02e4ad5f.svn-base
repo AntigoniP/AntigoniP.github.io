@@ -1,0 +1,188 @@
+% !TEX root =../main-optimal.tex
+
+\input{chapters/2pc-def}
+%\input{chapters/proof-systems}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% NONE OF THIS IS BEING USED, TO BE DELETED LATER%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\iffalse
+\section{Preliminaries}
+
+\paragraph{Basic notations.}
+We denote the security parameter by $\kappa$. We say that a function $\mu:\NN\rightarrow\NN$ is {\em negligible} if for every positive polynomial $p(\cdot)$ and all sufficiently large $\kappa$'s it holds that $\mu(\kappa)<\frac{1}{p(\kappa)}$. We use the abbreviation \ppt\ to denote probabilistic polynomial-time. We specify next the definition of computationally indistinguishable and statistical distance.
+
+\BD
+Let $X=\{X(a,\kappa)\}_{a\in\bit^*,\kappa\in\NN}$ and $Y=\{Y(a,\kappa)\}_{a\in\bit^*,\kappa\in\NN}$ be two distribution ensembles. We say that $X$ and $Y$ are {\em computationally indistinguishable}, denoted $X\indist Y$, if for every \ppt\ machine $D$, every $a\in\bit^*$, every positive polynomial $p(\cdot)$ and all sufficiently large $\kappa$'s,
+$$
+\big|\prob\left[D(X(a,\kappa),1^\kappa)=1\right]-\prob\left[D(Y(a,\kappa),1^\kappa)=1\right]\big|
+<\frac{1}{p(\kappa)}.
+$$
+\ED
+
+\BD
+Let $X_\kappa$ and $Y_\kappa$ be random variables accepting values taken from a finite domain $\Omega\subseteq\bit^\kappa$. The \emph{statistical distance} between $X_\kappa$ and $Y_\kappa$ is
+$$
+SD(X_\kappa,Y_\kappa)=\frac{1}{2}\sum_{\omega\in\Omega}\big|\Pr[X_\kappa=\omega]-\Pr[Y_\kappa=\omega]\big|.
+$$
+We say that $X_\kappa$ and $Y_\kappa$ are \emph{$\varepsilon$-close} if their statistical distance is at most $SD(X_\kappa,Y_\kappa) \le  \varepsilon(\kappa)$. We say that $X_\kappa$ and $Y_\kappa$ are \emph{statistically close}, denoted $X_\kappa\approx_s Y_\kappa$, if $\varepsilon(\kappa)$ is negligible in $\kappa$.
+\ED
+
+
+\subsection{Commitment Schemes}\label{sec:com}
+
+Commitment schemes are used to enable a party, known as the {\em sender} $\sen$, to commit itself to a value while keeping it secret from the {\em receiver} $\rec$ (this property is called \emph{hiding}). Furthermore, in a later stage when the commitment is opened, it is guaranteed that the ``opening'' can yield only a single value determined in the committing phase (this property is called \emph{binding}). In this work, we consider commitment schemes that are \emph{statistically binding}, namely while the hiding property only holds against computationally bounded (non-uniform) adversaries, the binding property is required to hold against unbounded adversaries. Formally,
+
+\BD[Commitment schemes]\label{def:com}
+A \ppt\ machine $\Com = \langle S, R\rangle$ is said to be a non-interactive commitment scheme if the following two properties hold.
+\begin{description}
+\item[Computational hiding:] For every (expected) \ppt\ machine $\rec^*$, it holds that the following ensembles are computationally indistinguishable.
+\BI
+\item $\{\view_{\Com}^{\rec^*}(m_1,z)\}_{\kappa \in N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$
+
+\item $\{\view_{\Com}^{\rec^*}(m_2,z)\}_{\kappa \in N,m_1, m_2 \in\{0,1\}^\kappa,z\in\{0,1\}^*}$
+\EI
+where $\view_{\Com}^{R^*}(m,z)$ denotes the random variable describing the output of $\rec^*$ after receiving a commitment to $m$ using $\Com$.
+
+\item[Statistical binding:] %Informally, the statistical-binding property asserts that, with overwhelming probability over the coin-tosses of the receiver $\rec$, the transcript of the interaction fully determines the value committed to by the sender.  More formally,
+For any (computationally unbounded) malicious sender $\sen^*$ and auxiliary input $z$, it holds that the probability that there exist valid decommitments to two different values for a view $v$, generated with an honest receiver while interacting with $\sen^*(z)$ using $\Com$, is negligible.
+\end{description}
+\ED
+We refer the reader to \cite{Goldreich01} for more details. We recall that non-interactive perfectly binding commitment schemes can be constructed based on one-way permutation, whereas two-round statistically binding commitment schemes can be constructed based on one-way functions~\cite{Naor91}.
+To set up some notations, we let $\com_m \leftarrow \Com(m; r_m)$ denote a commitment to a message $m$, where the sender uses uniform random coins $r_m$. The decommitment phase consists of the sender sending the decommitment information $\decom_m = (m, r_m)$ which contains the message $m$ together with the randomness $r_m$. This enables the receiver to verify whether $\decom_m$ is consistent with the transcript $\com_m$. If so, it outputs $m$; otherwise it outputs $\bot$. For simplicity of exposition, in the sequel, we will assume that random coins are an implicit input to the commitment functions, unless specified explicitly.
+
+\anti{insert notation for non-malleable commitments}
+
+
+\remove{\BD[Trapdoor commitment schemes]\label{def:tcom}
+Let $\Com=(\sen,\rec)$ be a statistically binding commitment scheme. We say that $\Com$ is a trapdoor commitment scheme is there exists an expected \ppt\ oracle machine $\cS = (\cS_1,\cS_2)$ such that for any \ppt\ $\rec^*$ and all $m\in\bit^\kappa$, the output $(\tau,w)$ of the following experiments is computationally indistinguishable:
+\BDE
+\item[-] an honest sender $\sen$ interacts with $\rec^*$ to commit to $m$, and then opens the commitment: $\tau$ is the view of $\rec^*$ in the commit phase, and $w$ is the message $\sen$ sends in the open phase.
+
+\item[-] the simulator $\cS$ generates a simulated view $\tau$ for the commit phase, and then opens the commitment to $m$ in the open phase: formally $(\tau,state)\gets\cS_1^{\rec^*}(1^\kappa)$, $w\gets\cS_2(state,m)$.
+\EDE
+\ED}
+
+
+
+\subsection{Hardcore Predicates}
+
+\BD[Hardcore predicate]\label{def:hardcore}\anti{if we keep this definition I have to modify it}
+Let $f : \bit^\kappa \rightarrow \bit^*$ and $\hb: \bit^\kappa \rightarrow \bit$ be a polynomial-time computable functions. We say $\hb$ is a hardcore predicate of $f$, if for every \ppt\ machine $A$, there exists a negligible function $\ngl(\cdot)$ such that
+$$
+\Pr[x \leftarrow \bit^\kappa; y = f(x) : A(1^\kappa,y) = \hb(x) ] \leq \frac{1}{2} + \ngl(\kappa).
+$$
+\ED
+
+\remove{An important theorem by Goldreich and Levin~\cite{GoldreichL89} states that if $f$ is a one-way function over $\bit^\kappa$ then the one-way function $f'$ over $\bit^{2\kappa}$, defined by $f'(x,r)=(f(x),r)$, admits the following hardcore predicate $b(x,r)=\langle x,r \rangle =\Sigma x_i r_i \bmod 2$, where $x_i,r_i$ is the $i$th bit of $x,r$ respectively. In the following, we refer to this predicate as the GL bit of $f$. We will use the following theorem that establishes the list-decoding property of the GL bit.
+
+\BT[\cite{GoldreichL89}]\label{thm:gole} There exists a \ppt\ oracle machine $\Inv$ that on input $(\kappa,\varepsilon)$ and oracle access to a predictor \ppt\ $B$, runs in time $poly(\kappa,\frac{1}{\varepsilon})$, makes at most $O(\frac{\kappa^2}{\varepsilon^2})$ queries to $B$ and outputs a list $L$ with $|L| \leq \frac{4\kappa}{\varepsilon^2}$ such that if
+$$
+\Pr[r \leftarrow \bit^\kappa: B(r) = \langle x,r \rangle] \geq \frac{1}{2}+\frac{\varepsilon}{2}
+$$
+then
+$$
+\Pr[L \leftarrow \Inv^B(\kappa,\varepsilon) : x \in L] \geq \frac{1}{2}.
+$$
+\ET
+\anti{update the hardcore predicates}}
+
+
+\remove{\subsection{Trapdoor Permutations}
+
+\BD[Trapdoor Permutation] Let $\cF = (\Gen, \Eval, \Invert)$ be three \ppt algorithms such
+that
+\BI
+\item $\Gen(1^\kappa)$ outputs a pair $(f,{\sf trap})$ where $f : \{0, 1\}^\kappa \rightarrow \{0, 1\}^\kappa$ is a permutation;
+\item $\Eval(f, \cdot) = f(\cdot)$ evaluates $f$; and
+\item $\Invert(f,{\sf trap}, \cdot) = f^{-1}(\cdot)$ evaluates $f^{-1}$.
+\EI
+We say that $\cF$ is a family of trapdoor permutations (TDPs) if for any \ppt algorithm $\sf R$
+$$\Pr[{(f,{\sf trap})\leftarrow\Gen(1^\kappa);y\leftarrow \{0,1\}^\kappa}:({\sf R}(f, y) = f^{-1}(x)\big)]= negl(\kappa)$$.
+\ED}
+
+
+
+
+\remove{\subsection{Secret-Sharing}\label{def:ss}
+
+A secret-sharing scheme allows distribution of a secret among a group of $n$ players, each of whom in a \emph{sharing phase} receive a share (or piece) of the secret. In its simplest form, the goal of secret-sharing is to allow only subsets of players of size at least $t+1$ to reconstruct the secret. More formally a $t+1$-out-of-$n$ secret sharing scheme comes with a sharing algorithm that on input a secret $s$ outputs $n$ shares $s_1,\ldots,s_n$ and a reconstruction algorithm that takes as input $((s_i)_{i \in S},S)$ where $|S| > t$ and outputs either a secret $s'$ or $\bot$. In this work, we will use the Shamir's secret sharing scheme~\cite{Shamir79} with secrets in $\FF = GF(2^\kappa)$. We present the sharing and reconstruction algorithms below:
+\begin{description}
+\item[Sharing algorithm:] For any input $s \in \FF$, pick a random polynomial $f(\cdot)$ of degree $t$ in the polynomial-field $\FF[x]$ with the condition that $f(0) = s$ and output $f(1),\ldots,f(n)$.
+
+\item[Reconstruction algorithm:] For any input $(s_i')_{i \in S}$ where none of the $s_i'$ are $\bot$ and $|S| > t$, compute a polynomial $g(x)$ such that $g(i) = s_i'$ for every $i \in S$. This is possible using Lagrange interpolation where $g$ is given by
+$$
+g(x) = \sum_{i \in S} s_i' \prod_{j \in S/\{i\}} \frac{x - j}{i-j}~.
+$$
+Finally the reconstruction algorithm outputs $g(0)$.
+\end{description}
+%
+We will additionally rely on the following property of secret-sharing schemes. To this end, we view the Shamir secret-sharing scheme as a linear code generated by the following $n\times (t+1)$ Vandermonde matrix
+$$
+A=\left(
+\begin{array}{ccccc}
+1 & 1^2& \cdots& 1^{t}\\
+1 & 2^2 &\cdots& 2^{t}\\
+\vdots&\vdots&\vdots&\vdots \\
+1& n^2&\cdots&n^{t}
+\end{array}
+\right)
+$$
+More formally, the shares of a secret $s$ that are obtained via a polynomial $f$ in the Shamir scheme, can be obtained by computing $A\textbf{c}$ where $\textbf{c}$ is the vector containing the coefficients of $f$. Next, we recall that for any linear code $A$, there exists a parity check matrix $H$ of dimension $(n-t-1)\times n$ which satisfies the equation $HA=\textbf{0}_{(n-t-1)\times (t+1)}$, i.e. the all $0$'s matrix. We thus define the linear operator $\phi(v) = Hv$ for any vector $v$. Then it holds that any set of shares $\textbf{s}$ is valid if and only if it satisfies the equation $\phi(\textbf{s}) = \textbf{0}_{n-t-1}$.
+
+%The authors in \cite{DZ13} were the first to propose an algorithm for verifying membership in (binary) codes, i.e., verifying the product of Boolean matrices in quadratic time with exponentially small error probability, while previous methods only achieved constant error.
+}
+
+\section{Garbled Circuits}
+
+
+
+
+
+\paragraph{Yao Garbling.} \anti{move this to the appendix}We briefly describe the garbling technique of Yao~\cite{Yao86} as described by Lindell and Pinkas in~\cite{LindellP09}. In this construction, the desired function $f$ is represented by a boolean circuit $C$ that is computed gate by gate from the input wires to the output wires. In the following, we distinguish four different types of wires used in a given boolean circuit: ({\bf a}) circuit-input wires; ({\bf b}) circuit-output wires; ({\bf c}) gate-input wires (that enter some gate $g$); and ({\bf d}) gate-output wires (that leave some gate $g$). The underlying idea is to associate every wire $w$ with two random values, say $\lbl^0_w,\lbl^1_w$, such that $\lbl^0_w$ represents the bit $0$ and $\lbl^1_w$ represents the bit $1$. The algorithm $\GCircuit$ on input the security parameter $\sec$, the circuit $C$, and the set of labels $\lbl^{w}_b$ for all the wires $w \in \inp(C)$ and $b \in \bit$ generates the garbled table for each gate which maps random input values  to random output values, with the property that given two input values it is only possible to learn the output value that corresponds to the output bit. This is accomplished by viewing the  four potential inputs to a gate $\lbl^0_w,\lbl^1_w$ (values associated with the first input wire)  and $\lbl^0_{w+1},\lbl^1_{w+1}$ (values associated with the second input wire), as encryption keys. So that the output key values $\lbl^0_{w+2},\lbl^1_{w+2}$ are encrypted under the appropriate input keys. For instance, let $\gate$ be a NAND gate. Then, the output key $\lbl_{w+2}^1$ (that corresponds to bit $1$) is encrypted under the pair of keys associated with the values $(0,0),\;(0,1),\;(1,0)$. Whereas, the output key $\lbl^0_{w+2}$ is encrypted under the pair of keys associated with $(1,1)$ which yields the following four ciphertexts
+$$
+\enc_{\lbl^0_w}(\enc_{\lbl^0_{w+1}}(\lbl^1_{w+2}))$$$$\enc_{\lbl^0_w}(\enc_{\lbl^1_{w+1}}(\lbl^1_{w+2}))$$$$\enc_{\lbl^1_w}(\enc_{\lbl^0_{w+1}}(\lbl^1_{w+2}))$$$$ \enc_{\lbl^1_w}(\enc_{\lbl^1_{w+1}}(\lbl^0_{w+2})),
+$$
+where $(\gen,\enc,\dec)$ is a symmetric key encryption scheme that has {\em chosen double encryption security} and an {\em elusive efficiently verifiable range}; see~\cite{LindellP09} for the formal definitions. These ciphertexts are randomly permuted in order to obtain the garbled table for gate $\gate$. The evaluation algorithm $\Eval$ performing the same operation per gate of $C$ proceeds as follows. Given the input wire keys $\lbl^{\alpha}_w,\lbl^{\beta}_{w+1}$ for a $\gate$ in $C$ that correspond to the bits $\alpha$ and $\beta$ and the garbled table containing the four ciphertexts, it is possible to obtain the output wire key $\lbl^{\gate(\alpha,\beta)}_{w+2}$. The description of the garbled circuit is concluded with the {\em output decryption tables}, mapping the random values on the circuit output wires back to their corresponding boolean values.
+\fi

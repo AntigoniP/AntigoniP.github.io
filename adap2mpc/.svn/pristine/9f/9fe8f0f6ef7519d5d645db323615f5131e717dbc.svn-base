@@ -1,0 +1,234 @@
+%
+% Paper latex template
+%
+% Date: 2015-01-05
+%
+% Changes:
+% - 2015-01-05: 
+%     major revision
+%     use of etoolbox toggle, cleveref, xspace todo, ...
+%
+
+%
+% Parameters
+%
+
+\RequirePackage[l2tabu, orthodox]{nag}
+\RequirePackage{etoolbox}
+
+\newtoggle{full}          % false = conference version; true = full version
+\newtoggle{showoverflow}  % true = show overflows
+\newtoggle{allowtodo}     % false = remove todo command
+\newtoggle{showtodo}      % true = show todo and notes; false = hide todo
+\newtoggle{anonymous}     % true = anonymous
+\newtoggle{submission}    % true = submission (force llncs style for crypto)
+\newtoggle{llncs}
+
+\providetoggle{forcefull} % true = force full version from outside (see paper-full.tex)
+\providetoggle{forceconf} % true = force conf version from outside (see paper-conf.tex)
+\iftoggle{forcefull}{
+  \toggletrue{full}
+}{
+  \iftoggle{forceconf}{
+    \togglefalse{full}
+  }{
+    \toggletrue{full}     % default value for full
+  }
+}
+
+
+\toggletrue{submission}   % default value for submission
+\toggletrue{showoverflow} % default value for showoverflow
+\toggletrue{allowtodo}    % default value for allowtodo
+\toggletrue{showtodo}     % default value for showtodo
+\toggletrue{anonymous}    % default value for anonymous
+
+\ifboolexpr{togl{full} and (not togl{submission})}{
+  \togglefalse{llncs}
+}{
+  \toggletrue{llncs}
+}
+
+\newcommand{\remove}[1]{}
+%
+% Document class 
+%
+\iftoggle{llncs}{
+  \documentclass[envcountsame,envcountsect,runningheads]{llncs}
+}{
+  % \documentclass[11pt,envcountsame,envcountsect,runningheads]{llncs}
+  % \documentclass[11pt,envcountsame,envcountsect,runningheads]{llncs+}
+  \documentclass[11pt]{article}
+
+  % Palatino is obsolete but the alternative does not give exactly the same result...
+  \usepackage{palatino}
+
+  \usepackage[hmargin=1in,vmargin=1in]{geometry}
+  \usepackage{amsthm,amsmath}
+  \usepackage{fullpage}
+}
+
+%
+% Custom header
+%
+\input{tex_files/ZZ_header}
+%\addtolength{\parskip}{0.75ex}
+
+% Theorem definition should be done after loading cleverref
+
+\nottoggle{llncs}{
+  \newtheorem{theorem}{Theorem}[section]
+  \newtheorem{lemma}[theorem]{Lemma}
+  \newtheorem{claim}[theorem]{Claim}
+  \newtheorem{corollary}[theorem]{Corollary}
+  \newtheorem{assumption}[theorem]{Assumption}
+  \theoremstyle{definition}
+  \newtheorem{mydefinition}[theorem]{Definition}
+  \theoremstyle{remark}
+  \newtheorem{remark}[theorem]{Remark}
+}{
+    % Force roman in definition
+  \makeatletter
+  \spnewtheorem{mydefinition}[theorem]{Definition}{\bfseries}{\rmfamily}
+  \def\theHmydefinition{\theHtheorem}
+  \makeatother
+  \Crefname{mydefinition}{Definition}{Definitions}
+  \crefname{mydefinition}{Definition}{Definitions}
+}
+
+\usepackage{multirow}
+
+%
+% Title and other informations
+%
+
+\title{Adaptive 2-Round Secure Multiparty Computation}
+
+\date{}
+
+\nottoggle{anonymous}{
+  \iftoggle{llncs}{  
+    \author{Fabrice Benhamouda\inst{1} \and Huijia Lin\inst{2} \and Antigoni Polychroniadou\inst{3} \and Muthuramakrishnan Venkitasubramaniam\inst{4}} 
+    \institute{
+      IBM Research, Yorktown Heights, US
+      \and
+      University of California, Santa Barbara, US
+      \and
+      Cornell Tech and University of Rochester, US
+      \and
+      University of Rochester, US
+    }
+  }{
+    % \author{Fabrice Benhamouda\thanks{ \texttt{fabrice.benhamouda@normalesup.org},
+    %     IBM Research, Yorktown Heights, US}
+    %   \and Huijia Lin\thanks{ \texttt{rachel.lin@cs.ucsb.edu},
+    %     University of California, Santa Barbara, US}
+    % } 
+  }
+  \hypersetup{
+    pdfauthor = {Fabrice Benhamouda, Huijia Lin, Antigoni Polychroniadou, and Muthuramakrishnan Venkitasubramaniam}
+  }
+  
+  \iftoggle{full}{
+    % \publication{}
+    % \copyright{}
+  }{
+  }
+}{
+  \author{}
+  % \authorrunning{}
+  \institute{}
+}
+
+\makeatletter
+\AtBeginDocument{
+  \hypersetup{
+    pdftitle = {\@title},
+  }
+}
+\makeatother
+
+\begin{document}
+\maketitle
+
+\nottoggle{llncs}{
+  \patchcmd{\abstract}{\small}{}{}{}
+  % use normal size abstract
+  % https://tex.stackexchange.com/a/133165/34384
+}{
+}
+
+\begin{abstract}
+The round complexity of secure multiparty computation is a fundamental question in modern cryptography. In this work, we identify the round complexity of multiparty computation against adaptive corruptions. 
+
+ assuming an ideal oblivious transfer (OT) functionality assuming adaptive corruptions. More precisely, we design a two-round adaptively secure MPC protocol in the OT-hybrid. We build upon the recent work of Benhamouda and Lin and Garg and Srinivasan who design a two-round secure MPC protocol in the OT-hybrid against static corruptions. 
+%\addvspace{\baselineskip}
+%\noindent
+%\textbf{Keywords.} 
+\end{abstract}
+
+\Fnote{We use CryptoBib (\url{https://cryptobib.di.ens.fr}) for the bibliography. Most references are already inside CryptoBib. See \url{https://cryptobib.di.ens.fr/manual\#labeling-conventions}. If you need to add a reference, please add it in the file add.bib.}
+
+\Fnote{We use cleveref. To make a reference to the introduction for example, just write \texttt{\textbackslash{}ref\{sec:intro\}} and you get \cref{sec:intro}}
+
+\Fnote{We can write notes using Anote, Fnote, Mnote, Rnote for Antigoni, Fabrice, Muthu, and Rachel respectively}
+
+\Rnote{}
+\anti{}
+\Mnote{}
+
+\Fnote{We use the environment ``mydefinition'' instead of ``definition'' to get roman fonts in llncs. I tried to patch smartly the environment of llncs instead of creating a new one but I did not manage without modifying llncs.cls (and so I think it would have been removed from the camera-ready version).}
+
+\nottoggle{llncs}{
+  \clearpage
+  \tableofcontents
+  \clearpage
+}
+
+\input{tex_files/01_Intro}
+\input{tex_files/02_Overview}
+\input{tex_files/03_Def}
+\input{tex_files/04_Semi_Malicious}
+\input{tex_files/05_Malicious}
+\input{tex_files/06_Instantiations}
+\input{tex_files/06b_HPS}
+% \input{tex_files/07_NIZK}
+
+\iftoggle{anonymous}{}{
+  \subsubsection*{Acknowledgments\iftoggle{llncs}{.}{}}
+}
+
+\iftoggle{llncs}{
+  \bibliographystyle{splncs03}
+}{
+%  \bibliographystyle{alpha-short}
+  \bibliographystyle{alpha}
+}
+\bibliography{cryptobib/abbrev3,cryptobib/crypto,add}
+
+\iftoggle{full}{
+\appendix
+
+\iftoggle{llncs}{\chapter*{Appendix}}{}
+
+\remove{\section{Appendices from EC paper}
+
+\Fnote{just for information}
+
+\input{tex_files/AA_Def}
+\input{tex_files/AB_MPC_Proof}
+\input{tex_files/AC_GIC_Cons_Proof}
+\input{tex_Files/AD_HC_Proof}
+}
+}{}
+
+
+\end{document}
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

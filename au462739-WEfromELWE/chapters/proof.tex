@@ -1,0 +1,68 @@
+% !TEX root =../main.tex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proof of Security} \label{sec:secProof}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+We follow a hybrid strategy where
+the core security property is focused on whether a single witness satisfies a relation via positional witness encryption.
+
+% To encode a position $t$, we wish to produce  tribes sub-matrix in $S$ where the boolean function will
+output 1 for every witness $y < t$, and will output $0$ otherwise.
+\BT 
+%Let $\ell_{in}, \ell_{out} \in \NN$ and let $F : (\bit^{\ell_{in}})^N \rightarrow \bit^{\ell_{out}}$ be any deterministic polynomial-time $N$-party functionality. 
+Assuming sub-exponential hardness of the interactive $\LWE$ the scheme above is a sound witness encryption scheme
+
+\label{thm:main}
+\ET
+\begin{proof}
+By construction for all $i\in [\ell], L_{A_{i,x_i}}^{\bid}=V_0\prod_{i\in[\ell]} S_{i,\id_i} A_{i,\id_i}$, however in order achieve indisthinghuisability between the real and simulated experiments each $S_{i,\id_i}$ is defined as a block diagonal matrix of size $(2n+\ell) \times (2n+\ell)$ with blocks $\upS, \downS, \auxS$ such that: 
+$$L_{A_{i,x_i}}^{\bid}=V_0(\prod_{i\in[\ell]} \upS_{i,\id_i} \upA_{i,\id_i}+\prod_{i\in[\ell]} \downS_{i,\id_i} \downA_{i,\id_i}+\prod_{i\in[\ell]} \auxS_{i,\id_i} \auxA_{i,\id_i})$$
+where $\downS, \auxS$ are zero matrices in the real world experiment. 
+For $k \in [0, 2^\ell]$ let $\Hyb{k}$ be a hybrid experiment that is identical to the original except that
+the challenge ciphertext is generated as a call to $\PEncrypt(1^\lambda,x,t=k,\mu_b)$. Note that $\Hyb{0}$
+corresponds to the actual witness encryption security game. Let $\adv^{\Hyb{k}}$ denote the advantage of
+the attacker $\cA$ in experiment $\Hyb{k}$. We are going to show that $\adv^{\Hyb{0}}\leq 2^\ell \cdot \adv^{\sf PWE}_\cA,x(\lambda)+ \adv^{\Hyb{2^\ell}}$.
+
+Throughout the hybrids we maintain the following invariant: 
+\BI
+\item For every non-output wire $w=1,\ldots,|\cC|-1$ carrying the value $b^*$ for input witness $k$ , trapdoors $T_{A_{w,b^*}}$ are not provided and $(T_{A_{w,1-b^*}}$ are provided. 
+\EI
+
+\BE
+
+\item[] $\hybs~ \Hyb{k,0}$: For all $i\in[\ell]$ we modify matrices $\downS_{i,k_i}$ by replacing each of them with a random matrix $U_{i,t_i}$. 
+\item[] $\hybs~ \Hyb{k,1}$: In this hybrid we modify the $\ell$-th matrixes $\downS_{\ell,k_\ell}$ by replacing both of them with the random matrix $s$. Indistinguishability follows by interactive LWE. 
+
+\item[] $\hybs~ \Hyb{k,2}$: As in hybrid $ \Hyb{k,1}$, except that the challenger simulates the generation of recoding keys corresponding to witness $k$ based on the final input encodings $\Encode(\downA, s)$. We define a collection of hybrid executions such that for every internal wire $w \in [\ell+ 1, |\cC| -1]$ of the circuit $\cC$ hybrid $\Hyb{k,2,w}$ is defined as follows:
+\BI
+\item Generation of public key $\downA_{w,1-b^*}$: For internal wire $w$ of the circuit $\cC$ carrying the value $b^*$ for input $t$, generate public/secret key pairs by running 
+$$(\downA_{w,1-b^*}, T_{\downA_{w,1-b^*}})\leftarrow \Keygen(\pp)$$.
+\item Generation of public key $\downA_{w,b^*}$: For internal wire $w$, let $g = (u, v, w)$ denote the gate for which $w$ is the outgoing
+wire. Suppose wires $u$ and $v$ carry the values $b^*$ and $c^*$, so that wire $w$ carries the value
+$d^*:= g_w(b^*, c^*)$. Given that $(T_{\downA_{w,b^*}},T_{\downA_{w,c^*}})$ are not provided generate recoding keys $\overline\rk=[\overline R, \overline R']^{\top}$ corresponding to $\downA$ matrices as follows: 
+
+
+
+\begin{gather*}
+(\downA_{w,d^*}, \overline\rk^w_{b^*,c^*})\leftarrow\SimReKeyGen(\downA_{u,b^*},\downA_{v,c^*})\\
+         \overline\rk^w_{1-b^*,c^*}\leftarrow\ReKeyGen\big(\downA_{u,1-b^*},\downA_{v,c^*},T_{\downA_{u,1-b^*}},\downA_{w,g_w(1-b^*,c^*)}\big) \\
+       \overline\rk^w_{b^*,1-c^*}\leftarrow\ReKeyGen\big(\downA_{u,1-b^*},\downA_{v,1-c^*},T_{\downA_{u,1-c^*}},\downA_{w,g_w(b^*,1-c^*)}\big) \\  \overline\rk^w_{1-b^*,1-c^*}\leftarrow\ReKeyGen\big(\downA_{u,1-b^*},\downA_{v,1-c^*},T_{\downA_{u,1-b^*}},\downA_{w,g_w(1-b^*,1-c^*)}\big)
+     \end{gather*}
+\EI
+In order to program the final recoding keys $\rk$ corresponding to input encodings $\Encode(A, \prod_{i\in[\ell-1]} S_{i,b^*}\cdot s)$ given simulated $\downA_{u,b}\cdot \overline R_{b,c}+\downA_{v,c}\cdot \overline R'_{b,c}=\downA_{w,g_w(b,c)}$ and trapdoors we generate $\rk$ such that 
+$A_{u,b}\cdot R_{b,c}+A_{v,c}\cdot  R'_{b,c}=A_{w,g_w(b,c)}$.  
+It follows by key indistinguishability and recoding simulation that $|\adv^{\Hyb{k,2,w}}-\adv^{\Hyb{k,2,w+1}}|\leq\ngl(\lambda)$.  \anti{$T_{\downA_{u,1-b^*}}$ doesnt really exist}
+
+\item[] $\hybs~ \Hyb{k,3}$: For all $i\in[\ell]$ we modify matrices $\auxS_{i,0},\auxS_{i,1}$ by replacing them with a tribal matrix according to $k$. In particular, let $k=(k_1,\ldots,k_\ell)\in\bit^\ell$ then the $c$-th
+column of matrices $\auxS_{i,t_i}$ of size $\ell\times\ell$ is defined as follows: 
+
+\begin{align*}
+\bullet~\text{For}~  &c<r           & \bullet~ \text{For}~  &c=r             &  \bullet~\text{For}~&c>r\\
+\auxS_{i,0}&  [r,c]=B    &  \auxS_{i,0}&[r,c]=\begin{cases}U~ \text{if}~ k_i=0\\B~ \text{if}~ k_i=1 \end{cases}   &  \auxS_{i,0}&[r,c]=B= \auxS_{i,1}[r,c]\\
+\auxS_{i,1}&[r,c]=\begin{cases}U~ \text{if}~ k_i=0\\B~ \text{if}~ k_i=1 \end{cases}  &  \auxS_{i,1}&   [r,c]=U        &  & 
+\end{align*}
+\EE
+\end{proof}
+%$\hybs~ \Hyb{k,0},\ldots, \Hyb{1,2\ell}$: We define a collection of hybrid executions such that for every $i \in [2\ell]$ hybrid $\Hyb{k,i}$ is defined as follows. We modify the lower part of matrices $S_{i,t_i}$ by replacing it with a tribal matrix according to $t=(t_1,\ldots,t_\ell)$. \anti{the matrix is defined in the same way as in \cite{C:GenLewWat14}, need to import it } 
+
+
+

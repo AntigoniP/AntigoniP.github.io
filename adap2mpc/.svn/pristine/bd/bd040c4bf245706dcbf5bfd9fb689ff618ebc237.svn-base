@@ -1,0 +1,363 @@
+% !TEX root =../main.tex
+
+%\section{Additional Definitions}
+%\label{A:def-preliminaries}
+
+\subsection{Circuit Classes and Indistinguishability}
+\label{A:preliminaries}
+
+\subparagraph{Circuit Classes and Families:}
+We recall the definitions of circuit classes and families.
+
+\begin{mydefinition}[Class of $\cirsize$-Size Circuits]
+  Let $\cirsize$ be a function from $\N$ to $\N$, a {\em
+    $\cirsize$-size circuit class} is a family of sets
+  $\circlass = {\{\circlass_\secpar\}}_{\secpar \in
+    \N}$ of circuits, satisfying that every circuit $\cir \in
+  \circlass_\secpar$ has size at most $\cirsize(\secpar)$. A
+  {\em $\poly$-size circuit class} is a $\cirsize$-size circuit class
+  for some polynomial $\cirsize$.
+  
+  Let $\cirinlen$ and $\ciroutlen$ be functions from $\N$ to $\N$. We
+  say that $\circlass$ has input and/or output length $\cirinlen$ and
+  $\ciroutlen$, if every circuit $\cir \in
+  \circlass_\secpar$ has input and/or output length~$\cirinlen(\secpar)$ and~$\ciroutlen(\secpar)$.
+\end{mydefinition}
+
+For the sake of simplicity, we suppose that all circuits in $\circlass_\secpar$ have the same input and output lengths. This can be achieved without loss of generality using appropriate paddings.
+
+
+
+% Since the
+% input and output lengths of any circuit in
+% $\circlass^\cirsize_\secpar$ are bounded by $\cirsize(\secpar)$, it
+% suffices if the universal circuit $\univcirc^\cirsize_\secpar$ takes
+% as input $\cirsize(\secpar) + \cirsize(\secpar)$ bits and outputs
+% $\cirsize(\secpar)$ bits, and the inputs and outputs are appropriately
+% padded.
+
+\subparagraph{Statistical and Computational Indistinguishability:}
+A function $\negl \colon \N \to \N$ is negligible if for any polynomial $p\colon \N \to \N$, for any large enough $\secpar \in \N$, $\negl(\secpar) < 1 / p(\secpar)$.
+
+\begin{mydefinition}[Indistinguishability]
+  Let $S = {\{S_\secpar\}}_{\secpar \in \N}$ be an ensemble of subsets
+  of $\bits^*$, where every element in set $S_\secpar$ has length
+  $\poly(\secpar)$.  Then ensembles $X = {\{X_{\secpar,
+      w}\}}_{\secpar \in \N, w \in S_\secpar}$ and $Y = {\{Y_{\secpar,
+      w}\}}_{\secpar \in \N, w \in S_\secpar}$ % \todo{F: maybe this should be moved after computationally ind., although there is a parenthesis issue --- by the way, we don't use this notation, but we may use it later.} 
+  are \emph{statistically} (resp., \emph{computationally}) \emph{indistinguishable}, denoted as $X \approx_s Y$ (resp., $X \approx Y$), if for any arbitrary-size (resp., polynomial-size)
+  circuit family $\dist = {\{\dist_\secpar\}}_{\secpar \in \N}$ and any polynomial-size sequence of index $\smallset{w_\secpar \in S}_{\secpar \in \N}$, there exists
+  a negligible function $\negl$ such that, for every $\secpar \in \N$,
+  \[ \left| \Pr\left[\dist_{\secpar}(w_\secpar,X_{\secpar,w_\secpar}) = 1\right] -
+    \Pr\left[\dist_{\secpar}(w_\secpar,Y_{\secpar,w_\secpar}) = 1\right] \right| \le \negl(\secpar) \enspace.\]
+\end{mydefinition}
+
+Two statistically indistinguishable ensembles are also said to be \emph{statistically close}.
+
+
+\subsection{Garbled Circuit}
+\label{sec:gc}
+
+\begin{mydefinition}[Garbled Circuit]
+  Let $\circlass = {\{\circlass_\secpar\}}_{\secpar \in \N}$ be a
+  $\poly$-size circuit class with input and output lengths $\cirinlen$
+  and $\ciroutlen$.  A \emph{garbled circuit} scheme $\gc$ for
+  $\circlass$ % with
+%   polynomial universal circuits 
+  is a tuple of four
+  polynomial-time algorithms $\gc=(\gcgen,\gcgarble,\gceval,\allowbreak\gcsim)$: 
+  \begin{description}
+  \item[Input Labels Generation:] $\gckey \getsr \gcgen(1^\secpar)$
+%     1^\cirinlen)$
+    generates input labels $\{\gckey_{b}^i\}_{i \in
+      [\cirinlen],b \in \bits }$ (with $\gckey_{b}^i \in \bits^\kappa$ being
+    the input label corresponding to the value $b$ of the $i$-th input
+    wire) for the security parameter $\secpar$, input length
+    $\cirinlen$, and input label length $\kappa$; % = \cirinlen(\secpar)$;
+  \item[Circuit Garbling:] $\gccir \getsr \gcgarble(\gckey, \cir)$
+     garbles the circuit $\cir \in \circlass_\secpar$
+    into $\gccir$;
+  \item[Evaluation:] $\cirout = \gceval(\gccir, \gckey_{b_i})$  evaluates the
+    garbled circuit $\gcgarble$ using input labels
+    ${\{\gckey^i_{b_i}\}}_{i \in [n]}$ (where $\gckey'[i] \in \bits^\kappa$)
+    and returns the output $\cirout \in \bits^\ciroutlen$; %   with
+%      $\ciroutlen = \ciroutlen(\secpar)$
+    
+  \item[Simulation:] $(\gckey', \gcsimcir) \getsr \gcsim(1^\secpar,
+    \cirout)$
+    % 1^\cirsize, 1^\cirinlen, \cirout)$
+     simulates  input labels $\gckey'$ and
+    a garbled circuit $\gcsimcir$ for the security parameter
+    $\secpar$ and the output $\cirout \in \bits^\ciroutlen$;
+  \end{description}
+  satisfying the following security properties:
+  \begin{description}
+  \item[Correctness:] For any security parameter $\secpar \in \N$, for any circuit $\cir \in \circlass_\secpar$, for any input $\cirin \in \bits^{\cirinlen}$, for any $\gckey$ in the image of $\gcgen(1^\secpar)$ and any $\gccir$ in the image of $\gcgarble(\gckey, \cir)$:
+    \[ \gceval(\gccir, {\{\gckey^i_{\cirin_i}\}}_{i \in [\cirinlen]}) = \cir(\cirin)\enspace. \]
+  \item[Simulatability:] The following two distributions are computationally indistinguishable:
+    \begin{align*}
+      \bigg\{
+      ({\{\gckey^i_{\cirin_i}\}}_{i \in [\cirinlen]}, \gccir)
+      \ &: \
+          \begin{array}{l}
+            \gckey \getsr \gcgen(1^\secpar); \\
+            \gccir \getsr \gcgarble(\gckey, \cir)
+          \end{array}
+      {\bigg\}}_{\secpar, \cir \in \circlass_\secpar, \cirin \in \bits^{\cirinlen}} \enspace, \\
+      \big\{
+      (\gckey', \gccir)
+      \ &: \
+          \begin{array}{l}
+            (\gckey',\cir) \getsr \gcsim(1^\secpar, \cir(\cirin))
+          \end{array}
+          {\big\}}_{\secpar, \cir \in \circlass_\secpar, \cirin \in
+          \bits^{\cirinlen}} \enspace.
+    \end{align*}
+  \end{description}
+\end{mydefinition}
+
+We recall that garbled circuit schemes can be constructed from one-way
+functions.
+
+For the sake of simplicity, if $\cirin \in \bits^\cirinlen$ and $\gckey = {\{\gckey[i, b]\}}_{i \in
+      [\cirinlen], b \in \bits}$, we define
+$\gckey[\cirin] = \smallset{\gckey[i,\cirin_i]}_{i \in
+  [\cirinlen]}$.
+  
+  \remove{
+We extend this notation when the input is a tuple: for example, if $\cirin=(u,v) \in \bits^{\cirinlen_1} \times \bits^{\cirinlen_2}$, we define $\gckey[u] = \smallset{\gckey[i,u_i]}_{i \in [\cirinlen_1]}$ and $\gckey[v] = \smallset{\gckey[\cirinlen_1 + i,v_i]}_{i \in [\cirinlen_2]}$.
+We also abuse notation and define $\gckey[[u]]$ (resp., $\gckey[[v]]$) to be the $2\cirinlen_1$ (resp., $2\cirinlen_2$) input labels corresponding to the input wires for $u$ and $v$: $\gckey[[u]] = \smallset{\gckey[i,b]}_{i \in [\cirinlen_1],b \in \bits}$ and $\gckey[[v]] = \smallset{\gckey[\cirinlen_1 + i,b]}_{i \in [\cirinlen_2], b \in \bits}$.
+This notation is also used for $\gckey' = {\{\gckey[i]\}}_{i \in [\cirinlen]}$: $\gckey'[[u]] = \smallset{\gckey'[i]}_{i \in [\cirinlen_1]}$ and $\gckey'[[v]] = \smallset{\gckey'[\cirinlen_1 + i]}_{i \in [\cirinlen_2]}$.}
+
+
+\subsection{Multiparty Computation Protocols}
+\label{A:def-MPC}
+
+We recall the definition of semi-honest multi-party computation (MPC) protocols essentially from~\cite{Goldreich04}.
+
+\subsubsection{Syntax}
+\begin{mydefinition}[Functionality] Let $N$ be a positive integer.  An $N$-party functionality
+  $\mpcfunc$ is a deterministic function from $\bigcup_{\mpcinlen \in
+    \N} {(\bits^\mpcinlen)}^N$ to ${(\bits^*)}^N$.
+\end{mydefinition}
+
+For any $i \in [N]$, we write $f_i(\mpcvecin)$ the $i$-th element of the output tuple of $f$ on input $\mpcvecin \in \bigcup_{\mpcinlen \in \N} {(\bits^\mpcinlen)}^N$.
+For any $I \subseteq [N]$, we write $f_I(\mpcvecin) = {\{f_i(\mpcvecin)\}}_{i \in I}$.
+Similarly, $\mpcvecin_I = \smallset{x_i}_{i \in I}$.
+
+We consider MPC protocols where at each round $\round$, each party $P_i$ broadcasts a message $m_i^\round$ to all the other parties.
+
+\begin{mydefinition}[MPC Protocol]
+  \label{def:mpc}
+  Let $N$ be a positive integer, % Let $\mpcinlen =
+  % \mpcinlen(\secpar)$, $\mpcrandlen = \mpcrandlen(\
+  $\nbrounds = \nbrounds(\secpar)$ a polynomial in the security
+  parameter, and $\mpcfunc$ an $N$-party functionality.  An
+  $\nbrounds$-round \emph{MPC protocol} $\mpc$ for $\mpcfunc$ is a
+  tuple of two deterministic polynomial-time algorithms
+  $\mpc=(\mpcnext, \mpcoutput)$:
+
+  \begin{description}
+  \item[Next Message:] $\msg_{i}^\round =
+    \mpcnext_i(1^\secpar,\mpcin_i,\mpcrand_i,\vec \msg^{<\round})$ is the message
+  broadcasted by party $P_i$ for $i \in [N]$ in round $\round \in
+  [\nbrounds]$, on input $\mpcin_i \in \bits^\mpcinlen$, on random
+  tape $\mpcrand_i \in \bits^{\mpcrandlen}$, after receiving the
+  messages $\vec \msg^{<\round} = {\{\msg_j^{\round'}\}}_{j
+      \in [N],\round' < \round}$, where $\msg_j^{\round'}$ is the message broadcasted by party $P_j$ on round $\round' \in [\round-1]$, and where the input length $\mpcinlen$
+  and random tape length $\mpcrandlen$ are polynomial in the security parameter $\secpar$;
+  \item[Output:] $\mpcout_i = \mpcoutput_i(1^\secpar,
+    \mpcin_i,\mpcrand_i,\vec \msg)$ is the output of party $P_i$ for $i
+  \in [N]$, on input $\mpcin_i \in
+  \bits^\mpcinlen$, on random tape $\mpcrand_i \in
+  \bits^{\mpcrandlen}$, after receiving the messages
+  $\vec \msg = \smallset{\msg_j^\round}_{j \in [N], \round \in [\nbrounds]}$ as defined above;
+  \end{description}
+  satisfying the following property:
+  \begin{description}
+  \item[Correctness:] For any security parameter
+    $\secpar \in \N$, for any inputs $(\mpcin_1,\dots,\mpcin_N) \in
+    {(\bits^\mpcinlen)}^N$, 
+    \begin{multline*}
+      \Pr\Big[
+        \left\{\mpcoutput_i(1^\secpar,\mpcin_i,\mpcrand_i,\vec\msg)\right\}_{i \in [N]} \ne
+        \mpcfunc(\mpcin_1,\dots,\mpcin_N) \ : \ 
+      \mpcvecrand \getsr {(\bits^{\mpcrandlen})}^N
+        \Big] =0~,
+    \end{multline*}
+    where $\msg_{i}^\round =
+    \mpcnext_i(1^\secpar,\mpcin_i,\mpcrand_i,\vec \msg^{<\round})$ for $i \in [N]$ and $\round \in
+    [\nbrounds]$.
+  \end{description}
+\end{mydefinition}
+
+
+\begin{mydefinition}[View and Output]
+  Let $N$ be a positive integer. Let $\mpcfunc$ be an $N$-party functionality.
+  Let $\mpc = (\mpcnext, \mpcoutput)$ be an MPC protocol for $\mpcfunc$.
+  Let $I \subseteq [N]$.
+
+  \begin{itemize}
+  \item   The \emph{view} of parties ${\{P_i\}}_{i \in I}$ during an execution of $\mpc$ with security parameter~$\secpar$, input length $\mpcinlen$, inputs $\mpcvecin = (\mpcin_1,\dots,\mpcin_N) \in {(\bits^{\mpcinlen})}^N$, random tapes $\mpcvecrand = (\mpcrand_1,\dots,\mpcrand_N) \in {(\bits^{\mpcrandlen})}^N$ is:
+  \[ \mpcview_I(1^\secpar,\mpcvecin,\mpcvecrand) = {\left( \mpcvecin_i, \mpcvecrand_I, \vec \msg \right)}\enspace, \]
+where $\vec \msg$ is defined as in \cref{def:mpc}.
+
+\item The \emph{output} of the protocol for the parties ${\{P_i\}}_{i \in I}$ is:
+\[ \mpcoutput_I(\mpcvecin,\mpcvecrand) = \smallset{\mpcout_i}_{i \in I}\enspace, \]
+where $\mpcout_i = \mpcoutput_i(1^\secpar, \mpcin_i,\mpcrand_i, \vec \msg)$.
+
+  \end{itemize}
+
+\end{mydefinition}
+
+In the sequel, the unary representation $1^\secpar$ of the security parameter $\secpar$ is often omitted from the parameters of $\mpcnext$, $\mpcoutput$, and $\mpcview$ to simplify notation.
+
+
+\subsubsection{Security against Semi-Honest Adversaries}
+
+\begin{mydefinition}[Security against Semi-Honest Adversaries]
+  \label{def:semi-honest-mpc}
+  Let $N$ be a positive integer. Let $\mpcfunc$ be an $N$-party functionality.
+  Let $\mpc$ be an MPC protocol for~$\mpcfunc$.
+  Then $\mpc$ is \emph{secure against semi-honest adversaries} if there exists a probabilistic polynomial-time algorithm $\mpcsim$ such that for the following two distributions are computationally indistinguishable:
+  \begin{align*}
+    &{\left\{
+      \left(
+      \mpcview_I(1^\secpar, \mpcvecin, \mpcvecrand),\;
+      \mpcoutput_I(\mpcvecin,\mpcvecrand)\right)
+      \ : \
+      \mpcvecrand \getsr {(\bits^{\mpcrandlen})}^N
+      \right\}}_{\secpar,I \subseteq [N],\mpcvecin} \enspace, \\
+    &{\left\{
+      \left(\mpcsim(1^\secpar, I, \mpcvecin_{I},
+      \mpcfunc_{I}(\mpcvecin)),\;
+      \mpcfunc_I(\mpcvecin)\right)
+      \right\}}_{\secpar,I \subseteq [N],\mpcvecin} \enspace.
+  \end{align*}
+\end{mydefinition}
+
+\subsubsection{Security against Malicious Adversaries}
+We now recall the notion of security against malicious adversary. We
+focus on the case with static corruptions and security with abortion.
+We also recall that we assume that parties have access to a simultaneous broadcast channel.
+
+We first need to define the notions of ideal execution
+$\mpcideal_{I,\mpcsim}(1^\secpar,\mpcvecin)$ against a simulator
+$\mpcsim$ simulating malicious parties $\smallset{P_i}_{i \in I}$ and
+of real execution $\mpcreal_{I,\advA}(1^\secpar,\mpcvecin)$ against an
+adversary $\advA$ playing the roles of malicious parties
+$\smallset{P_i}_{i \in I}$.  Simulators $\mpcsim$ are defined as
+non-uniform \emph{expected-poly-time} interactive Turing machines
+while adversaries $\advA$ are defined as non-uniform poly-time
+interactive Turing machines.
+
+\paragraph{Ideal Execution.}
+$\mpcideal_{I,\mpcsim}(1^\secpar,\mpcvecin)$ is defined by playing the following game with the simulator $\mpcsim$:
+\begin{enumerate}
+\item The simulator is given $I$ and $\mpcvecin_I$.
+\item The simulator chooses a vector
+  $\mpcvecin'_I = \smallset{\mpcvecin'_i}_{i \in I}$ intuitively corresponding to the extracted inputs of the malicious parties. We set $\mpcin'_i = \mpcin_i$ for $i \in \bar{I}$, where $\bar{I} = [N] \setminus I$ corresponds to the set of honest parties. As usual, $\mpcvecin' = \smallset{\mpcvecin'_i}_{i \in [N]}$. % such that $\mpcvecin'_{\bar{I}} = \mpcvecin_{\bar{I}}$, where $\bar{I} = [N] \setminus I$ corresponds to the set of honest parties.
+\item The simulator is given $\mpcfunc_I(\mpcvecin')$.
+\item The simulator can then decide to abort or proceed. If it aborts, we set $\vec \mpcout_{\bar{I}} = (\perp,\dots,\perp)$, otherwise, we set $\vec \mpcout_{\bar{I}} = \mpcfunc_{\bar{I}}(\mpcvecin')$.
+\item $\mpcideal_{I,\mpcsim}(1^\secpar,\mpcvecin)$ is defined as $(\vec \mpcout_{\bar{I}}, z)$ where $z$ is the output of the simulator.
+\end{enumerate}
+
+\paragraph{Real Execution.}
+$\mpcreal_{I,\advA}(1^\secpar,\mpcvecin)$ is defined by running the MPC protocol where the adversary $\advA$ controls the malicious parties $\smallset{P_i}_{i \in I}$ while the honest parties $\smallset{P_i}_{i \in \bar{I}}$ follow the protocol. It is then defined as the pair $(\vec \mpcout_{\bar{I}}, z)$, where $\vec\mpcout_{\bar{I}}$ is the vector of outputs of the honest parties while $z$ is the output of the adversary.
+The adversary can be rushing: in each round, it can wait for all the messages from the honest parties before sending its own messages.
+
+%\paragraph{Security.}
+
+\begin{mydefinition}[Malicious Security]
+  Let $N$ be a positive integer. Let $\mpcfunc$ be an $N$-party functionality.
+  Let $\mpc$ be an MPC protocol for~$\mpcfunc$.
+  Then $\mpc$ is \emph{secure against malicious adversaries} if for any non-uniform poly-time interactive Turing machine $\advA$, there exists a non-uniform expected-poly-time interactive Turing machine $\mpcsim = \smallset{\mpcsim_\secpar}_{\secpar \in \N}$ such that:
+  \[ \smallset{\mpcideal_{I,\mpcsim}(1^\secpar,\mpcvecin)}_{\secpar,I,\mpcvecin} \approx \smallset{\mpcreal_{I,\advA}(1^\secpar,\mpcvecin)}_{\secpar,I,\mpcvecin} \enspace. \]
+\end{mydefinition}
+
+
+\subsubsection{Security against Semi-Malicious Adversaries}
+A semi-malicious adversary~\cite{EC:AJLTVW12} $\advA$ is similar to a malicious adversary, except that after each round, it has to write on a special \emph{witness tape}, pairs $(\mpcin_i,\mpcrand_i)$ of input $\mpcin_i$ and randomness $\mpcrand_i$ explaining all the messages of the malicious party $P_i$, for each $i \in I$.
+The witnesses given in each round do not need to be consistent, and the adversary is rushing: in each round, it can choose its message and witness $(\mpcin_i,\mpcrand_i)$ after having seen the messages of the other parties.
+
+More formally, we define $\mpcrealsm_{I,\advA}(1^\secpar,\mpcvecin)$ as $\mpcreal_{I,\advA}
+(1^\secpar,\mpcvecin)$ except that if at some round $\round$ one witness is invalid, then honest parties all abort (do not send any more messages) and output $\perp$.
+
+\begin{mydefinition}[Semi-Malicious Security]
+  Let $N$ be a positive integer. Let $\mpcfunc$ be an $N$-party functionality.
+  Let $\mpc$ be an MPC protocol for~$\mpcfunc$.
+  Then $\mpc$ is \emph{secure against malicious adversaries} if for any non-uniform poly-time interactive Turing machine $\advA$ (with an extra witness tape), there exists a non-uniform poly-time interactive Turing machine $\mpcsim$ such that:
+  \[ \smallset{\mpcideal_{I,\mpcsim}(1^\secpar,\mpcvecin)}_{\secpar,I,\mpcvecin} \approx \smallset{\mpcrealsm_{I,\advA}(1^\secpar,\mpcvecin)}_{\secpar,I,\mpcvecin} \enspace. \]
+\end{mydefinition}
+
+\subsubsection{Delayed-Semi-Malicious Security}
+\label{sec:def-def-mpc}
+Haitner~\cite{TCC:Haitner08} introduced the notion of defensible
+security for constructing malicious OT from semi-honest OT in a
+black-box way. In his definition, a defensible adversary is one that
+outputs at the end of the protocol execution a ``defense,'' which is a
+pair of input and randomness, and is valid if an honest player with
+this pair of input and randomness would produce exactly the same
+messages as what the adversary has sent. In other words, a defensible
+adversary is like a semi-malicious adversary, except that it only
+needs to provide a witness (as defined above) at the end of the
+execution. Haitner then gave an indistinguishability-based definition
+of OT privacy against defensible adversaries.
+
+In this work, we consider a variant of defensible adversaries,
+called \emph{delayed-semi-malicious} who are required to provide a
+witness in the {\em second last round}, and security only holds if
+this witness explains the messages of the corrupted players in {\em
+  all} rounds.  Furthermore, we define simulation-based security
+against these adversaries with a {\em universal} simulator that can
+simulate the view of the adversaries by interacting them as black-box
+in a {\em straight-line}. In slightly more detail,
+\begin{itemize}
+\item The real world is defined identically as the real world for
+  semi-malicious security, except that, the adversary $\advA$ is only
+  required to provide a witness in the {\em second last round}, that
+  is, round $\nbrounds-1$. If the witness is invalid w.r.t.\ messages
+  of the corrupted players in the first $\nbrounds-1$ rounds, then
+  honest parties all abort (do not send any more messages) and output
+  $\perp$ after round $\nbrounds-1$. In addition, if the witness is
+  invalid w.r.t.\ messages of the corrupted parties in the last round
+  $\nbrounds$, then honest parties again output $\perp$.
+  $\mpcrealdef_{I,\advA}(1^\secpar,\mpcvecin)$ denotes the outputs of
+  honest players and the adversary.
+
+\item The ideal world is defined identically as the ideal world for
+  semi-malicious security, except that, the universal simulator
+  $\mpcsim$ on input $(1^\secpar, I)$ interacts with adversary $\advA$
+  (as a black-box) in a {\em straight line}, and receives the witness
+  that $\advA$ outputs after round $\nbrounds
+  -1$. $\mpcideal_{I,\mpcsim\leftrightarrow\advA}(1^\secpar,\mpcvecin)$
+  denotes the output of honest players and $\mpcsim$.
+
+\end{itemize}
+% More formally, we define $\mpcrealdef_{I,\advA}(1^\secpar,\mpcvecin)$
+% as $\mpcreal_{I,\advA} (1^\secpar,\mpcvecin)$ except that
+% honest parties all abort and output $\perp$ if the witness provided at round $\nbrounds-1$
+% is invalid w.r.t.\ a message sent by the adversary at any round (including the last round $\nbrounds$).
+%, as
+%described above, if the witness is invalid at the round $\nbrounds-1$
+%or $\nbrounds$, then honest parties all abort (do not send any more
+%messages) and output $\perp$.
+
+\begin{mydefinition}
+  Let $N$ be a positive integer. Let $\mpcfunc$ be an $N$-party
+  functionality.  Let $\mpc$ be an MPC protocol for~$\mpcfunc$.  Then
+  $\mpc$ is \emph{delayed-semi-maliciously secure} if there exists a
+  non-uniform expected-poly-time interactive Turing machine $\mpcsim$,
+  such that, for every non-uniform poly-time interactive Turing
+  machine $\advA$:
+  \[
+  \smallset{\mpcideal_{I,\mpcsim\leftrightarrow\advA}(1^\secpar,\mpcvecin)}_{\secpar,I}
+  \approx
+  \smallset{\mpcrealdef_{I,\advA}(1^\secpar,\mpcvecin)}_{\secpar,I,\mpcvecin}
+  \enspace. \]
+\end{mydefinition}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

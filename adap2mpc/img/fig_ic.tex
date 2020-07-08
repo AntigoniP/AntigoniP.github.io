@@ -1,0 +1,78 @@
+\RequirePackage[l2tabu, orthodox]{nag}
+\RequirePackage{etoolbox}
+
+\newtoggle{full}          % false = conference version; true = full version
+\newtoggle{showoverflow}  % true = show overflows
+\newtoggle{allowtodo}     % false = remove todo command
+\newtoggle{showtodo}      % true = show todo; false = hide todo
+\newtoggle{anonymous}     % true = anonymous
+\newtoggle{submission}    % true = submission (force llncs style for crypto)
+\newtoggle{llncs}
+
+\documentclass[11pt]{standalone}
+
+\input{../tex_files/ZZ_header}
+
+\begin{document}
+\begin{tikzpicture}[>=latex]
+
+  \tikzset{
+    cstep/.style={rectangle,minimum width=1.5cm,minimum height=1cm},
+    nda/.style={circle,minimum size=0.9cm}% ,
+    %every node/.append style={thick},
+    %every path/.append style={thick}
+  }
+
+  \node[draw,cstep] (s1) at (0,0) {\small$\icnext^1$};
+  \path (s1.300) node[below=0.8cm] (y1) {\footnotesize$\icout^1$};
+  \node[draw,cstep] (s2) at (3,0) {\small$\icnext^2$};
+  \path (s2.300) node[below=0.8cm] (y2) {\footnotesize$\icout^2$};
+  \node[cstep] (s3) at (6,0) {};
+  \node[cstep] (s35) at (7,0) {\footnotesize\dots};
+  \path (s35.south) node[below=0.9cm] (ydots) {\footnotesize\dots};
+  \node[cstep] (s4) at (8,0) {};
+  \node[draw,cstep] (sL) at (11,0) {\small$\icnext^\nbrounds$};
+  \path (sL.300) node[below=0.8cm] (yL) {\footnotesize$\icout^\nbrounds$};
+  
+  \node[draw,nda] (nda1) at (1.5,1.5) {\small$\nda$};
+  \path (nda1.north) node[above=0.8cm] (w1) {\footnotesize$\vec w^1$};
+  \node[draw,nda] (nda2) at (4.5,1.5) {\small$\nda$};
+  \path (nda2.north) node[above=0.8cm] (w2) {\footnotesize$\vec w^2$};
+  \node[nda] (nda35) at (7,1.5) {};
+  \path (nda35.north) node[above=0.8cm] (wdits) {\footnotesize\dots};
+  \node[draw,nda] (ndaL1) at (9.5,1.5) {\small$\nda$};
+  \path (ndaL1.north) node[above=0.8cm] (wL1) {\footnotesize$\vec w^{\nbrounds-1}$};
+
+  \draw[->] (s1) -- node[midway,above] {\footnotesize$\icst^1$} (s2);
+  \draw[->,dashed] (s2) -- node[midway,above] {\footnotesize$\icst^2$} (s3);
+  \draw[->,dashed] (s4) -- node[midway,above] {\footnotesize$\icst^{\nbrounds-1}$} (sL);
+
+  \draw[->] (s1.60) |- (nda1);
+  \draw[->] (nda1)  -| (s2.120);
+  \draw[->] (s2.60) |- (nda2);
+  \draw[->,dashed] (nda2)  -| (s3.120);
+  \draw[->,dashed] (s4.60) |- (ndaL1);
+  \draw[->] (ndaL1)  -| (sL.120);
+
+  \path (nda1.west) -- node[midway,above] {\footnotesize$\vec q^1$} ++(-0.7,0);
+  \path (nda1.east) -- node[midway,above] {\footnotesize$\vec a^1$} ++(+0.7,0);
+  \path (nda2.west) -- node[midway,above] {\footnotesize$\vec q^2$} ++(-0.7,0);
+  \path (nda2.east) -- node[midway,above] {\footnotesize$\vec a^2$} ++(+0.7,0);
+  \path (ndaL1.west) -- node[midway,above] {\footnotesize$\vec q^{\nbrounds-1}$} ++(-0.7,0);
+  \path (ndaL1.east) -- node[midway,above] {\footnotesize$\vec a^{\nbrounds-1}$} ++(+0.7,0);
+
+  \draw[->] (w1) -- (nda1);
+  \draw[->] (w2) -- (nda2);
+  \draw[->] (wL1) -- (ndaL1);
+
+  \draw[->] (s1.300) -- (y1);
+  \draw[->] (s2.300) -- (y2);
+  \draw[->] (sL.300) -- (yL);
+
+\end{tikzpicture}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

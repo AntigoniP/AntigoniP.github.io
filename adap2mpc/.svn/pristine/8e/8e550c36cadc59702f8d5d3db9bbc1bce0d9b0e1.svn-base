@@ -1,0 +1,219 @@
+@misc{BLSV17,
+    author = {Zvika Brakerski and Alex Lombardi and Gil Segev and Vinod Vaikuntanathan},
+    title = {Anonymous IBE, Leakage Resilience and Circular Security from New Assumptions},
+    howpublished = {Cryptology ePrint Archive, Report 2017/967},
+    year = {2017},
+    note = {\url{https://eprint.iacr.org/2017/967}},
+}
+
+@misc{ITCS:BGILT17,
+    author = {Elette Boyle and Niv Gilboa and Yuval Ishai and Huijia Lin and Stefano Tessaro},
+    title = {Foundations of Homomorphic Secret Sharing},
+    howpublished = {To appear, ITCS},
+    year = {2018},
+}
+
+@InProceedings{AIK05, 
+  author={B. Applebaum and Y. Ishai and E. Kushilevitz}, 
+  booktitle={20th Annual IEEE Conference on Computational Complexity (CCC'05)}, 
+  title={Computationally private randomizing polynomials and their applications (extended abstract)}, 
+  year={2005}, 
+  pages={260-274}, 
+  keywords={computational complexity;cryptography;data privacy;functions;information theory;polynomials;random number generation;randomised algorithms;computationally private randomizing polynomials;cryptographic pseudorandom generator;function representation;garbled circuit technique;information theory;intractability assumptions;output distribution;polynomial-time computable function;randomized encoding;randomized mapping;Application software;Circuits;Computer science;Cryptography;Digital signatures;Distributed computing;Encoding;Polynomials;Public key;Security}, 
+  doi={10.1109/CCC.2005.9}, 
+  ISSN={1093-0159}, 
+  month={June},
+}
+
+@InProceedings{ISTCS:IshKus97,
+  author =   "Yuval Ishai and
+                  Eyal Kushilevitz",
+  title =        "Private Simultaneous Message Protocols with Applications",
+	 booktitle = {Proceedings of ISTCS},
+  pages =        "174--184",
+  year =         1997,
+}
+
+@BOOK{flajolet,
+	title={Analytic Combinatorics},
+	author={Flajolet, Philippe and Sedgewick, Robert},
+	publisher={Cambridge University Press},
+	year={2009},
+	month={January}
+}
+
+@techreport{Shmuely85,
+    author = {Shmuely, Z.},
+    citeulike-article-id = {887993},
+    citeulike-linkout-0 = {http://www.cs.technion.ac.il/users/wwwb/cgi-bin/tr-info.cgi/1985/CS/CS0356},
+    institution = {Technion},
+    keywords = {cryptography, dh, ifp, resiliency},
+    posted-at = {2006-10-07 02:03:21},
+    priority = {2},
+    title = {{Composite Diffie-Hellman Public-Key Generating Systems are Hard to Break}},
+    url = {http://www.cs.technion.ac.il/users/wwwb/cgi-bin/tr-info.cgi/1985/CS/CS0356},
+    volume = {CS0356},
+    year = {1985}
+}
+
+
+
+@incollection{LLL:May10,
+  author    = {Alexander May},
+  title     = {Using LLL-Reduction for Solving {RSA} and Factorization Problems},
+  booktitle = {The {LLL} Algorithm - Survey and Applications},
+  pages     = {315--348},
+  year      = {2010},
+  crossref  = {LLL25},
+}
+
+@book{LLL25,
+  editor    = {Phong Q. Nguyen and
+               Brigitte Vall{\'{e}}e},
+  title     = {The {LLL} Algorithm - Survey and Applications},
+  series    = {Information Security and Cryptography},
+  publisher = {Springer},
+  year      = {2010},
+  url       = {http://dx.doi.org/10.1007/978-3-642-02295-1},
+  doi       = {10.1007/978-3-642-02295-1},
+  isbn      = {978-3-642-02294-4},
+}
+
+
+@phdthesis{PHD:Ritzenhofen10,
+  author    = {Maike Ritzenhofen},
+  title     = {On efficiently calculating small solutions of systems of polynomial
+               equations: lattice-based methods and applications to cryptography},
+  school    = {Ruhr University Bochum},
+  year      = {2010},
+  url       = {http://www-brs.ub.ruhr-uni-bochum.de/netahtml/HSS/Diss/RitzenhofenMaike/},
+  timestamp = {Myon, 09 Jul 2012 19:19:14 +0200},
+  biburl    = {http://dblp.uni-trier.de/rec/bib/phd/de/Ritzenhofen2010},
+  bibsource = {dblp computer science bibliography, http://dblp.org}
+}
+
+@article{JACM:Boyar89,
+  author    = {Joan Boyar},
+  title     = {Inferring sequences produced by pseudo-random number generators},
+  journal   = {J. {ACM}},
+  volume    = {36},
+  number    = {1},
+  pages     = {129--141},
+  year      = {1989},
+}
+
+@article{JALG:BGGS06,
+  author    = {Simon R. Blackburn and
+               Domingo G{\'{o}}mez{-}P{\'{e}}rez and
+               Jaime Gutierrez and
+               Igor Shparlinski},
+  title     = {Reconstructing noisy polynomial evaluation in residue rings},
+  journal   = {J. Algorithms},
+  volume    = {61},
+  number    = {2},
+  pages     = {47--59},
+  year      = {2006},
+}
+
+@article{MOC:BGGS05,
+  author    = {Simon R. Blackburn and
+               Domingo G{\'{o}}mez{-}P{\'{e}}rez and
+               Jaime Gutierrez and
+               Igor Shparlinski},
+  title     = {Predicting nonlinear pseudorandom number generators},
+  journal   = {Math. Comput.},
+  volume    = {74},
+  number    = {251},
+  pages     = {1471--1494},
+  year      = {2005},
+}
+
+@phdthesis{thesis:Ritzenhofen,
+  author    = {Maike Ritwenhofen},
+  title     = {On Efficiently Calculating Small Solutions of Systems of Polynomial Equations --- Lattice-Based Methods and Applications to Cryptography},
+  month     = jan,
+  year      = 2010,
+  school    = {Ruhr-Universität Bochum, Germany},
+  note      = {\url{http://www.cits.rub.de/imperia/md/content/may/publicationen/dissertation_maikeritzenhofen.pdf}}
+}
+
+@Techreport{RFC2313,
+  author = "B. Kaliski",
+  title = "{PKCS \#1: RSA Encryption Version 1.5}",
+  type = "RFC",
+  institution = "Internet Engineering Task Force",
+  number = 2313,
+  days = 15,
+  month = mar,
+  year = 1998,
+  url = "http://www.rfc-editor.org/rfc/rfc2313.txt",
+}
+
+@article{JCSS:GolMic84,
+  author    = {Shafi Goldwasser and
+               Silvio Micali},
+  title     = {Probabilistic Encryption},
+  journal   = {J. Comput. Syst. Sci.},
+  volume    = {28},
+  number    = {2},
+  pages     = {270--299},
+  year      = {1984},
+}
+
+
+
+@article{IEEETIT:BonDur00,
+  author    = {Dan Boneh and
+               Glenn Durfee},
+  title     = {Cryptanalysis of {RSA} with private key d less than N\({}^{\mbox{0.292}}\)},
+  journal   = {{IEEE} Transactions on Information Theory},
+  volume    = {46},
+  number    = {4},
+  pages     = {1339--1349},
+  year      = {2000},
+}
+
+
+@book{BOOK:LipReg13,
+  author    = {Richard J. Lipton and
+               Kenneth W. Regan},
+  title     = {People, Problems, and Proofs - Essays from G{\"{o}}del's Lost
+               Letter: 2010},
+  publisher = {Springer},
+  year      = {2013},
+}
+
+@book{macwilliams1977theory,
+  title={The theory of error-correcting codes},
+  author={MacWilliams, Florence Jessie and Sloane, Neil James Alexander},
+  year={1977},
+  publisher={Elsevier}
+}
+
+@article{baker2001difference,
+  title={The difference between consecutive primes, II},
+  author={Baker, Roger C and Harman, Glyn and Pintz, J{\'a}nos},
+  journal={Proceedings of the London Mathematical Society},
+  volume={83},
+  number={3},
+  pages={532--562},
+  year={2001},
+  publisher={Wiley Online Library},
+  url={http://www.cs.umd.edu/~gasarch/BLOGPAPERS/BakerHarmanPintz.pdf}
+}
+
+@misc{EC:GarSri18,
+    author = {Sanjam Garg and Akshayaram Srinivasan},
+    title = {Two-Round Multiparty Secure Computation from Minimal Assumptions},
+    howpublished = {Cryptology ePrint Archive, Report 2017/1156},
+    year = {2017},
+    note = {\url{https://eprint.iacr.org/2017/1156}. To appear at Eurocrypt 2018},
+}
+
+@misc{EC:BenLin18,
+    author = {Fabrice Benhamouda and Huijia Lin},
+    title = {k-Round {MPC} from k-Round {OT} via Garbled Interactive Circuits},
+    howpublished = {Cryptology ePrint Archive, Report 2017/1125},
+    year = {2017},
+    note = {\url{https://eprint.iacr.org/2017/1125}. To appear at Eurocrypt 2018},
+}
